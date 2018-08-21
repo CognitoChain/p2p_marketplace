@@ -1,0 +1,112 @@
+{
+  "loanRequests": [
+    {
+      "kernelVersion": "0x755e131019e5ab3e213dc269a4020e3e82e06e20",
+      "issuanceVersion": "0x0688659d5e36896da7e5d44ebe3e10aa9d2c9968",
+      "principalAmount": "2000000000000000000000",
+      "principalToken": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
+      "debtor": "0x8774706fa996ac8f2d0360447eff687d8f21b7aa",
+      "debtorFee": "0",
+      "creditor": "0x0000000000000000000000000000000000000000",
+      "creditorFee": "100000000000000000000",
+      "relayer": "0x0000000000000000000000000000000000000001",
+      "relayerFee": "100000000000000000000",
+      "underwriter": "0x0000000000000000000000000000000000000000",
+      "underwriterFee": "0",
+      "underwriterRiskRating": "0",
+      "termsContract": "0x13763cf3eb3b6813fa800d4935725a0504c8eb8f",
+      "termsContractParameters": "0x040000006c6b935b8bbd400000004e203000600000006c6b935b8bbd40000000",
+      "expirationTimestampInSec": "1537361528",
+      "salt": "69611501209242482110",
+      "debtorSignature": {
+        "v": 28,
+        "r": "0xc5a20d4a9de0e200479f576ea46ba4bfdaf80a3be4d6956ab5b2aef375be7d01",
+        "s": "0x56e8da610bbfa76d5f31490b32a60ba19698e5fcbdc885916dabeba28664f527"
+      },
+      "creditorSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "underwriterSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "createdAt": 1534769553331,
+      "id": 1
+    },
+    {
+      "kernelVersion": "0x755e131019e5ab3e213dc269a4020e3e82e06e20",
+      "issuanceVersion": "0x0688659d5e36896da7e5d44ebe3e10aa9d2c9968",
+      "principalAmount": "1000000000000000000000",
+      "principalToken": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
+      "debtor": "0x8774706fa996ac8f2d0360447eff687d8f21b7aa",
+      "debtorFee": "0",
+      "creditor": "0x0000000000000000000000000000000000000000",
+      "creditorFee": "50000000000000000000",
+      "relayer": "0x0000000000000000000000000000000000000001",
+      "relayerFee": "50000000000000000000",
+      "underwriter": "0x0000000000000000000000000000000000000000",
+      "underwriterFee": "0",
+      "underwriterRiskRating": "0",
+      "termsContract": "0x13763cf3eb3b6813fa800d4935725a0504c8eb8f",
+      "termsContractParameters": "0x040000003635c9adc5dea000000027103000c00000003635c9adc5dea0000000",
+      "expirationTimestampInSec": "1537361620",
+      "salt": "12304993506686790067",
+      "debtorSignature": {
+        "v": 27,
+        "r": "0x6f62f8aec94eb8f4eb24238757b8ee69819621c09c4eb22d056c90466a60c7ec",
+        "s": "0x4f29aa7fd9c751ae26269216842811b843dae5233fb482543d0759986b4f076f"
+      },
+      "creditorSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "underwriterSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "createdAt": 1534769629339,
+      "id": 2
+    },
+    {
+      "kernelVersion": "0x755e131019e5ab3e213dc269a4020e3e82e06e20",
+      "issuanceVersion": "0x0688659d5e36896da7e5d44ebe3e10aa9d2c9968",
+      "principalAmount": "100000000000000000000",
+      "principalToken": "0x3b3909585ba1a3237478b04936a27c328bae6855",
+      "debtor": "0x8774706fa996ac8f2d0360447eff687d8f21b7aa",
+      "debtorFee": "0",
+      "creditor": "0x0000000000000000000000000000000000000000",
+      "creditorFee": "5000000000000000000",
+      "relayer": "0x0000000000000000000000000000000000000001",
+      "relayerFee": "5000000000000000000",
+      "underwriter": "0x0000000000000000000000000000000000000000",
+      "underwriterFee": "0",
+      "underwriterRiskRating": "0",
+      "termsContract": "0x13763cf3eb3b6813fa800d4935725a0504c8eb8f",
+      "termsContractParameters": "0x07000000056bc75e2d63100000002710200040700000056bc75e2d6310000000",
+      "expirationTimestampInSec": "1537448532",
+      "salt": "35785114847364615671",
+      "debtorSignature": {
+        "v": 28,
+        "r": "0xdc0c6dffa5077e856d9411779ab446bff80949355afbe1f947ebca75a0e36603",
+        "s": "0x3ba453be6f8b992aafaf1500af8c11d8b5a9ac69e7f6445bdff8a774392cfbf5"
+      },
+      "creditorSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "underwriterSignature": {
+        "r": "",
+        "s": "",
+        "v": 0
+      },
+      "createdAt": 1534856553729,
+      "id": 3
+    }
+  ]
+}
