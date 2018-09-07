@@ -83,6 +83,7 @@ class CreateLoanRequest extends Component {
         try {
             const { dharma } = this.props;
             const currentAccount = await dharma.blockchain.getCurrentAccount();
+            console.log("createLoanRequest() - currentAccount: ", currentAccount);
             const loanRequest = await this.generateLoanRequest(currentAccount);
 
             const id = await api.create("loanRequests", loanRequest.toJSON());
@@ -104,7 +105,7 @@ class CreateLoanRequest extends Component {
         const { Tokens } = Dharma.Types;
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-
+        console.log("setHasSufficientAllowance() - currentAccount: ", currentAccount);
         const tokens = new Tokens(dharma, currentAccount);
 
         const tokenData = await tokens.getTokenDataForSymbol(symbol);
@@ -125,7 +126,7 @@ class CreateLoanRequest extends Component {
         const { collateralTokenSymbol } = this.state;
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-
+        console.log("authorizeCollateralTransfer() - currentAccount: ", currentAccount);
         const allowance = new Allowance(dharma, currentAccount, collateralTokenSymbol);
 
         const txHash = await allowance.makeUnlimitedIfNecessary();

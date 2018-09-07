@@ -53,10 +53,12 @@ class DharmaProvider extends Component {
         });
 
         dharma.blockchain.getAccounts().then((accounts) => {
+            console.log("getUserTokens() - accounts: ", accounts);
             const owner = accounts[0];
-
+            console.log("getUserTokens() - dharma: ", dharma);
+            console.log("getUserTokens() - owner: ", owner);
             const tokens = new Tokens(dharma, owner);
-
+            console.log("getUserTokens() - tokens: ", tokens);
             tokens.get().then((tokenData) => {
                 this.setState({
                     tokens: tokenData,
