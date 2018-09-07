@@ -1,7 +1,7 @@
-const defaultAPI = process.env.REACT_APP_API_SERVER || "";
+const defaultAPI = process.env.REACT_APP_API_SERVER || "/api";
 
 class Api {
-    constructor(apiUrl) {
+    constructor(apiUrl) {        
         this.apiUrl = apiUrl || defaultAPI;
     }
 
@@ -41,13 +41,20 @@ class Api {
      * @param params
      * @returns {Promise}
      */
-    get(resource, params) {
+    get(resource, params) {        
         const query = params ? `?${this.parseQueryParams(params)}` : '';
-
+        console.log("GET "+this.apiUrl+ "/"+ resource+query)
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}${query}`)
-                .then((response) => resolve(response.json()))
-                .catch((reason) => reject(reason));
+                .then((response) => {
+                 let json = response.json()
+                 console.log("response: ", json);
+                 resolve(json)
+                })
+                .catch((reason) => {
+                    console.log("error: ", reason);
+                    reject(reason)
+                });
         });
     }
 
@@ -59,6 +66,7 @@ class Api {
      * @returns {Promise}
      */
     delete(resource, id) {
+        console.log("DELETE ", this.apiUrl, "/", resource, "/", id)
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}/${id}`, { method: "DELETE" })
                 .then((response) => resolve(response.json()))
@@ -73,7 +81,8 @@ class Api {
      * @param data
      * @returns {Promise<any>}
      */
-    create(resource = "loanRequests", data) {
+    create(resource = "newLoanRequest", data) {
+        console.log("POST ", this.apiUrl, "/", resource, " data:", data)
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}`, {
                 method: "POST",

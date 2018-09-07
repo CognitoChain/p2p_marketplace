@@ -8,8 +8,9 @@ const path = require("path");
 var proxyRules = new HttpProxyRules({
 rules: {
 '/api/ping': 'http://localhost:3000/ping',
+'/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1', 
 '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all', 
-'/api/newLoanRequests': 'http://localhost:3000/loanrequest/save',
+'/api/newLoanRequest': 'http://localhost:3000/loanrequest/save',
 '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
 '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
 
