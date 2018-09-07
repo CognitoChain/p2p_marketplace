@@ -2,7 +2,7 @@ const jsonServer = require("json-server");
 const path = require("path");
 
 // NOTE: This should change to the network that you're wanting to deploy against.
-const network = process.env.NETWORK || "local";
+const network = process.env.NETWORK || "kovan";
 
 const server = jsonServer.create();
 
@@ -70,6 +70,6 @@ server.use((req, res, next) => {
 });
 
 server.use(router);
-server.listen(process.env.PORT || 8000, () => {
+server.listen(process.env.PORT || 8080, () => {
   console.log(`JSON Server is running for ${network} blockchain`);
 });
