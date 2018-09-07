@@ -128,7 +128,7 @@ class LoanRequest extends Component {
         const { Tokens } = Dharma.Types;
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        console.log("currentAccount: ", currentAccount);
+
         const tokens = new Tokens(dharma, currentAccount);
         const terms = loanRequest.getTerms();
 

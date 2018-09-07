@@ -1,76 +1,75 @@
-//var http = require('http')
-const jsonServer = require("json-server")
-const httpProxy = require('http-proxy');
-const  HttpProxyRules = require('http-proxy-rules');
+const jsonServer = require("json-server");
 const path = require("path");
 
-// Set up proxy rules instance
-var proxyRules = new HttpProxyRules({
-rules: {
-'/api/ping': 'http://localhost:3000/ping',
-'/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1', 
-'/api/loanRequests/*': 'http://localhost:3000/loanrequest/all', 
-'/api/newLoanRequest': 'http://localhost:3000/loanrequest/save',
-'/api/relayerFee': 'http://localhost:3000/config/relayerFee',
-'/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
-
-}
-});
-
-// Create reverse proxy instance
-var proxy = httpProxy.createProxy();
+// NOTE: This should change to the network that you're wanting to deploy against.
+const network = process.env.NETWORK || "kovan";
 
 const server = jsonServer.create();
-//const server = http.create();
+
+// The database we "connect" to should depend on the network we're deploying for.
+const db = `db-${network}.json`;
+
+const router = jsonServer.router(`data/${db}`);
 
 const middlewares = jsonServer.defaults({
   static: path.join(__dirname, "build")
 });
 
-// server.use(middlewares);
-// server.use(jsonServer.bodyParser);
+/**
+ * This is where you put your address to start receiving fees.
+ * @type {string}
+ */
+const RELAYER_ADDRESS = "0xcdad1af8b76b77bf6ae0b30bc2413865d3fa0cdd";
 
-server.get("/api/*", 
-// function(req, res){ 
-//   apiProxy.web(req, res, { target: 'http://google.com:80' });
-// }
-  function(req, res) {
-    // a match method is exposed on the proxy rules instance
-    // to test a request to see if it matches against one of the specified rules
-    var target = proxyRules.match(req);
-    console.log("GET target: ", target, " req: ", req.url)
-    
-    if (target) {    
-      proxy.web(req, res, { target: target });
-    } else {
-      res.statusCode = 404;
-      res.json({ error: 'Not Found' })
-    }
-  }
-);
-
-
-server.post("/api/*", 
-// function(req, res){ 
-//   apiProxy.web(req, res, { target: 'http://google.com:80' });
-// }
-  function(req, res) {
-    // a match method is exposed on the proxy rules instance
-    // to test a request to see if it matches against one of the specified rules
-    var target = proxyRules.match(req);
-    console.log("POST target: ", target, " req: ", req.url)
-    if (target) { 
-        proxy.web(req, res, { target: target });
-    } else {
-      res.statusCode = 404;
-      res.json({ error: 'Not Found' })
-    }
-  }
-);
+/**
+ * This is an example of a way to set a fee amount per order filled.
+ * @type {number}
+ */
+const FEE_PERCENT = 2;
 
 server.use(middlewares);
-//server.use(jsonServer.bodyParser);
 
+/**
+ * An example function to show how we might add fees, given some data about the loan.
+ *
+ * @param loanData
+ */
+const getFee = loanData => {
+  const principalAmount = parseFloat(loanData.principalAmount);
+
+  if (!principalAmount) {
+    return 0;
+  }
+
+  // In this example we return a fee of 5% of the principal amount, rounded down to 2 decimals.
+  const totalFee = (principalAmount / 100) * FEE_PERCENT;
+  return totalFee.toFixed(2);
+};
+
+server.use(jsonServer.bodyParser);
+
+// The client can request a relayer fee for some given loan data.
+server.get("/relayerFee", (req, res) => res.json({ fee: getFee(req.query) }));
+server.get("/relayerAddress", (req, res) =>
+  res.json({ address: RELAYER_ADDRESS })
+);
+
+// Add a "createdAt" field for each new LoanRequest.
+server.use((req, res, next) => {
+  if (req.method === "POST") {
+    console.log("request url ", req.url);
+    console.log("body:\n", req.body);
+    req.body.createdAt = Date.now();
+
+    // NOTE: Here one could check if the relayer address and fee match the
+    // expected values.
+  }
+
+  // Continue to JSON Server router
+  next();
+});
+
+server.use(router);
 server.listen(process.env.PORT || 8080, () => {
-  console.log(`JSON Server started  on port ${process.env.PORT }`);
+  console.log(`JSON Server is running for ${network} blockchain`);
 });
