@@ -2,7 +2,7 @@ const jsonServer = require("json-server");
 const path = require("path");
 
 // NOTE: This should change to the network that you're wanting to deploy against.
-const network = process.env.NETWORK || "local";
+const network = process.env.NETWORK || "kovan";
 
 const server = jsonServer.create();
 
