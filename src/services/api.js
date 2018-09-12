@@ -81,7 +81,7 @@ class Api {
      * @param data
      * @returns {Promise<any>}
      */
-    create(resource = "newLoanRequest", data) {
+    create(resource = "loanRequests", data) {
         console.log("POST ", this.apiUrl, "/", resource, " data:", data)
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}`, {
