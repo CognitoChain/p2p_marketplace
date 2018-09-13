@@ -2,6 +2,8 @@ const jsonServer = require("json-server")
 const httpProxy = require('http-proxy');
 const HttpProxyRules = require('http-proxy-rules');
 const path = require("path");
+process.env.NODE_ENV = 'development';
+require('./config/env');
 
 // Set up proxy rules instance
 var getProxyRules = new HttpProxyRules({

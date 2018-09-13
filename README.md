@@ -10,7 +10,9 @@ Based on the Dharma Relayer kit:
 ```
 https://github.com/dharmaprotocol/relayer-kit
 ```
- 
+# Install latest packages
+yarn install
+
 # Start Local Dev environment
 ```
 $ yarn blockchain
