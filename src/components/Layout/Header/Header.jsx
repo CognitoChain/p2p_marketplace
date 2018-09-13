@@ -31,6 +31,10 @@ class Header extends Component {
           <LinkContainer to="/investments">
             <NavItem>Investments</NavItem>
           </LinkContainer>
+
+          <LinkContainer to="/login">
+            <NavItem>Login</NavItem>
+          </LinkContainer>
         </Nav>
       </Navbar>
     );

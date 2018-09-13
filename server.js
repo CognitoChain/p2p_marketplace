@@ -17,7 +17,8 @@ var getProxyRules = new HttpProxyRules({
 
 var postProxyRules = new HttpProxyRules({
   rules: {
-    '/api/loanRequests': 'http://localhost:3000/loanrequest/save'
+    '/api/loanRequests': 'http://localhost:3000/loanrequest/save',
+    '/api/goauthlogin': 'http://localhost:3000/goauthlogin'
   }
 });
 

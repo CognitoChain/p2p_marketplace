@@ -8,6 +8,7 @@ import LoanRequestsContainer from "../../../containers/LoanRequests";
 import CreateLoanRequestContainer from "../../../containers/CreateLoanRequest";
 import TokensContainer from "../../../containers/Tokens";
 import LoanRequestContainer from "../../../containers/LoanRequest";
+import LoginContainer from "../../../containers/LoginContainer";
 
 // Styling
 import "./Main.css";
@@ -24,6 +25,7 @@ class Main extends Component {
                         <Route path="/tokens" component={TokensContainer} />
                         <Route path="/request/:id" component={LoanRequestContainer} />
                         <Route path="/investments" component={InvestmentsContainer} />
+                        <Route path="/login" component={LoginContainer} />
                     </Switch>
                 </Grid>
             </main>
