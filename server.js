@@ -8,9 +8,16 @@ var getProxyRules = new HttpProxyRules({
   rules: {
     '/api/ping': 'http://localhost:3000/ping',
     '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1', 
-    '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all', 
+    '/api/user/loanRequests': 'http://localhost:3000/user/loanrequests',    
+    '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all',
     '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
-    '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress'
+    '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
+
+    '/api/swagger-ui.html': 'http://localhost:3000/swagger-ui.html',
+    '/api/webjars/(.+)': 'http://localhost:3000/webjars/$1',
+    '/api/swagger-resources(.*)': 'http://localhost:3000/swagger-resources/$1',
+    '/api/v2/(.+)': 'http://localhost:3000/v2/$1'
+
   }
 });
 
