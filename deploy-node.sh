@@ -26,28 +26,24 @@ cd $dir
 scp -i "MyEC2Key.pem" build.zip ec2-user@${EC2HOST}:
 rm -f $dir/build.zip
 ssh -i "MyEC2Key.pem"  ec2-user@${EC2HOST} <<'ENDSSH'
-    echo "1. deleting..."
+    echo "1. deleting ~/deploy dir ..."
     rm -rf ~/deploy
     mkdir -p ~/deploy/build
 
-    echo "2. unzipping..."
+    echo "2. unzipping build.zip ..."
     unzip -o ~/build.zip -d ~/deploy/
 
-    echo "3. killing node service"
-    app_pid=`ps auxw | grep server.js | grep -v grep | cut -d ' ' -f 2`
+    echo "3. stopping 'relayer' service"
+    sudo systemctl stop relayer
 
-    if [[ -z $app_pid ]]; then
-        echo "no server.js process found."
-    else 
-        echo "killing server.js process $app_pid"
-        kill $app_pid
-    fi
+    echo "4. coping new code onto destination dir ..."
+    cp -R ~/deploy/* /usr/local/cognitochain/relayer/
 
-    echo "starting server.js ..."
-    cd deploy
-    nohup yarn server &>server.out &
-    echo "done."
-    ps auxw | grep server.js | grep -v grep | cut -d ' ' -f 2
+    echo "5. starting 'relayer' service ..."
+    sudo systemctl daemon-reload
+    sudo systemctl start relayer
+    sudo systemctl status relayer
+
 ENDSSH
 
 cd $projdir
