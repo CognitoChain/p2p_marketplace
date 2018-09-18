@@ -1,14 +1,15 @@
 import React from 'react';
-import validators from '../../../validators';
 import { Link } from 'react-router-dom';
-import './Register.css';
 import {Row,Col,Container} from 'reactstrap';
+import { toast } from 'react-toastify';
+import validators from '../../../validators';
+import './Register.css';
+import Api from "../../../services/api";
+
 class Register extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            firstname: '',
-            lastname: '',
             email: '',
             password: '',
             error: null,
@@ -45,11 +46,13 @@ class Register extends React.Component{
     }
     isFormValid() {
         let status = true;
-        // Object.keys(this.validators).forEach((field) => {
-        //   if (!this.validators[field].valid) {
-        //     status = false;
-        //   }
-        // });
+        Object.keys(this.validators).forEach((field) => {
+          if(field=='email' || field=='password' ){
+            if (!this.validators[field].valid) {
+              status = false;
+            }
+          }
+        });
         return status;
     }
     displayValidationErrors(fieldName) {
@@ -68,34 +71,25 @@ class Register extends React.Component{
       }
       return result;
     }
-     register(event) {
-        // const {
-        //   firstname,
-        //   lastname,
-        //   email,
-        //   password,
-        // } = this.state;
-        // auth.doCreateUserWithEmailAndPassword(email, password)
-        //   .then(authUser => {
-        //     db.doCreateUser(authUser.user.uid, firstname,lastname, email)
-        //     .then(() => {
-        //       this.setState(() => ({
-        //         firstname:firstname,
-        //         lastname,lastname,
-        //         email:email,
-        //         password:password,
-        //       }));
-        //       this.props.history.push("/login");
-        //     })
-        //     .catch(error => {
-        //       alert('Something went wrong');
-        //     });
-        //   })
-        //   .catch(error => {
-        //     alert('Something went wrong');
-        //   });
-          this.props.history.push("/dashboard");
-          event.preventDefault();
+    async register(event) {
+      event.preventDefault();
+      const {
+        email,
+        password,
+      } = this.state;
+      const api = new Api();
+      const response = await api.create("sign-up", {
+        username:email,
+        password:password
+      });
+      
+      if(response.status === "SUCCESS"){
+        /* Store token in localstorage */
+        this.props.history.push("/dashboard");
+      }
+      else{
+        toast.error(response.status);
+      }  
     }
     render(){
         return(
@@ -116,18 +110,6 @@ class Register extends React.Component{
                     <Col lg={4} md={6} className=" bg-white">
                       <div className="login-fancy pb-40 clearfix">
                         <h3 className="mb-30">Signup</h3>
-                        <Row>
-                          <div className="section-field mb-20 col-sm-6">
-                            <label className="mb-10" htmlFor="fname">First name* </label>
-                            <input id="firstname" value={this.state.firstname} className="web form-control" type="text" placeholder="First name" name="firstname" onChange={this.onchange} />
-                            { this.displayValidationErrors('firstname') }
-                          </div>
-                          <div className="section-field mb-20 col-sm-6">
-                            <label className="mb-10" htmlFor="lname">Last name* </label>
-                            <input id="lastname" value={this.state.lastname} className="web form-control" type="text" placeholder="Last name" name="lastname" onChange={this.onchange} />
-                            { this.displayValidationErrors('lastname') }
-                          </div>
-                        </Row>
                         <div className="section-field mb-20">
                           <label className="mb-10" htmlFor="email">Email* </label>
                           <input type="email" value={this.state.email} placeholder="Email*" id="email" className="form-control" name="email" onChange={this.onchange} />

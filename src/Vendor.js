@@ -6,6 +6,8 @@ import 'font-awesome/css/font-awesome.min.css';
 
 import '../node_modules/jquery/dist/jquery.js';
 
+import 'react-toastify/dist/ReactToastify.min.css';
+
 //Themify Icon Css
 import './assets/themify-icons/themify-icons.css';
 
