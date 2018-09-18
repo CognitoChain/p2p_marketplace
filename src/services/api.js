@@ -81,7 +81,7 @@ class Api {
      * @param data
      * @returns {Promise<any>}
      */
-    create(resource = "newLoanRequest", data) {
+    create(resource = "loanRequests", data) {
         console.log("POST ", this.apiUrl, "/", resource, " data:", data)
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}`, {
@@ -93,14 +93,8 @@ class Api {
                 body: JSON.stringify(data),
             })
                 .then(async (response) => {
-                    if(resource === "newLoanRequest"){
-                        const loanRequest = await response.json();
-                        resolve(loanRequest.id);
-                    }
-                    else{
-                        const json = await response.json();
-                        resolve(json);
-                    }
+                    const json = await response.json();
+                    resolve(json);
                 })
                 .catch((reason) => reject(reason));
         });
