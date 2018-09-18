@@ -8,6 +8,12 @@ projdir=./
 dir=../aws/ 
 
 yarn build
+if [ $? -ne 0 ] 
+then
+  echo "yarn build exited with error $?"
+  exit 1
+fi
+
 rm -f $dir/build.zip
 
 # create new build.zip in 'cognito/aws' dir
@@ -37,10 +43,11 @@ ssh -i "MyEC2Key.pem"  ec2-user@${EC2HOST} <<'ENDSSH'
     sudo systemctl stop relayer
 
     echo "4. coping new code onto destination dir ..."
+    #sudo rm -rf /usr/local/cognitochain/relayer/*
     cp -R ~/deploy/* /usr/local/cognitochain/relayer/
 
     echo "5. starting 'relayer' service ..."
-    sudo systemctl daemon-reload
+   
     sudo systemctl start relayer
     sudo systemctl status relayer
 

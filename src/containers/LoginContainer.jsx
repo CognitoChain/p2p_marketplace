@@ -39,14 +39,16 @@ class LoginContainer extends Component {
         }
 
         if (type === "google") {
-            console.log("have google profile: ", res.w3.U3);
-            console.log("tokenId: ", res.tokenId)  ;          
+            console.log("have google profile: ", res.w3.U3);     
             this.googleSignIn(res.tokenId).then(response => {
-                console.log("logged-in as '", response.name, "' email: ", response.email);
+                let auth = response.headers.get('authorization');
+                console.log("authorization: ", auth);
+                console.log("logged-in as '", response.name, "' email: ", response.email, " ==> ", auth);
                 this.setState({
                     name: response.name,
                     email: response.email,
-                    pictureUrl: response.pictureUrl
+                    pictureUrl: response.pictureUrl,
+                    auth: auth
                 })
             });
         }
@@ -102,6 +104,7 @@ class LoginContainer extends Component {
                  <br /> Email: {this.state.email}  
                  <br /><br />
                  <img src={this.state.pictureUrl} />
+                 <br /><br />Authorization: {this.state.auth} 
             </div>
         }
 
