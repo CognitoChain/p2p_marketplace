@@ -144,16 +144,35 @@ class Sidebar extends Component{
             
               <ul className="nav navbar-nav side-menu" id="sidebarnav">
                 {/* <!-- menu item Dashboard--> */}
-                <li className="active">
-                  <Link to="/dashboard"><i className="ti-home"></i><span className="right-nav-text">Dashboard</span></Link>  
+                <li className="">
+                  <Link to="/market"><i className="ti-home"></i><span className="right-nav-text">Market</span></Link>
+                </li>  
+                <li className="">
+                  <Link to="/dashboard"><i className="ti-home"></i><span className="right-nav-text">My Loans</span></Link>  
                 </li>
-                <li className="active">
-                  <Link to="/dashboard"><i className="ti-home"></i><span className="right-nav-text">Market</span></Link>  
-                </li>
-                <li className="active">
-                  <Link to="/dashboard"><i className="ti-home"></i><span className="right-nav-text">My Wallet</span></Link>  
+                <li className="">
+                  <Link to="/wallet"><i className="ti-wallet"></i><span className="right-nav-text">My Wallet</span></Link>  
                 </li>
               </ul>
+            </div>
+
+            <div className="sidebar-bottom-section">
+              <hr className="grey-hr" />
+              <div className="details-container">
+                <div>Contact Us</div>
+                <div className="support-email">support@cognitochain.io</div>
+              </div>
+
+              <div>
+                <ul className="sidebar-links">
+                  <li>
+                    <Link to="/privacy-policy">Privacy Policy</Link>
+                  </li>  
+                  <li>
+                    <Link to="/terms-and-conditions">Terms and conditions</Link>  
+                  </li>
+                </ul>
+              </div>
             </div>
           </ScrollArea> 
         </div> 

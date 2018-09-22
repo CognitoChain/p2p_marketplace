@@ -369,7 +369,7 @@
   position: fixed;
   top: 58px;
   left: 0;
-  width: 230px;
+  width: 180px;
   margin-left: 0;
   bottom: 0;
   z-index: 100;
@@ -784,7 +784,7 @@ a.button-toggle-nav {
 }
 
 .content-wrapper {
-  margin-left: 230px;
+  margin-left: 180px;
   background: $body;
   position: relative;
   @include transition (all, 0.5s, ease);
@@ -1073,4 +1073,31 @@ a.button-toggle-nav {
 
   }
 
+}
+
+.side-menu-fixed .side-menu{
+  padding-top:0px !important;
+}
+
+.sidebar-bottom-section{
+  bottom:50px !important;
+  position:fixed;
+  color:$sidebar_color !important;
+  padding:15px;
+}
+.details-container{
+  margin-bottom:40px;
+}
+.sidebar-links{
+  list-style: none !important;
+}
+.sidebar-links li{
+  margin-bottom:10px;
+  font-size:12px;
+}
+.grey-hr{
+  background-color:$grey;
+}
+.support-email{
+  margin-top:10px;
 }

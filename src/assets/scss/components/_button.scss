@@ -60,6 +60,27 @@ button {
   	 }
   }
  
+  .button.orange { 
+	background: $orange; 
+	color: $white; 
+	border:2px solid $orange;
+
+	&:hover {
+	  background: $theme-color; 
+	  color: $white; 
+	  border-color: $theme-color;
+	 }
+	&:active {
+	  background: $theme-color; 
+	  color: $white; 
+	  border-color: $theme-color;
+	 }
+	 &:focus {
+	  background: $theme-color; 
+	  color: $white; 
+	  border-color: $theme-color;
+	 }
+}
 
 .button.gray {
     background: $border-color; 
@@ -315,3 +336,4 @@ button {
 	margin-left: 0; 
 }
  
+

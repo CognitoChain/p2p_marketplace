@@ -49,7 +49,7 @@ class LoanRequest extends Component {
 
         const api = new Api();
 
-        api.get(`loanRequests/${id}`).then(async (loanRequestData) => {
+        api.setToken(this.props.token).get(`loanRequests/${id}`).then(async (loanRequestData) => {
             const loanRequest = await LoanRequest.load(dharma, loanRequestData);
             this.setState({ loanRequest });
             this.reloadState();

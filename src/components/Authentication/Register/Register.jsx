@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import {Row,Col,Container} from 'reactstrap';
 import { toast } from 'react-toastify';
 import validators from '../../../validators';
-import './Register.css';
 import Api from "../../../services/api";
+import './Register.css';
+
 
 class Register extends React.Component{
     constructor(props){
@@ -84,7 +85,6 @@ class Register extends React.Component{
       });
       
       if(response.status === "SUCCESS"){
-        /* Store token in localstorage */
         this.props.history.push("/dashboard");
       }
       else{

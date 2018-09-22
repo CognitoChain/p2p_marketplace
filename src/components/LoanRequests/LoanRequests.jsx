@@ -1,7 +1,7 @@
 // External libraries
+import React, { Component } from 'react';
 import Dharma from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
-import React, { Component } from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 
 // Components
@@ -49,7 +49,6 @@ const columns = [
 class LoanRequests extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             loanRequests: [],
             highlightRow: null,
@@ -80,13 +79,18 @@ class LoanRequests extends Component {
         const sort = "createdAt";
         const order = "desc";
 
-        api.get("loanRequests", { sort, order })
+        api.setToken(this.props.token).get("loanRequests", { sort, order })
             .then(this.parseLoanRequests)
             .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                if(error.status && error.status === 403){
+                    this.props.redirect(`/login/`);
+                }
+            });
     }
 
     parseLoanRequests(loanRequestData) {
+        console.log(loanRequestData)
         return Promise.all(loanRequestData.map(this.parseLoanRequest));
     }
 
@@ -104,7 +108,9 @@ class LoanRequests extends Component {
         const { LoanRequest } = Dharma.Types;
 
         return new Promise((resolve) => {
+            console.log("A");
             LoanRequest.load(dharma, datum).then((loanRequest) => {
+                console.log(loanRequest);
                 resolve({
                     ...loanRequest.getTerms(),
                     id: datum.id,
@@ -122,7 +128,7 @@ class LoanRequests extends Component {
      */
     getData() {
         const { loanRequests } = this.state;
-
+        console.log(loanRequests)
         return loanRequests.map((request) => {
             return {
                 ...request,

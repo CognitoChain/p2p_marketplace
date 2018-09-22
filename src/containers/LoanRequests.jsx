@@ -10,7 +10,6 @@ import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 class LoanRequestsContainer extends Component {
     constructor(props) {
         super(props);
-
         this.redirect = this.redirect.bind(this);
         this.parseQueryParams = this.parseQueryParams.bind(this);
     }
@@ -43,6 +42,7 @@ class LoanRequestsContainer extends Component {
             <DharmaConsumer>
                 {(dharmaProps) => (
                     <LoanRequests
+                        token={this.props.token}
                         dharma={dharmaProps.dharma}
                         redirect={this.redirect}
                         highlightRow={highlightRow}

@@ -1,10 +1,19 @@
 const defaultAPI = process.env.REACT_APP_API_SERVER || "/api";
 
 class Api {
-    constructor(apiUrl) {        
+    constructor(apiUrl,token) {        
         this.apiUrl = apiUrl || defaultAPI;
     }
-
+    setToken(token){
+        this.token = token;
+        return this;
+    }
+    processResponse(response){
+        console.log(response)
+        console.log(response.headers.get('Authorization'))
+        //if(response.status === 403)
+            //localStorage.removeItem('token');
+    }
     /**
      * Makes a GET request to the API server, and returns a promise
      * with the resulting JSON response.
@@ -44,15 +53,33 @@ class Api {
     get(resource, params) {        
         const query = params ? `?${this.parseQueryParams(params)}` : '';
         console.log("GET "+this.apiUrl+ "/"+ resource+query)
+        console.log("Token "+this.token)
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${resource}${query}`)
+            let obj = {};
+        
+            if(this.token){
+                let obj = {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': this.token,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            }
+            fetch(`${this.apiUrl}/${resource}${query}`,obj)
                 .then((response) => {
-                 let json = response.json()
-                 console.log("response: ", json);
-                 resolve(json)
+                    this.processResponse(response);
+                    if(response.ok){
+                        let json = response.json()
+                        //console.log("response: ", json);
+                        resolve(json)
+                    }
+                    else{
+                        reject(response)
+                    }
                 })
                 .catch((reason) => {
-                    console.log("error: ", reason);
+                    //console.log("error: ", reason);
                     reject(reason)
                 });
         });
@@ -89,13 +116,26 @@ class Api {
                 cache: "no-cache",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': this.token,
                 },
                 body: JSON.stringify(data),
             })
-                .then(async (response) => {
-                    const json = await response.json();
-                    resolve(json);
-                })
+            .then(async (response) => {
+                this.processResponse(response);
+                if(response.ok){
+                    if(resource === "login"){
+                        resolve(response);
+                    }
+                    else{
+                        const json = await response.json();
+                        resolve(json);    
+                    }
+                }
+                else{
+                    reject(response)
+                }
+                
+            })
                 .catch((reason) => reject(reason));
         });
     }

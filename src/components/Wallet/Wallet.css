@@ -1,0 +1,22 @@
+.eth-address{
+	font-size: 16px;
+	font-weight: bolder;
+	margin-top: 5px;
+}
+.crypto-currency-text{
+	margin-left:10px;
+}
+.card .card-body .icon-box{
+	height: 40px !important;
+	width: 40px !important;
+}
+.card.card-statistics .icon-box .highlight-icon {
+	font-size: 20px !important;
+	line-height: 40px !important;
+}
+.card-statistics .card-body{
+	padding: 0.75em;
+}
+.btn.cognito.x-small {
+   	font-size: 0.90em !important;
+}
