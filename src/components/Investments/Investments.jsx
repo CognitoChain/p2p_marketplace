@@ -48,13 +48,11 @@ class Investments extends React.Component {
 
     async componentDidMount() {
         const { dharma } = this.props;
-
         const { Investments } = Dharma.Types;
 
         const creditor = await dharma.blockchain.getCurrentAccount();
-
         const investments = await Investments.getExpandedData(dharma, creditor);
-
+        console.log("investments: ", investments);
         this.setState({
             investments,
         });

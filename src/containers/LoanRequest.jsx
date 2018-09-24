@@ -15,10 +15,11 @@ class LoanRequestContainer extends Component {
         this.onFillComplete = this.onFillComplete.bind(this);
     }
 
-    async onFillComplete(id) {
+    async onFillComplete(id, currentAccount) {
         const api = new Api();
-
-        await api.delete("loanRequests", id);
+        let data = {'address': currentAccount};
+        console.log("updating loan request - data: ", data)
+        await api.put("loanRequests", id, data);
 
         this.props.history.push(`/investments`);
     }
@@ -35,7 +36,8 @@ class LoanRequestContainer extends Component {
                             dharma={ dharmaProps.dharma }
                             onFillComplete={ async () => {
                                 dharmaProps.refreshTokens();
-                                await this.onFillComplete(id);
+                                const currentAccount = await dharmaProps.dharma.blockchain.getCurrentAccount();
+                                await this.onFillComplete(id, currentAccount);
                             } }
                         />
                     )

@@ -47,7 +47,7 @@ ssh -i "MyEC2Key.pem"  ec2-user@${EC2HOST} <<'ENDSSH'
     cp -R ~/deploy/* /usr/local/cognitochain/relayer/
 
     echo "5. starting 'relayer' service ..."
-   
+    sudo systemctl daemon-reload
     sudo systemctl start relayer
     sudo systemctl status relayer
 

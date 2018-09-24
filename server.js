@@ -32,6 +32,19 @@ var postProxyRules = new HttpProxyRules({
   }
 });
 
+var deleteProxyRules = new HttpProxyRules({
+  rules: {
+    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1'
+  }
+});
+
+var putProxyRules = new HttpProxyRules({
+  rules: {
+    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1'
+  }
+});
+
+
 // Create reverse proxy instance
 var proxy = httpProxy.createProxy();
 const server = jsonServer.create();
@@ -45,8 +58,12 @@ const middlewares = jsonServer.defaults({
 function proxyRequestHandler(req, res, proxyRules) {
   var target = proxyRules.match(req);
   console.log(req.method, "\t", req.originalUrl, " -> ", target)  
-  if (target) {    
-    proxy.web(req, res, { target: target });
+  if (target) {   
+    try { 
+       proxy.web(req, res, { target: target });
+    } catch(err) {
+      console.log(err);
+    }
   } else {
     res.statusCode = 404;
     res.json({ error: 'Not Found' })
@@ -62,6 +79,18 @@ server.get("/api/*", function(req, res) {
 // POST requests use 'postProxyRules'
 server.post("/api/*", function(req, res) {
     proxyRequestHandler(req, res, postProxyRules);
+  }
+);
+
+// DELETE requests use 'deleteProxyRules'
+server.delete("/api/*", function(req, res) {
+    proxyRequestHandler(req, res, deleteProxyRules);
+  }
+);
+
+// PUT requests use 'putProxyRules'
+server.put("/api/*", function(req, res) {
+    proxyRequestHandler(req, res, putProxyRules);
   }
 );
 

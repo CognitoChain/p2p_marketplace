@@ -66,14 +66,43 @@ class Api {
      * @returns {Promise}
      */
     delete(resource, id) {
+        let auth = localStorage.getItem('authorization');
+        console.log("Api.delete - auth: ", auth);
         console.log("DELETE ", this.apiUrl, "/", resource, "/", id)
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${resource}/${id}`, { method: "DELETE" })
+            fetch(`${this.apiUrl}/${resource}/${id}`, { 
+                    method: "DELETE",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": auth
+                    },
+                })
                 .then((response) => resolve(response.json()))
                 .catch((reason) => reject(reason));
         });
     }
 
+    put(resource, id, data) {
+        let auth = localStorage.getItem('authorization');
+        console.log("Api.delete - auth: ", auth);
+        console.log("PUT ", this.apiUrl, "/", resource, "/", id)
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/${resource}/${id}`, { 
+                    method: "PUT",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": auth
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then((response) => resolve(response.json()))
+                .catch((reason) => reject(reason));
+        });
+    }
+
+    
     /**
      * Creates a new resource by posting the given data to the API.
      *
@@ -82,17 +111,29 @@ class Api {
      * @returns {Promise<any>}
      */
     create(resource = "loanRequests", data) {
+        let auth = localStorage.getItem('authorization');
+        console.log("Api.create - auth: ", auth);
         console.log("POST ", this.apiUrl, "/", resource, " data:", data)
+        
         return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}`, {
                 method: "POST",
                 cache: "no-cache",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": auth
                 },
                 body: JSON.stringify(data),
             })
                 .then(async (response) => {
+                    let auth = response.headers.get('authorization');   
+                    if (auth) {
+                        console.log("headers['authorization']: ", auth);
+                        localStorage.setItem('authorization', auth);                        
+                        console.log("localStorage.authorization: ", localStorage.getItem('authorization'));
+                    }
+                    
+
                     const json = await response.json();
                     resolve(json);
                 })

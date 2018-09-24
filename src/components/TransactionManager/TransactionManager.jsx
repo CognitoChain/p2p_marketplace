@@ -81,7 +81,7 @@ class TransactionManager extends Component {
                 <h4>{TX_STATE_TO_TITLE[txState]}</h4>
                 <p>{description}</p>
                 <p>
-                    <a href={`https://etherscan.io/tx/${txHash}`} target="_blank">
+                    <a href={`https://kovan.etherscan.io/tx/${txHash}`} target="_blank">
                         Transaction Details
                     </a>
                 </p>

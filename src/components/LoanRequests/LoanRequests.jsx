@@ -44,6 +44,10 @@ const columns = [
         dataField: "requestedAt",
         text: "Requested at",
     },
+    {
+        dataField: "status",
+        text: "Status",
+    },
 ];
 
 class LoanRequests extends Component {
@@ -109,6 +113,7 @@ class LoanRequests extends Component {
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
+                    status:datum.status
                 });
             });
         });
