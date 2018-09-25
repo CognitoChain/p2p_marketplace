@@ -118,7 +118,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -149,7 +149,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -180,7 +180,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -212,7 +212,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -246,7 +246,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -277,7 +277,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
@@ -308,7 +308,7 @@ class Wallet extends Component {
 
             </div>
             <div className="mt-3">
-            <a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Deposit</a>
+            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
             <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
             </div>
             </CardBody>
