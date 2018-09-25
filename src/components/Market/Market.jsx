@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {Card,CardBody,CardTitle,Row,Col,Table} from 'reactstrap';
+import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
+import LoanRequests from "../LoanRequests/LoanRequests";
+import FundedLoans from "../FundedLoans/FundedLoans";
 import { Link } from 'react-router-dom';
 import './Market.css';
 class Market extends Component {
@@ -7,10 +10,36 @@ class Market extends Component {
         super(props);
         console.log(this.props)
         this.state = {};
+        this.redirect = this.redirect.bind(this);
+        this.parseQueryParams = this.parseQueryParams.bind(this);
     }
+    
     componentWillMount() {        
     }
+    redirect(location) {
+        this.props.history.push(location);
+    }
+
+    /**
+     * Returns the id of the LoanRequest that should be highlighted.
+     *
+     * @returns {number||null}
+     */
+    parseQueryParams() {
+        /*const search = this.props.location.search;*/
+        const search = '';
+        const params = new URLSearchParams(search);
+        const rowToHighlight = params.get("highlightRow");
+
+        if (rowToHighlight) {
+            return parseInt(rowToHighlight, 10);
+        } else {
+            return null;
+        }
+    }
     render() {
+        const highlightRow = this.parseQueryParams();
+
         return (
             <div className="content-with-market-bg">
                     <div className="market-bg-image">
@@ -54,7 +83,7 @@ class Market extends Component {
                                 <div className='delete-button' onClick={(item) => { if (window.confirm('Are you sure you wish to delete this item?')) this.onCancel(item) }} />
                             </Col>
                             <Col sm={6} className="pull-right text-right">
-                                <Link to="/create"><span className="btn cognito orange small icon mb-15"><i className="fa fa-envelope-o" /> Borrow</span></Link>
+                                <Link to="/create"><span className="btn cognito orange small icon mb-15 btn-market-borrow"><img src="assets/images/borrow.png" height="20" /> Borrow</span></Link>
                             </Col>
                         </Row>
                     </div>
@@ -62,72 +91,30 @@ class Market extends Component {
                     <Row className="open-request-table">
                             
                         <Col md={12} className="mb-30">
-                        <Card className="card-statistics h-100">
-                            <div className="btn-group info-drop">
-                                <a className="btn btn-outline-info cognito x-small mb-15" href="javascript:void(0);">Filter</a>
-                            </div>
+                        <Card className="card-statistics h-100 p-3">
+                            
                             <CardBody>
-                                <CardTitle>Open Requests</CardTitle>
-                                <Table responsive className="open-request">
-                                    <thead>
-                                        <tr>
-                                            <th width="15%" className="text-center">Request Type</th>
-                                            <th width="15%" className="text-center">Loan Amount</th>
-                                            <th width="10%" className="text-center">Term</th>
-                                            <th width="15%" className="text-center">Interest Rate</th>
-                                            <th width="10%" className="text-center">Collateral</th>
-                                            <th width="10%" className="text-center">Total Repayment</th>
-                                            <th width="10%" className="text-center">Repayment Frequency</th>
-                                            <th width="15%" className="text-center">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><div className="round round-lg orange"><i className="ti-money"></i></div></td>
-                                            <td><span className="number-highlight">5,000</span><br />DAI</td>
-                                            <td><span className="number-highlight">1</span> Month</td>
-                                            <td><span className="number-highlight">5</span> %</td>
-                                            <td><span className="number-highlight">33</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,250</span><br />DAI</td>
-                                            <td>One-time</td>
-                                            <td><a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Fund</a></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td><div className="round round-lg orange"><i className="ti-money"></i></div></td>
-                                            <td><span className="number-highlight">5,000</span><br />OMG</td>
-                                            <td><span className="number-highlight">1</span> Week</td>
-                                            <td><span className="number-highlight">3</span> %</td>
-                                            <td><span className="number-highlight">12</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,150</span><br />OMG</td>
-                                            <td>One-time</td>
-                                            <td><a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Fund</a></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td><div className="round round-lg orange"><i className="ti-money"></i></div></td>
-                                            <td><span className="number-highlight">10,000</span><br />REP</td>
-                                            <td><span className="number-highlight">6</span> Months</td>
-                                            <td><span className="number-highlight">12</span> %</td>
-                                            <td><span className="number-highlight">1</span><br />WETH</td>
-                                            <td><span className="number-highlight">10,000</span><br />REP</td>
-                                            <td>One-time</td>
-                                            <td><a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Fund</a></td>
-                                        </tr>
-
-                                        <tr>
-                                            <td><div className="round round-lg orange"><i className="ti-money"></i></div></td>
-                                            <td><span className="number-highlight">5,000</span><br />ZRX</td>
-                                            <td><span className="number-highlight">1</span> Month</td>
-                                            <td><span className="number-highlight">6</span> %</td>
-                                            <td><span className="number-highlight">3</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,300</span><br />DAI</td>
-                                            <td>One-time</td>
-                                            <td><a className="btn btn-outline-success cognito x-small" href="javascript:void(0);">Fund</a></td>
-                                        </tr>
-                                        
-                                    </tbody>
-                                </Table>
+                                <div className="d-block d-md-flex justify-content-between" style={{ position: "relative" }}>
+                                    <div className="d-block w-100">
+                                        <CardTitle>Open Requests</CardTitle>
+                                    </div>
+                                    <div className="d-block d-md-flex" style={{ position: 'absolute', right: 0, top: 0 }}>
+                                        <div className="btn-group">
+                                            <a className="btn btn-outline-info cognito x-small mb-15" href="javascript:void(0);">Filter</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <DharmaConsumer>
+                                    {(dharmaProps) => (
+                                        <LoanRequests
+                                            authenticated={this.props.authenticated}
+                                            token={this.props.token}
+                                            dharma={dharmaProps.dharma}
+                                            redirect={this.redirect}
+                                            highlightRow={highlightRow}
+                                        />
+                                    )}
+                                </DharmaConsumer>
                             </CardBody>
                         </Card>
                     </Col>
@@ -138,65 +125,14 @@ class Market extends Component {
                     <Row className="recent-funded-loans-table">
                             
                         <Col md={12} className="mb-30">
-                        <Card className="card-statistics h-100">
+                        <Card className="card-statistics h-100 p-3">
                             <CardBody>
                                 <CardTitle>Recent Funded Loans</CardTitle>
-                                <Table responsive className="open-request">
-                                    <thead>
-                                        <tr>
-                                            <th width="20%" className="text-center">Created Date</th>
-                                            <th width="15%" className="text-center">Amount</th>
-                                            <th width="15%" className="text-center">Term</th>
-                                            <th width="15%" className="text-center">Interest Rate</th>
-                                            <th width="10%" className="text-center">Collateral</th>
-                                            <th width="15%" className="text-center">Total Repayment</th>
-                                            <th width="10%" className="text-center">Repayment Frequency</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><span className="number-highlight">12/08/2018</span><br />00:12:22</td>
-                                            <td><span className="number-highlight">5,000</span><br /> DAI</td>
-                                            <td><span className="number-highlight">1</span> Month</td>
-                                            <td><span className="number-highlight">5</span>%</td>
-                                            <td><span className="number-highlight">53</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,250</span><br />DAI</td>
-                                            <td>One-time</td>
-                                        </tr>
-
-                                        <tr>
-                                            <td><span className="number-highlight">07/08/2018</span><br />00:12:22</td>
-                                            <td><span className="number-highlight">5,000</span><br /> OMG</td>
-                                            <td><span className="number-highlight">1</span> Week</td>
-                                            <td><span className="number-highlight">3</span>%</td>
-                                            <td><span className="number-highlight">12</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,150</span><br />OMG</td>
-                                            <td>One-time</td>
-                                        </tr>
-
-                                        <tr>
-                                            <td><span className="number-highlight">01/08/2018</span><br />00:12:22</td>
-                                            <td><span className="number-highlight">10,000</span><br /> REP</td>
-                                            <td><span className="number-highlight">6</span> Months</td>
-                                            <td><span className="number-highlight">12</span>%</td>
-                                            <td><span className="number-highlight">1</span><br />WETH</td>
-                                            <td><span className="number-highlight">12,000</span><br />REP</td>
-                                            <td>One-time</td>
-                                        </tr>
-
-
-                                        <tr>
-                                            <td><span className="number-highlight">10/07/2018</span><br />00:12:22</td>
-                                            <td><span className="number-highlight">5000</span><br /> ZRX</td>
-                                            <td><span className="number-highlight">1</span> Month</td>
-                                            <td><span className="number-highlight">6</span>%</td>
-                                            <td><span className="number-highlight">3</span><br />WETH</td>
-                                            <td><span className="number-highlight">5,300</span><br />ZRX</td>
-                                            <td>One-time</td>
-                                        </tr>
-                                        
-                                    </tbody>
-                                </Table>
+                                <DharmaConsumer>
+                                    { (dharmaProps) => {
+                                        return <FundedLoans dharma={ dharmaProps.dharma }/>
+                                    } }
+                                </DharmaConsumer>
                             </CardBody>
                         </Card>
                     </Col>

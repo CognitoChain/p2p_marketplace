@@ -1,8 +1,11 @@
 // External libraries
 import React, { Component } from 'react';
+import {Redirect} from "react-router-dom";
 import Dharma from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
+import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from "react-bootstrap-table-next";
+import { Link } from 'react-router-dom';
 
 // Components
 import Loading from "../Loading/Loading";
@@ -14,37 +17,13 @@ import Api from "../../services/api";
 import "./LoanRequests.css";
 import Title from "../Title/Title";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-
+import _ from 'lodash';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
  */
-const columns = [
-    {
-        dataField: "principal",
-        text: "Principal",
-    },
-    {
-        dataField: "collateral",
-        text: "Collateral",
-    },
-    {
-        dataField: "interestRate",
-        text: "Interest Rate",
-    },
-    {
-        dataField: "termDuration",
-        text: "Term Length",
-    },
-    {
-        dataField: "expiration",
-        text: "Expiration",
-    },
-    {
-        dataField: "requestedAt",
-        text: "Requested at",
-    },
-];
 
 class LoanRequests extends Component {
     constructor(props) {
@@ -53,10 +32,14 @@ class LoanRequests extends Component {
             loanRequests: [],
             highlightRow: null,
             isLoading: true,
+            modal: false
         };
-
+        
+        this.renderShowsTotal = this.renderShowsTotal.bind(this);
         this.parseLoanRequests = this.parseLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
+        this.toggle = this.toggle.bind(this);
+        /*this.openlink = this.openlink.bind(this);*/
     }
 
     /**
@@ -69,11 +52,9 @@ class LoanRequests extends Component {
      */
     componentDidMount() {
         const { highlightRow } = this.props;
-
         this.setState({
             highlightRow,
         });
-
         const api = new Api();
 
         const sort = "createdAt";
@@ -91,7 +72,8 @@ class LoanRequests extends Component {
 
     parseLoanRequests(loanRequestData) {
         console.log(loanRequestData)
-        return Promise.all(loanRequestData.map(this.parseLoanRequest));
+        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
+        return Promise.all(filteredRequestData.map(this.parseLoanRequest));
     }
 
     /**
@@ -108,9 +90,7 @@ class LoanRequests extends Component {
         const { LoanRequest } = Dharma.Types;
 
         return new Promise((resolve) => {
-            console.log("A");
             LoanRequest.load(dharma, datum).then((loanRequest) => {
-                console.log(loanRequest);
                 resolve({
                     ...loanRequest.getTerms(),
                     id: datum.id,
@@ -128,21 +108,55 @@ class LoanRequests extends Component {
      */
     getData() {
         const { loanRequests } = this.state;
-        console.log(loanRequests)
         return loanRequests.map((request) => {
             return {
                 ...request,
                 principal: `${request.principalAmount} ${request.principalTokenSymbol}`,
                 collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
-                interestRate: `${request.interestRate}%`,
-                termDuration: `${request.termDuration} ${request.termUnit}`,
+                term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
-                requestedAt: moment(request.requestedAt).calendar(),
+                requestedDate: moment(request.requestedAt).calendar(),
+                authenticated:this.props.authenticated
             };
         });
     }
-
+    renderShowsTotal(start, to, total) {
+        return (
+          <p style={ { color: 'blue' } }>
+            From { start } to { to }, totals is { total }&nbsp;&nbsp;(its a customize text)
+          </p>
+        );
+    }
+    toggle() {
+        this.setState({
+            modal: !this.state.modal
+        });
+    }
+    openlink(row_id){
+        console.log("ABCDEF");
+        console.log(this.props.authenticated);
+        if(this.props.authenticated)
+        {
+            this.props.redirect(`/request/${row_id}`);            
+        }
+        else
+        {
+             confirmAlert({
+              title: 'Login to fund',
+              buttons: [
+                {
+                  label: 'Login',
+                  onClick: () => this.props.redirect(`/login`)
+                },
+                {
+                  label: 'Cancel'
+                }
+              ]
+            });
+        }
+    }
     render() {
+        let _self=this;
         const { highlightRow, isLoading } = this.state;
 
         const data = this.getData();
@@ -161,23 +175,119 @@ class LoanRequests extends Component {
             const rowData = data[rowIndex];
 
             if (rowData.id === highlightRow) {
-                return "loan-request-row highlight";
+                return "loan-request-row1 highlight";
             } else {
-                return "loan-request-row";
+                return "loan-request-row1";
             }
         };
-
+        const columns = [
+            {
+                dataField: "icon",
+                isDummyField: true,
+                text: "Request Type",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div className="d-inline-block">
+                            <div className="rounded-circle bg-orange icon-box">
+                                <img src="assets/images/borrow.png" alt="" className="img-fluid"/>
+                            </div>
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "principalAmount",
+                text: "Loan Amount",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalTokenSymbol}</div>
+                        </div>
+                    )
+                },
+            },
+            {
+                dataField: "termDuration",
+                text: "Term",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            <span className="number-highlight">{cell}</span> {row.termUnit}
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "interestRate",
+                text: "Interest Rate",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            <span className="number-highlight">{cell}</span> %
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "collateralAmount",
+                text: "Collateral",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralTokenSymbol}</div>
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "repayment",
+                isDummyField: true,
+                text: "Total Repayment",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.collateralAmount}</span><br />{row.collateralTokenSymbol}</div>
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "repaymentFrequency",
+                isDummyField: true,
+                text: "Repayment Frequency",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div>
+                            One-time
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "fund",
+                isDummyField: true,
+                text: "Action",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    return (
+                        <div className="d-inline-block">
+                            <a href="javascript:;" className="btn btn-outline-success cognito x-small" onClick={() => _self.openlink(row.id)}>Fund</a>
+                        </div>
+                    )
+                }
+            }
+        ];
+        
         return (
             <div className="LoanRequests">
-                <Title>Browse Loan Requests</Title>
-
                 <BootstrapTable
-                    hover={true}
+                    hover={false}
                     keyField="id"
+                    classes = {"open-request"}
                     columns={columns}
                     data={data}
-                    rowEvents={rowEvents}
+                    headerClasses={"text-center"}
                     rowClasses={rowClasses}
+                    bordered={ false }
                 />
 
                 {

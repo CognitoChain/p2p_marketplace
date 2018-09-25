@@ -25,3 +25,7 @@
 .react-bootstrap-table th .order > .dropup > .caret {
   display: none;
 }
+
+.dispaly-inline-block{
+  display: inline-block !important;
+}

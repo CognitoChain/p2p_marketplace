@@ -1,6 +1,6 @@
 import Dharma from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
-
+import {Card,CardBody,CardTitle,Row,Col,Table} from 'reactstrap';
 import Api from "../../services/api";
 
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
@@ -153,55 +153,64 @@ class LoanRequest extends Component {
 
         return (
             <div>
-                <Breadcrumb>
-                    <LinkContainer to="/" exact={true}>
-                        <Breadcrumb.Item href="#">&lsaquo; All Requests</Breadcrumb.Item>
-                    </LinkContainer>
+                <Row>
+                    <Col md={12} className="mb-30">
+                            <Card className="card-statistics h-100 p-3">
+                                <CardBody>
+                                    <Breadcrumb>
+                                        <LinkContainer to="/" exact={true}>
+                                            <Breadcrumb.Item href="#">&lsaquo; All Requests </Breadcrumb.Item>
+                                        </LinkContainer>
 
-                    <Breadcrumb.Item active>Details</Breadcrumb.Item>
-                </Breadcrumb>
+                                        <Breadcrumb.Item active>Details</Breadcrumb.Item>
+                                    </Breadcrumb>
 
-                {error && <NotFillableAlert>{error.message}</NotFillableAlert>}
+                                    {error && <NotFillableAlert>{error.message}</NotFillableAlert>}
 
-                {transactions.map((transaction) => {
-                    const { txHash, description } = transaction;
+                                    {transactions.map((transaction) => {
+                                        const { txHash, description } = transaction;
 
-                    let onSuccess;
+                                        let onSuccess;
 
-                    if (description === TRANSACTION_DESCRIPTIONS.fill) {
-                        onSuccess = onFillComplete;
-                    } else {
-                        onSuccess = this.reloadState;
-                    }
+                                        if (description === TRANSACTION_DESCRIPTIONS.fill) {
+                                            onSuccess = onFillComplete;
+                                        } else {
+                                            onSuccess = this.reloadState;
+                                        }
 
-                    return (
-                        <TransactionManager
-                            key={txHash}
-                            txHash={txHash}
-                            dharma={dharma}
-                            description={description}
-                            onSuccess={onSuccess}
-                        />
-                    );
-                })}
-
-                <Panel bsStyle="primary">
-                    <Panel.Heading>
-                        <Panel.Title componentClass="h3">Loan Request</Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <Terms terms={loanRequest.getTerms()} />
-                    </Panel.Body>
-                    <Panel.Footer>
-                        <AuthorizableAction
-                            canTakeAction={!error && hasSufficientAllowance}
-                            canAuthorize={!hasSufficientAllowance}
-                            onAction={this.handleFill}
-                            onAuthorize={this.handleAuthorize}>
-                            Fill
-                        </AuthorizableAction>
-                    </Panel.Footer>
-                </Panel>
+                                        return (
+                                            <TransactionManager
+                                                key={txHash}
+                                                txHash={txHash}
+                                                dharma={dharma}
+                                                description={description}
+                                                onSuccess={onSuccess}
+                                            />
+                                        );
+                                    })}
+                                    <Panel bsStyle="primary">
+                                        <Panel.Heading>
+                                            <Panel.Title componentClass="h3">Loan Request</Panel.Title>
+                                        </Panel.Heading>
+                                        <Panel.Body>
+                                            <Terms terms={loanRequest.getTerms()} />
+                                        </Panel.Body>
+                                        <Panel.Footer>
+                                            <AuthorizableAction
+                                                canTakeAction={!error && hasSufficientAllowance}
+                                                canAuthorize={!hasSufficientAllowance}
+                                                onAction={this.handleFill}
+                                                onAuthorize={this.handleAuthorize}>
+                                                <p>Authorize Token Transfer</p>
+                                                <p>Fill</p>
+                                            </AuthorizableAction>
+                                        </Panel.Footer>
+                                    </Panel>
+                                </CardBody>
+                            </Card>
+                    </Col>
+                </Row>
+                
             </div>
         );
     }
