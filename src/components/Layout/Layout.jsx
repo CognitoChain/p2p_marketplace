@@ -10,7 +10,8 @@ import Register from '../Authentication/Register/Register';
 import Dashboard from '../Dashboard/Dashboard';
 import Market from '../Market/Market';
 import Wallet from '../Wallet/Wallet';
-import Create from '../Create/Create';
+/*import Create from '../Create/Create';*/
+import Create from "../../containers/CreateLoan";
 
 import {withRouter} from 'react-router-dom';
 
@@ -36,7 +37,7 @@ const PublicRoute = ({component: Component, authenticated, ...rest}) => {
         {...rest}
         render={(props) => authenticated === false
           ? <Component {...rest} {...props} />
-          : <Redirect to={{pathname: '/dashboard', state: {from: props.location}}} />}
+          : <Redirect to={{pathname: '/', state: {from: props.location}}} />}
       />
     )
 }
@@ -49,16 +50,20 @@ class Layout extends Component {
         localStorage.removeItem('token');
         this.props.history.push("/login");
     }
+    componentDidUpdate() {
+        window.scroll({
+          top: 0, 
+          left: 0, 
+          behavior: 'smooth' 
+        });
+    }
     render() {
         const token = localStorage.getItem('token');
         const authenticated = ((token && token !== null) ? true : false)
         const location = this.props.location.pathname.substr(1);
-        console.log(authenticated)
-        console.log(token)
         if(location ==='login' || location ==='register'){
               return (
                 <Basepages>
-                    <PublicRoute authenticated={authenticated} path="/" exact={true} component={Login} />
                     <PublicRoute authenticated={authenticated} path="/login" exact={true} component={Login} /> 
                     <PublicRoute authenticated={authenticated} path="/register" component={Register} />
                 </Basepages>
@@ -66,14 +71,25 @@ class Layout extends Component {
         }
         else{
             return (
-                <Base logout={this.logout}>
+                <Base logout={this.logout} authenticated={authenticated} token={token} >
                     <Switch>
+                        <Route exact={true} path='/' 
+                            render={() => 
+                              <Market {...this.props} authenticated={authenticated} token={token} />
+                            }
+                          />
+
+                        <Route path='/market' 
+                            render={() => 
+                              <Market {...this.props} authenticated={authenticated} token={token} />
+                            }
+                          />  
+
                         <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={Dashboard}/>
-                        <PrivateRoute authenticated={authenticated} token={token} path="/market" component={Market}/> 
-                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={Wallet}/> 
+                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={Wallet} /> 
                         <PrivateRoute authenticated={authenticated} token={token} path="/loanrequests" component={LoanRequestsContainer} />
-                        <PrivateRoute path="/create"  authenticated={authenticated} token={token}  component={CreateLoanRequestContainer} />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/createnew" component={Create} />
+                        <PrivateRoute path="/createold"  authenticated={authenticated} token={token}  component={CreateLoanRequestContainer} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/tokens" component={TokensContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/request/:id" component={LoanRequestContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/investments" component={InvestmentsContainer} />

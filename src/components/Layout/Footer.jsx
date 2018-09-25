@@ -6,7 +6,7 @@ class Footer extends Component{
         return(
             //<!--================================= footer -->
          
-        <footer className="bg-white p-4">
+        <footer className="bg-white mt-20 p-4">
                <Row>
                 <Col md={6}>
                     <div className="text-center text-md-left">

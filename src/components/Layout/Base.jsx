@@ -25,7 +25,7 @@ class Base extends Component {
         return (
             <div className={this.state.toggleactive ? "wrapper  slide-menu" : "wrapper"}>
                 <ToastContainer />
-                <Header updateParent={this.updateValue} logout={this.props.logout}/>
+                <Header updateParent={this.updateValue}  logout={this.props.logout} authenticated={this.props.authenticated} token={this.props.token} />
                 <div className="container-fluid">
                     <div className="row">
                         <Sidebar />
