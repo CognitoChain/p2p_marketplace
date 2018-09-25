@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {Row,Col,Container} from 'reactstrap';
 import { toast } from 'react-toastify';
 import validators from '../../../validators';
+import GoogleLogin from "react-google-login";
 import Api from "../../../services/api";
 import './Register.css';
 
@@ -20,6 +21,26 @@ class Register extends React.Component{
         this.register=this.register.bind(this);
         this.displayValidationErrors = this.displayValidationErrors.bind(this);
         this.updateValidators = this.updateValidators.bind(this);
+    }
+    async googleSignIn(token) {
+      const api = new Api();
+      return new Promise((resolve) => {
+        api.create("goauthlogin", { token: token }).then((response) => {
+          resolve(response);
+        });
+      });
+    }
+    signup(res, type) {
+      console.log("have google profile: ", res.w3.U3);
+      console.log("tokenId: ", res.tokenId)  ;          
+      this.googleSignIn(res.tokenId).then(response => {
+        console.log("logged-in as '", response.name, "' email: ", response.email);
+        this.setState({
+          name: response.name,
+          email: response.email,
+          pictureUrl: response.pictureUrl
+        })
+      });
     }
     onchange(event){
         this.setState({
@@ -92,13 +113,22 @@ class Register extends React.Component{
       }  
     }
     render(){
+      const responseGoogle = response => {
+        console.log("google console");
+        console.log(response);
+        this.signup(response, "google");
+      };
         return(
             <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{backgroundImage: 'url(assets/images/register-bg.png)'}}>
               <Container>
                 <Row className="justify-content-center no-gutters vertical-align row">
                   <Col lg={4} md={6} className="offset-lg-1 login-fancy-bg bg parallax" style={{backgroundImage: 'url(assets/images/register-inner-bg.png)'}}>
                     <div className="login-fancy">
-                      <h2 className="text-white mb-20 text-center"><img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" /></h2>
+                      <h2 className="text-white mb-20 text-center">
+                        <a href="/">
+                          <img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" />
+                        </a>
+                      </h2>
                       <p className="mb-20 text-white">Create tailor-cut websites with the exclusive multi-purpose responsive template along with powerful features.</p>
                       <ul className="list-unstyled pos-bot pb-30">
                         <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use</a> </li>
@@ -120,10 +150,25 @@ class Register extends React.Component{
                           <input className="Password form-control" value={this.state.password} id="password" type="password" placeholder="Password" name="password" onChange={this.onchange} />
                           { this.displayValidationErrors('password') }
                         </div>
+
+                        <div>
+
                         { <a onClick={this.register}  className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
                           <span className="text-white">Signup</span>
                           <i className="fa fa-check text-white" />
                         </a>}
+
+                        <span className="login-buttons-seperator">OR</span>
+
+                        <GoogleLogin
+                              clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
+                              buttonText="Signup with Google"
+                              onSuccess={responseGoogle}
+                              onFailure={responseGoogle}
+                              className="google-login-btn"
+                        />
+                        </div>
+
                         <p className="mt-20 mb-0 remember-checkbox">You have an account? <Link to="login"> Login here</Link></p>
                       </div>
                     </Col>
