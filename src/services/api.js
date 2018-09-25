@@ -9,10 +9,8 @@ class Api {
         return this;
     }
     processResponse(response){
-        console.log(response)
-        console.log(response.headers.get('Authorization'))
-        //if(response.status === 403)
-            //localStorage.removeItem('token');
+        if(response.status === 403)
+            localStorage.removeItem('token');
     }
     /**
      * Makes a GET request to the API server, and returns a promise
@@ -58,7 +56,7 @@ class Api {
             let obj = {};
         
             if(this.token){
-                let obj = {
+                obj = {
                     method: 'GET',
                     headers: {
                         'Authorization': this.token,
@@ -122,21 +120,15 @@ class Api {
             })
             .then(async (response) => {
                 this.processResponse(response);
-                if(response.ok){
-                    if(resource === "login"){
-                        resolve(response);
-                    }
-                    else{
-                        const json = await response.json();
-                        resolve(json);    
-                    }
+                if(resource === "login"){
+                    resolve(response);
                 }
                 else{
-                    reject(response)
+                    const json = await response.json();
+                    resolve(json);    
                 }
-                
             })
-                .catch((reason) => reject(reason));
+            .catch((reason) => reject(reason));
         });
     }
 
