@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import logoImg from "../../assets/images/logo.svg";
 class Header extends Component {
 
     constructor(props) {
@@ -20,8 +21,8 @@ class Header extends Component {
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
                 <div className="text-left navbar-brand-wrapper">
-                    <Link className="navbar-brand brand-logo" to="/"><img src="assets/images/logo.svg" alt="" /></Link>
-                    <Link className="navbar-brand brand-logo-mini" to="/"><img src="assets/images/logo.svg" alt="" /></Link>
+                    <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
+                    <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
                 </div>
                 {/* <!-- Top bar left --> */}
                 {/*<ul className="nav navbar-nav mr-auto">
