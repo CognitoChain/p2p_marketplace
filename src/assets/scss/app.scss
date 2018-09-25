@@ -14,7 +14,6 @@
 .btn.cognito.x-small { 
 	padding-top: 5px;
 	padding-bottom: 5px; 
-	font-size: $font-base; 
 }
 .btn.cognito.small { 
 	padding-top: 10px;
@@ -31,7 +30,10 @@
 	padding-bottom: 20px; 
 	font-size: $font-base; 
 }
-.round {
+.bg-orange{
+  background-color: $orange;
+}
+.round-icon {
   display: inline-block;
   height: 30px;
   width: 30px;
@@ -63,13 +65,13 @@
     border-radius: 10px;
     font-size: 0.7em;
   }
-  &.round-lg {
+  &.round-icon-lg {
     height: 35px;
     width: 35px;
     line-height: 40px;
     -moz-border-radius: 20px;
     border-radius: 20px;
-    font-size: 1.5em;
+    font-size: 1em;
   }
   &.blue {
     background-color: $theme-color;
@@ -103,4 +105,20 @@
       box-shadow: 0px 0px 0px 3px $success;
     }
   }
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.create-loan-slider .input-range{
+  margin-top:1em!important;
+}
+.input-range__track--active{
+  background: #18a2b8;
+}
+.input-range__slider{
+  background: #18a2b8;
+  border: 1px solid #18a2b8;
 }
