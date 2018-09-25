@@ -155,7 +155,7 @@ class Dashboard extends Component {
                                 <Table responsive borderless className="my-activities-table">
                                     <tbody>
                                         <tr>
-                                            <td width="5%"><div className="round round-lg orange"><i className="ti-money"></i></div></td>
+                                            <td width="5%"><div className="round-icon round-icon-lg orange"><i className="ti-money"></i></div></td>
                                             <td>
                                                 <span className="weight-bolder">Loan repayment due</span>
                                                 <div>Loan#1026</div>
@@ -171,7 +171,7 @@ class Dashboard extends Component {
                                         </tr>
 
                                         <tr>
-                                            <td width="5%"><div className="round round-lg orange"><i className="ti-money"></i></div></td>
+                                            <td width="5%"><div className="round-icon round-icon-lg orange"><i className="ti-money"></i></div></td>
                                             <td>
                                                 <span className="weight-bolder">Loan repayment due</span>
                                                 <div>Loan#1297</div>
@@ -187,7 +187,7 @@ class Dashboard extends Component {
                                         </tr>
 
                                         <tr>
-                                            <td width="5%"><div className="round round-lg green"><i className="ti-money"></i></div></td>
+                                            <td width="5%"><div className="round-icon round-icon-lg green"><i className="ti-money"></i></div></td>
                                             <td>
                                                 <span className="weight-bolder">Loan Settlement</span>
                                                 <div>Loan#926</div>
@@ -202,7 +202,7 @@ class Dashboard extends Component {
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td width="5%"><div className="round round-lg green"><i className="ti-money"></i></div> </td>
+                                            <td width="5%"><div className="round-icon round-icon-lg green"><i className="ti-money"></i></div> </td>
                                             <td>
                                                 <span className="weight-bolder">Loan Settlement</span>
                                                 <div>Loan#720</div>
