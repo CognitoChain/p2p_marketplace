@@ -20,16 +20,16 @@ class AuthorizableAction extends Component {
                     onClick={(event) => this.handleClick(event, onAuthorize)}
                     disabled={!canAuthorize}
                     bsStyle="primary"
-                    className="AuthorizableAction-Authorize">
-                    Authorize Token Transfer
+                    className="AuthorizableAction-Button unlock-tokens-button btn btn-success cognito">
+                    {this.props.children[0]}
                 </Button>
 
                 <Button
                     onClick={(event) => this.handleClick(event, onAction)}
                     disabled={!canTakeAction}
                     bsStyle="primary"
-                    className="AuthorizableAction-Action">
-                    {this.props.children}
+                    className="AuthorizableAction-Button btn btn-primary cognito">
+                    {this.props.children[1]}
                 </Button>
             </div>
         );
