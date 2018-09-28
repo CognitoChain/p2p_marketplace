@@ -7,7 +7,7 @@ const path = require("path");
 var getProxyRules = new HttpProxyRules({
   rules: {
     '/api/ping': 'http://localhost:3000/ping',
-    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1', 
+    '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1', 
     '/api/user/loanRequests': 'http://localhost:3000/user/loanrequests',    
     '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all',
     '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
@@ -32,15 +32,10 @@ var postProxyRules = new HttpProxyRules({
   }
 });
 
-var deleteProxyRules = new HttpProxyRules({
-  rules: {
-    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1'
-  }
-});
 
 var putProxyRules = new HttpProxyRules({
   rules: {
-    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1'
+    '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1'
   }
 });
 
@@ -62,7 +57,7 @@ function proxyRequestHandler(req, res, proxyRules) {
     try { 
        proxy.web(req, res, { target: target });
     } catch(err) {
-      console.log(err);
+      console.log("Error: ", err);
     }
   } else {
     res.statusCode = 404;
@@ -79,12 +74,6 @@ server.get("/api/*", function(req, res) {
 // POST requests use 'postProxyRules'
 server.post("/api/*", function(req, res) {
     proxyRequestHandler(req, res, postProxyRules);
-  }
-);
-
-// DELETE requests use 'deleteProxyRules'
-server.delete("/api/*", function(req, res) {
-    proxyRequestHandler(req, res, deleteProxyRules);
   }
 );
 

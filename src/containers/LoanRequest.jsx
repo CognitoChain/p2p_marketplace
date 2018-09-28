@@ -11,12 +11,12 @@ import Api from "../services/api";
 class LoanRequestContainer extends Component {
     constructor(props) {
         super(props);
-
         this.onFillComplete = this.onFillComplete.bind(this);
     }
 
     async onFillComplete(id, currentAccount) {
         const api = new Api();
+
         let data = {'address': currentAccount};
         console.log("updating loan request - data: ", data)
         await api.put("loanRequests", id, data);

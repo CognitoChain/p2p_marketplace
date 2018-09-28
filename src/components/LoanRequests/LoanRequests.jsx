@@ -1,5 +1,5 @@
 // External libraries
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import React, { Component } from "react";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -48,6 +48,7 @@ const columns = [
         dataField: "status",
         text: "Status",
     },
+
 ];
 
 class LoanRequests extends Component {
@@ -86,14 +87,7 @@ class LoanRequests extends Component {
 
         api.get("loanRequests", { sort, order })
             .then(this.parseLoanRequests)
-            .then( (loanRequests) => { 
-                    console.log("loanRequests: ", loanRequests)
-                    loanRequests.forEach(function(loan) {
-                        console.log("loanRequest.agreementId: ", loan.agreementId);
-                    });
-                    this.setState({ loanRequests, isLoading: false })
-                }
-            )
+            .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
             .catch((error) => console.error(error));
     }
 
@@ -118,10 +112,9 @@ class LoanRequests extends Component {
             LoanRequest.load(dharma, datum).then((loanRequest) => {
                 resolve({
                     ...loanRequest.getTerms(),
-                    agreementId: loanRequest.getAgreementId(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
-                    status:datum.status
+                    status:datum.status,
                 });
             });
         });
@@ -145,6 +138,7 @@ class LoanRequests extends Component {
                 termDuration: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
                 requestedAt: moment(request.requestedAt).calendar(),
+                status:request.status,
             };
         });
     }

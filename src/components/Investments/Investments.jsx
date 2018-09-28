@@ -1,5 +1,5 @@
 // External libraries
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import React from "react";
 import BootstrapTable from "react-bootstrap-table-next";
 
@@ -48,8 +48,17 @@ class Investments extends React.Component {
 
     async componentDidMount() {
         const { dharma } = this.props;
+
         const { Investments, Investment, Debt } = Dharma.Types;
 
+
+        const creditor = await dharma.blockchain.getCurrentAccount();
+
+        const investments = await Investments.getExpandedData(dharma, creditor);
+        console.log("-- investments --");
+        console.log(investments);
+
+        // Test loading a Debt and an Investment by id (agreementId)
         let agreementId = "0xf509b73911c77950846c794c770d562ac3d3411ce99750bb5c5da48c68a0ce43";
         
         console.log("-- investment --");
@@ -60,10 +69,6 @@ class Investments extends React.Component {
         const debt = await Debt.fetch(dharma, agreementId);
         console.log(debt);
 
-
-        const creditor = await dharma.blockchain.getCurrentAccount();
-        const investments = await Investments.getExpandedData(dharma, creditor);
-        console.log("investments: ", investments);
         this.setState({
             investments,
         });
