@@ -86,7 +86,14 @@ class LoanRequests extends Component {
 
         api.get("loanRequests", { sort, order })
             .then(this.parseLoanRequests)
-            .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
+            .then( (loanRequests) => { 
+                    console.log("loanRequests: ", loanRequests)
+                    loanRequests.forEach(function(loan) {
+                        console.log("loanRequest.agreementId: ", loan.agreementId);
+                    });
+                    this.setState({ loanRequests, isLoading: false })
+                }
+            )
             .catch((error) => console.error(error));
     }
 
@@ -111,6 +118,7 @@ class LoanRequests extends Component {
             LoanRequest.load(dharma, datum).then((loanRequest) => {
                 resolve({
                     ...loanRequest.getTerms(),
+                    agreementId: loanRequest.getAgreementId(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
                     status:datum.status

@@ -48,7 +48,18 @@ class Investments extends React.Component {
 
     async componentDidMount() {
         const { dharma } = this.props;
-        const { Investments } = Dharma.Types;
+        const { Investments, Investment, Debt } = Dharma.Types;
+
+        let agreementId = "0xf509b73911c77950846c794c770d562ac3d3411ce99750bb5c5da48c68a0ce43";
+        
+        console.log("-- investment --");
+        const investment = await Investment.fetch(dharma, agreementId);
+        console.log(investment);
+
+        console.log("-- debt --");
+        const debt = await Debt.fetch(dharma, agreementId);
+        console.log(debt);
+
 
         const creditor = await dharma.blockchain.getCurrentAccount();
         const investments = await Investments.getExpandedData(dharma, creditor);
