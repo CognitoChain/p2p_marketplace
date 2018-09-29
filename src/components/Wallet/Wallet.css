@@ -20,3 +20,6 @@
 .btn.cognito.x-small {
    	font-size: 0.90em !important;
 }
+.wallet-token-symbol,.wallet-token-balance{
+	font-weight: bolder !important;
+}

@@ -9,10 +9,10 @@ import Login from '../Authentication/Login/Login';
 import Register from '../Authentication/Register/Register';
 import Dashboard from '../Dashboard/Dashboard';
 import Market from '../Market/Market';
-import Wallet from '../Wallet/Wallet';
+/*import Wallet from '../Wallet/Wallet';*/
 /*import Create from '../Create/Create';*/
 import Create from "../../containers/CreateLoan";
-
+import WalletContainer from "../../containers/Wallet";
 import {withRouter} from 'react-router-dom';
 
 import LoanRequestsContainer from "../../containers/LoanRequests";
@@ -86,7 +86,7 @@ class Layout extends Component {
                           />  
 
                         <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={Dashboard}/>
-                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={Wallet} /> 
+                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={WalletContainer} /> 
                         <PrivateRoute authenticated={authenticated} token={token} path="/loanrequests" component={LoanRequestsContainer} />
                         <PrivateRoute path="/createold"  authenticated={authenticated} token={token}  component={CreateLoanRequestContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />

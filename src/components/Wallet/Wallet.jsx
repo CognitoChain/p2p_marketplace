@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card,CardBody,TabContent, TabPane,Nav, NavItem, NavLink, Row, Col,Breadcrumb,BreadcrumbItem} from 'reactstrap';
 import './Wallet.css';
 import classnames from 'classnames';
-
+import Loading from "../Loading/Loading";
 class Wallet extends Component {
 
     constructor(props) {
@@ -10,23 +10,30 @@ class Wallet extends Component {
         this.tabsclick = this.tabsclick.bind(this);
         this.state = {
             activeTab: '1',
-        };
-    }
-    
-    tabsclick(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({
-                activeTab: tab
-            });
-        }
-    }
+      };
+}
 
-    componentWillMount() {
+tabsclick(tab) {
+  if (this.state.activeTab !== tab) {
+      this.setState({
+          activeTab: tab
+    });
+}
+}
 
-    }
-    
-    render() {
-        return (
+componentWillMount() {
+
+}
+
+render() {
+      console.log(this.props.tokens);
+      const { tokens } = this.props;
+
+     /* if (tokens.length === 0) {
+            return <Loading/>;
+      }*/
+
+      return (
             <div>
             <div className="page-title">
             <Row>
@@ -94,229 +101,54 @@ class Wallet extends Component {
             <h5>Token Balances</h5>
 
             <Row>
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
-            
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
-
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
 
 
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
+            {tokens.map((token) => {
 
-            
+                  if(token.balance > 0)
+                  {
+                       return (
 
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>    
+                        <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
+                        <Card className="card card-statistics h-100">
+                        <CardBody>
+                        <div className="clearfix mb-10">
+                        <div className="float-left icon-box bg-danger rounded-circle">
+                        <span className="text-white">
+                        <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
+                        </span>
+                        </div>
+
+                        <div>
+                        <div className="float-left text-left crypto-currency-text">
+                        <div className="wallet-token-symbol">{token.symbol}</div>
+                        <div>{token.name}</div>
+                        </div>
+                        <div className="float-right text-right">
+                        <p className="card-text text-dark"><span className="wallet-token-balance">{token.balance}</span> {token.symbol}</p>
+                        </div>
+                        </div>
+
+
+
+                        </div>
+                        <div className="mt-3">
+                        <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
+                        <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
+                        </div>
+                        </CardBody>
+                        </Card>
+                        </Col>
+
+                        );
+                  }
+
+                  
+            })}
             
             </Row>
 
-            <Row>
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
-            
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
-
-            <Col xl={3} md={6} lg={6} className="mb-30" >
-            <Card className="card card-statistics h-100">
-            <CardBody>
-            <div className="clearfix mb-10">
-            <div className="float-left icon-box bg-danger rounded-circle">
-            <span className="text-white">
-            <i className="fa fa-bar-chart-o highlight-icon" aria-hidden="true" />
-            </span>
-            </div>
-            
-            <div>
-            <div className="float-left text-left crypto-currency-text">
-            <div>ETH</div>
-            <div>Ethereum</div>
-            </div>
-            <div className="float-right text-right">
-            <p className="card-text text-dark">23 ETH</p>
-            </div>
-            </div>
-
-            
-
-            </div>
-            <div className="mt-3">
-            <a className="btn btn-success cognito x-small" href="javascript:void(0);">Deposit</a>
-            <a className="btn btn-outline-success cognito x-small pull-right" href="javascript:void(0);">Withdrawal</a>
-            </div>
-            </CardBody>
-            </Card>
-            </Col>
-            
-            
-            </Row>
+           
 
             </div>
 
