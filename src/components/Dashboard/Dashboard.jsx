@@ -4,6 +4,9 @@ import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row
 import './Dashboard.css';
 import classnames from 'classnames';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
+import Dharma from "@dharmaprotocol/dharma.js";
+import MyLoanRequests from "../MyLoanRequests/MyLoanRequests";
 
 const funded_loans = [
     {
@@ -287,18 +290,16 @@ class Dashboard extends Component {
                                         </TabPane>
 
                                         <TabPane tabId="2" title="Borrowed Loans">
-                                            <BootstrapTable
-                                                data={funded_loans}
-                                                bordered={ false }
-                                                >
-                                                <TableHeaderColumn width='100' dataField='created_date' isKey>Created Date</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='amount'>Amount</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='term'>Term</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='interest_rate'>Interest Rate</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='collateral'>Collateral</TableHeaderColumn>
-                                                <TableHeaderColumn width='200' dataField='total_repayment'>Total Repayment</TableHeaderColumn>
-                                                <TableHeaderColumn width='150' dataField='repayment_frequency'>Repayment Frequency</TableHeaderColumn>
-                                            </BootstrapTable>
+                                            <DharmaConsumer>
+                                                {(dharmaProps) => (
+                                                    <MyLoanRequests
+                                                    authenticated={this.props.authenticated}
+                                                    token={this.props.token}
+                                                    dharma={dharmaProps.dharma}
+                                                    redirect={this.redirect}
+                                                    />
+                                                    )}
+                                            </DharmaConsumer>
                                         </TabPane>
 
                                         <TabPane tabId="3" title="Archive">
