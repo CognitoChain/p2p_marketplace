@@ -18,7 +18,7 @@ class LoanRequestContainer extends Component {
     async onFillComplete(id) {
         const api = new Api();
 
-        await api.delete("loanRequests", id);
+        await api.put("loanRequests", id);
 
         this.props.history.push(`/investments`);
     }

@@ -100,6 +100,23 @@ class Api {
     }
 
     /**
+     * Allows putting a record.
+     *
+     * @param resource
+     * @param id
+     * @returns {Promise}
+     */
+    put(resource, id) {
+        console.log("PUT ", this.apiUrl, "/", resource, "/", id)
+        return new Promise((resolve, reject) => {
+            fetch(`${this.apiUrl}/${resource}/${id}`, { method: "PUT" })
+                .then((response) => resolve(response.json()))
+                .catch((reason) => reject(reason));
+        });
+    }
+
+
+    /**
      * Creates a new resource by posting the given data to the API.
      *
      * @param resource
