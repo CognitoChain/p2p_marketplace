@@ -1,6 +1,6 @@
 // External libraries
 import React, { Component } from 'react';
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 
@@ -12,7 +12,6 @@ import Api from "../../services/api";
 
 // Styling
 import "./FundedLoans.css";
-import Title from "../Title/Title";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
 
