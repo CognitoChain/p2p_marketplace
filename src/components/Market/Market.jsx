@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Card,CardBody,CardTitle,Row,Col,Table} from 'reactstrap';
+import {Card,CardBody,CardTitle,Row,Col} from 'reactstrap';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import LoanRequests from "../LoanRequests/LoanRequests";
 import FundedLoans from "../FundedLoans/FundedLoans";
@@ -83,7 +83,7 @@ class Market extends Component {
                                 <div className='delete-button' onClick={(item) => { if (window.confirm('Are you sure you wish to delete this item?')) this.onCancel(item) }} />
                             </Col>
                             <Col sm={6} className="pull-right text-right">
-                                <Link to="/create"><span className="btn cognito orange small icon mb-15 btn-market-borrow"><img src="assets/images/borrow.png" height="20" /> Borrow</span></Link>
+                                <Link to="/create"><span className="btn cognito orange small icon mb-15 btn-market-borrow"><img src="assets/images/borrow.png" height="20" alt="Borrow" /> Borrow</span></Link>
                             </Col>
                         </Row>
                     </div>
