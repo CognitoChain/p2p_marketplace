@@ -2,3 +2,17 @@
 	font-size: 10px !important;
 	text-align: right !important;
 }
+.loan-detail-card-statistics
+{
+	background-color: #E3FAE0 !important;
+}
+.loan-detail-numbers{
+	font-size: 16px;
+	font-weight: bolder;
+}
+.btn.cognito.repayment-button
+{
+	background-color: #17A086 !important;
+	color: white !important;
+	padding:10px 15px;
+}
