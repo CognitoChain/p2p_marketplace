@@ -20,7 +20,8 @@ class CreateLoanContainer extends Component {
      * all of the loan requests, and highlight the newly created request.
      */
     onCompletion(id) {
-        this.props.history.push(`/requests/${id}`);
+        /*this.props.history.push(`/requests/${id}`);*/
+        this.props.history.push('success');
     }
     redirect(location) {
         this.props.history.push(location);

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, InputGroup, Input, InputGroupAddon, ListGroup, Form } from 'reactstrap';
 import InputRange from 'react-input-range';
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
 import Loading from "../Loading/Loading";
 import TransactionManager from "../TransactionManager/TransactionManager";
@@ -77,14 +77,17 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
-
         try {
             const { dharma } = this.props;
             const currentAccount = await dharma.blockchain.getCurrentAccount();
             console.log("createLoanRequest() - currentAccount: ", currentAccount);
             const loanRequest = await this.generateLoanRequest(currentAccount);
-            const id = await api.setToken(this.props.token).create("loanRequests", loanRequest.toJSON());
-            this.props.onCompletion(id);
+            /*const id = await api.setToken(this.props.token).create("loanRequests", loanRequest.toJSON());*/
+            const id = await api.setToken(this.props.token).create("loanRequests", {
+                ...loanRequest.toJSON(),
+                id: loanRequest.getAgreementId(),
+            });
+            this.props.onCompletion(loanRequest.getAgreementId());
         } catch (e) {
             console.error(e);
             this.setState({ error: e.message });
@@ -95,38 +98,51 @@ class CreateLoan extends Component {
         const { dharma } = this.props;
         const { collateralTokenSymbol, collateralAmount } = this.state;
         const symbol = tokenSymbol ? tokenSymbol : collateralTokenSymbol;
-        const { Tokens } = Dharma.Types;
+        /*const { Tokens } = Dharma.Types;*/
+        const { Token } = Dharma.Types;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
         console.log("setHasSufficientAllowance() - currentAccount: ", currentAccount);
-        const tokens = new Tokens(dharma, currentAccount);
-        const tokenData = await tokens.getTokenDataForSymbol(symbol);
+        /*const tokens = new Tokens(dharma, currentAccount);*/
+        /*const tokenData = await tokens.getTokenDataForSymbol(symbol);*/
+        const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
         const hasSufficientAllowance =
             tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount;
-
         this.setState({
             hasSufficientAllowance,
         });
     }
 
     async authorizeCollateralTransfer() {
+        /*const { dharma } = this.props;
+        const { Allowance } = Dharma.Types;
+        const { collateralTokenSymbol } = this.state;
+        const currentAccount = await dharma.blockchain.getCurrentAccount();
+        console.log("authorizeCollateralTransfer() - currentAccount: ", currentAccount);
+        const allowance = new Allowance(dharma, collateralTokenSymbol, currentAccount);
+        const txHash = await allowance.makeUnlimitedIfNecessary();
+        this.setState({
+            txHash,
+        });*/
         const { dharma } = this.props;
 
-        const { Allowance } = Dharma.Types;
+        const { Token } = Dharma.Types;
 
         const { collateralTokenSymbol } = this.state;
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        console.log("authorizeCollateralTransfer() - currentAccount: ", currentAccount);
-        const allowance = new Allowance(dharma, currentAccount, collateralTokenSymbol);
 
-        const txHash = await allowance.makeUnlimitedIfNecessary();
+        const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
+            dharma,
+            collateralTokenSymbol,
+            currentAccount,
+        );
 
         this.setState({
             txHash,
         });
     }
 
-    async generateLoanRequest(debtorAddress) {
+    async generateLoanRequest_bk(debtorAddress) {
         const { dharma } = this.props;
 
         const { LoanRequest } = Dharma.Types;
@@ -162,6 +178,45 @@ class CreateLoan extends Component {
             creditorFeeAmount: relayerFeeAmount,
         });
     }
+
+     async generateLoanRequest(debtor) {
+        const { dharma } = this.props;
+
+        const { LoanRequest } = Dharma.Types;
+
+        const {
+            principal,
+            principalTokenSymbol,
+            collateralTokenSymbol,
+            relayerAddress,
+            relayerFeeAmount,
+            collateral,
+            termUnit,
+            expirationUnit,
+            expirationLength,
+            interestRate,
+            termLength,
+        } = this.state;
+
+        const terms = {
+            principalAmount: principal,
+            principalToken: principalTokenSymbol,
+            collateralAmount: collateral,
+            collateralToken: collateralTokenSymbol,
+            interestRate,
+            relayerFeeAmount,
+            relayerAddress,
+            termDuration: termLength,
+            termUnit,
+            expiresInDuration: expirationLength,
+            expiresInUnit: expirationUnit,
+            // Here we simplistically make the creditor pay the relayer fee.
+            creditorFeeAmount: relayerFeeAmount,
+        };
+
+        return LoanRequest.createAndSignAsDebtor(dharma, terms, debtor);
+    }
+
     toggleDropDown(field) {
         field = field + "DropdownOpen";
         this.setState({
@@ -279,7 +334,7 @@ class CreateLoan extends Component {
 
                                     <Form disabled={disabled} onSubmit={this.createLoanRequest}>
                                         <div className="mt-20">
-                                            <label>Principal Amount</label>
+                                            <label>Loan Amount</label>
                                             <TokenSelect
                                                 name="principal"
                                                 onChange={this.handleInputChange}
@@ -337,7 +392,7 @@ class CreateLoan extends Component {
                                                 <InputGroupAddon addonType="append">%</InputGroupAddon>
                                             </InputGroup>
                                         </div>
-                                        <div className="mt-20">
+                                        {/*<div className="mt-20">
                                             <label>Expiration</label>
                                             <TimeUnitSelect
                                                 name="expirationLength"
@@ -348,7 +403,7 @@ class CreateLoan extends Component {
                                                 dropdownOpen={expirationUnitDropdownOpen}
                                                 toggleDropDown={this.toggleDropDown}
                                             />
-                                        </div>
+                                        </div>*/}
                                     </Form>
 
                                 </CardBody>
@@ -382,10 +437,10 @@ class CreateLoan extends Component {
                                                 labelName = "Interest Rate(Per Loan Term)"
                                                 labelValue = { interestRate + "%" }
                                             />
-                                            <SummaryItem 
+                                            {/*<SummaryItem 
                                                 labelName = "Expiration"
                                                 labelValue = { expirationLength + " " + expirationUnit }
-                                            />
+                                            />*/}
                                             <SummaryItem 
                                                 labelName = "Interest Amount"
                                                 labelValue = "-"
@@ -394,10 +449,10 @@ class CreateLoan extends Component {
                                                 labelName = "Total Repayment Amount"
                                                 labelValue = "-"
                                             />
-                                            <SummaryItem 
+                                            {/*<SummaryItem 
                                                 labelName = "Relayer Fee"
                                                 labelValue = {relayerFeeAmount > 0 ? relayerFeeAmount + ' ' + principalTokenSymbol : '-'}
-                                            />
+                                            />*/}
                                         </ListGroup>
 
                                         <hr />
@@ -433,19 +488,7 @@ class CreateLoan extends Component {
                         </Col>
                     </Row>
                 </div>
-
-
-
-
-
-
-
-
-
             </div>
-
-
-
         );
     }
 }
