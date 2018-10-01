@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card,CardBody,TabContent, TabPane,Nav, NavItem, NavLink, Row, Col,Breadcrumb,BreadcrumbItem} from 'reactstrap';
 import './Wallet.css';
 import classnames from 'classnames';
-import Loading from "../Loading/Loading";
+/*import Loading from "../Loading/Loading";*/
 class Wallet extends Component {
 
     constructor(props) {
