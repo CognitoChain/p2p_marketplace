@@ -1,0 +1,18 @@
+.check-green-color{
+	color:#6AC359 !important;
+	font-size: 48px !important;
+}
+.loan-success-msg .alert-info {
+	background-color:#E4FDF9 !important;
+	border:none !important;
+}
+.loan-created-success-text{
+	font-size: 30px;
+}
+.back-to-market-link{
+	font-size: 18px;
+	color: #72B3D8 !important;
+}
+.market-link{
+	color: #79ABC8 !important;
+}
