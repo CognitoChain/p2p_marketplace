@@ -1,11 +1,8 @@
 // External libraries
 import React, { Component } from 'react';
-import {Redirect} from "react-router-dom";
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
-import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from "react-bootstrap-table-next";
-import { Link } from 'react-router-dom';
 
 // Components
 import Loading from "../Loading/Loading";
@@ -15,11 +12,12 @@ import Api from "../../services/api";
 
 // Styling
 import "./MyLoanRequests.css";
-import Title from "../Title/Title";
 import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
 import _ from 'lodash';
-import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
+/*import { withRouter } from 'react-router';
+import { Redirect } from 'react-router-dom';*/
+
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
@@ -70,10 +68,8 @@ class MyLoanRequests extends Component {
     }
 
     parseMyLoanRequests(loanRequestData) {
-        console.log("My Loans Data");
-        console.log(loanRequestData);
-        /*var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });*/
-        return Promise.all(loanRequestData.map(this.parseLoanRequest));
+        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
+        return Promise.all(filteredRequestData.map(this.parseLoanRequest));
     }
 
     /**
@@ -108,6 +104,10 @@ class MyLoanRequests extends Component {
      */
     getData() {
         const { MyloanRequests } = this.state;
+        if (!MyloanRequests) {
+            return null;
+        }
+
         return MyloanRequests.map((request) => {
             return {
                 ...request,
@@ -133,12 +133,19 @@ class MyLoanRequests extends Component {
         });
     }
     render() {
-        let _self=this;
+        /*let _self=this;*/
         const { highlightRow, isLoading } = this.state;
         const data = this.getData();
         if (isLoading) {
             return <Loading/>;
         }
+
+        const rowEvents = {
+            onClick: (e, row, rowIndex) => {
+                /*this.props.history.push(`/detail/${row.id}`);
+                this.props.redirect(`/login/`);*/
+            },
+        };
 
         const rowClasses = (row, rowIndex) => {
             const rowData = data[rowIndex];
@@ -244,6 +251,7 @@ class MyLoanRequests extends Component {
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
+                    rowEvents={rowEvents}
                 />
 
                 {
