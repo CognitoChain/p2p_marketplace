@@ -1,51 +1,13 @@
 import React, { Component } from 'react';
 import { Doughnut } from 'react-chartjs-2';
+/*import { Dharma } from "@dharmaprotocol/dharma.js";*/
 import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row, Col,Breadcrumb ,BreadcrumbItem,Progress,Table } from 'reactstrap';
 import './Dashboard.css';
 import classnames from 'classnames';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
-import Dharma from "@dharmaprotocol/dharma.js";
 import MyLoanRequests from "../MyLoanRequests/MyLoanRequests";
-
-const funded_loans = [
-    {
-        "created_date": "12/08/2018 00:12:22",
-        "amount": "5000 DAI",
-        "term": "1 Month",
-        "interest_rate": "5%",
-        "collateral": "53 WETH",
-        "total_repayment": "5,250 DAI",
-        "repayment_frequency": "One Time"
-    },
-    {
-        "created_date": "07/08/2018 \n 00:12:22",
-        "amount": "5000 OMG",
-        "term": "1 Week",
-        "interest_rate": "3%",
-        "collateral": "12 WETH",
-        "total_repayment": "5,150 OMG",
-        "repayment_frequency": "One Time"
-    },
-    {
-        "created_date": "01/08/2018 \n 00:12:22",
-        "amount": "10,000 REP",
-        "term": "6 Month",
-        "interest_rate": "12%",
-        "collateral": "1 WETH",
-        "total_repayment": "12,000 REP",
-        "repayment_frequency": "One Time"
-    },
-    {
-        "created_date": "10/07/2018 00:12:22",
-        "amount": "5000 ZRX",
-        "term": "1 Month",
-        "interest_rate": "6%",
-        "collateral": "3 WETH",
-        "total_repayment": "5,300 ZRX",
-        "repayment_frequency": "One Time"
-    }    
-]
+import FundedLoanRequests from "../FundedLoanRequests/FundedLoanRequests";
 
 const data = {
     labels: [
@@ -244,21 +206,20 @@ class Dashboard extends Component {
                                         <div className="d-block d-md-flex" style={{ position: 'absolute', left: 100, top: 0 }}>
                                             <Nav tabs>
                                                 <NavItem>
-                                                    <NavLink className={classnames({ active: this.state.activeTab === '1' })}
-                                                        onClick={() => { this.tabsclick('1'); }}
-                                                    >
-                                                        Funded Loans
-                                                    </NavLink>
-                                                </NavItem>
-                                                <NavItem>
                                                     <NavLink
-                                                        className={classnames({ active: this.state.activeTab === '2' })}
-                                                        onClick={() => { this.tabsclick('2'); }}
+                                                        className={classnames({ active: this.state.activeTab === '1' })}
+                                                        onClick={() => { this.tabsclick('1'); }}
                                                     >
                                                         Borrowed Loans
                                                     </NavLink>
                                                 </NavItem>
-
+                                                <NavItem>
+                                                    <NavLink className={classnames({ active: this.state.activeTab === '2' })}
+                                                        onClick={() => { this.tabsclick('2'); }}
+                                                    >
+                                                        Funded Loans
+                                                    </NavLink>
+                                                </NavItem>
                                                 <NavItem>
                                                     <NavLink
                                                         className={classnames({ active: this.state.activeTab === '3' })}
@@ -273,23 +234,7 @@ class Dashboard extends Component {
                                         </div>
                                     </div>
                                     <TabContent activeTab={this.state.activeTab}>
-                                        
-                                        <TabPane tabId="1" title="Funded Loans">
-                                            <BootstrapTable
-                                                data={funded_loans}
-                                               bordered={ false }
-                                                >
-                                                <TableHeaderColumn width='100' dataField='created_date' isKey>Created Date</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='amount'>Amount</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='term'>Term</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='interest_rate'>Interest Rate</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='collateral'>Collateral</TableHeaderColumn>
-                                                <TableHeaderColumn width='200' dataField='total_repayment'>Total Repayment</TableHeaderColumn>
-                                                <TableHeaderColumn width='150' dataField='repayment_frequency'>Repayment Frequency</TableHeaderColumn>
-                                            </BootstrapTable>
-                                        </TabPane>
-
-                                        <TabPane tabId="2" title="Borrowed Loans">
+                                        <TabPane tabId="1" title="Borrowed Loans">
                                             <DharmaConsumer>
                                                 {(dharmaProps) => (
                                                     <MyLoanRequests
@@ -299,22 +244,24 @@ class Dashboard extends Component {
                                                     redirect={this.redirect}
                                                     />
                                                     )}
-                                            </DharmaConsumer>
+                                            </DharmaConsumer>                                  
+                                        </TabPane>
+
+                                        <TabPane tabId="2" title="Funded Loans">
+                                            <DharmaConsumer>
+                                                {(dharmaProps) => (
+                                                    <FundedLoanRequests
+                                                    authenticated={this.props.authenticated}
+                                                    token={this.props.token}
+                                                    dharma={dharmaProps.dharma}
+                                                    redirect={this.redirect}
+                                                    />
+                                                    )}
+                                            </DharmaConsumer>      
                                         </TabPane>
 
                                         <TabPane tabId="3" title="Archive">
-                                            <BootstrapTable
-                                                data={funded_loans}
-                                                bordered={ false }
-                                                >
-                                                <TableHeaderColumn width='100' dataField='created_date' isKey>Created Date</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='amount'>Amount</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='term'>Term</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='interest_rate'>Interest Rate</TableHeaderColumn>
-                                                <TableHeaderColumn width='100' dataField='collateral'>Collateral</TableHeaderColumn>
-                                                <TableHeaderColumn width='200' dataField='total_repayment'>Total Repayment</TableHeaderColumn>
-                                                <TableHeaderColumn width='150' dataField='repayment_frequency'>Repayment Frequency</TableHeaderColumn>
-                                            </BootstrapTable>
+                                            
                                         </TabPane>
 
 
