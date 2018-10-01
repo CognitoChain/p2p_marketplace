@@ -1,11 +1,9 @@
 // External libraries
 import React, { Component } from 'react';
-import {Redirect} from "react-router-dom";
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
-import paginationFactory from 'react-bootstrap-table2-paginator';
 import BootstrapTable from "react-bootstrap-table-next";
-import { Link } from 'react-router-dom';
+/*import { Link } from 'react-router-dom';*/
 
 // Components
 import Loading from "../Loading/Loading";
@@ -15,7 +13,7 @@ import Api from "../../services/api";
 
 // Styling
 import "./LoanRequests.css";
-import Title from "../Title/Title";
+/*import Title from "../Title/Title";*/
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert'; // Import
@@ -95,6 +93,7 @@ class LoanRequests extends Component {
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
+                    status:datum.status
                 });
             });
         });
@@ -165,11 +164,11 @@ class LoanRequests extends Component {
             return <Loading/>;
         }
 
-        const rowEvents = {
+        /*const rowEvents = {
             onClick: (e, row, rowIndex) => {
                 this.props.redirect(`/request/${row.id}`);
             },
-        };
+        };*/
 
         const rowClasses = (row, rowIndex) => {
             const rowData = data[rowIndex];

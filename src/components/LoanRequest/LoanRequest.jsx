@@ -1,6 +1,6 @@
-import Dharma from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
-import {Card,CardBody,CardTitle,Row,Col,Table} from 'reactstrap';
+import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, InputGroup, Input, InputGroupAddon, ListGroup, Form } from 'reactstrap';
 import Api from "../../services/api";
 
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
@@ -14,7 +14,9 @@ import "./LoanRequest.css";
 
 import { LinkContainer } from "react-router-bootstrap";
 
-import { Breadcrumb, Panel } from "react-bootstrap";
+import {Panel } from "react-bootstrap";
+import SummaryItem from "./SummaryItem/SummaryItem";
+import Error from "../Error/Error";
 
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
@@ -27,9 +29,22 @@ class LoanRequest extends Component {
 
         this.state = {
             loanRequest: null,
-            hasSufficientAllowance: null,
             transactions: [],
             error: null,
+            principal: 0,
+            principalTokenSymbol: "WETH",
+            LTVRatioValue: 0,
+            collateral: 0,
+            collateralTokenSymbol: "REP",
+            interestRate: 0,
+            termLength: 0,
+            termUnit: "weeks",
+            expirationLength: 30,
+            expirationUnit: "days",
+            disabled: false,
+            error: null,
+            hasSufficientAllowance: null,
+            txHash: null
         };
 
         // handlers
@@ -43,7 +58,7 @@ class LoanRequest extends Component {
     }
 
     componentDidMount() {
-        const { LoanRequest } = Dharma.Types;
+        const { LoanRequest,Debt } = Dharma.Types;
 
         const { dharma, id } = this.props;
 
@@ -51,7 +66,28 @@ class LoanRequest extends Component {
 
         api.setToken(this.props.token).get(`loanRequests/${id}`).then(async (loanRequestData) => {
             const loanRequest = await LoanRequest.load(dharma, loanRequestData);
+            console.log(loanRequest);
+            
+            /*const repaymentAmount = await loan.getTotalExpectedRepaymentAmount();*/
+            /*console.log(repaymentAmount);*/
+            /*const debt = await Debt.fetch(dharma, id);
+            console.log(debt);
+            const outstandingAmount = await debt.getOutstandingAmount();
+            console.log(outstandingAmount);
+            */
+
+
             this.setState({ loanRequest });
+            var get_terms = loanRequest.getTerms();
+            this.setState({
+                principal:get_terms.principalAmount,
+                principalTokenSymbol:get_terms.principalTokenSymbol,
+                collateralAmount:get_terms.collateralAmount,
+                collateralTokenSymbol:get_terms.collateralTokenSymbol,
+                interestRate:get_terms.interestRate,
+                termLength:get_terms.termDuration,
+                termUnit:get_terms.termUnit              
+            });
             this.reloadState();
         });
     }
@@ -65,36 +101,29 @@ class LoanRequest extends Component {
         const { loanRequest } = this.state;
 
         loanRequest
-            .fill()
-            .then((txHash) => {
-                const { transactions } = this.state;
-                transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
+        .fillAsCreditor()
+        .then((txHash) => {
+            const { transactions } = this.state;
+            transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
 
-                this.setState({
-                    transactions,
-                });
-            })
-            .catch((error) => {
-                this.setState({
-                    error,
-                });
+            this.setState({
+                transactions,
             });
+        })
+        .catch((error) => {
+            this.setState({
+                error,
+            });
+        });
     }
 
     async handleAuthorize() {
         const { loanRequest, transactions } = this.state;
-
         const { dharma } = this.props;
-
-        const { Allowance } = Dharma.Types;
-
+        const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
-
         const terms = loanRequest.getTerms();
-
-        const allowance = new Allowance(dharma, owner, terms.principalTokenSymbol);
-        const txHash = await allowance.makeUnlimitedIfNecessary();
-
+        const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
         if (txHash) {
             transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
 
@@ -108,34 +137,33 @@ class LoanRequest extends Component {
         const { loanRequest } = this.state;
 
         loanRequest
-            .assertFillable()
-            .then(() => {
-                this.setState({
-                    error: null,
-                });
-            })
-            .catch((error) => {
-                this.setState({
-                    error,
-                });
+        .assertFillable()
+        .then(() => {
+            this.setState({
+                error: null,
             });
+        })
+        .catch((error) => {
+            this.setState({
+                error,
+            });
+        });
     }
 
     async setHasSufficientAllowance() {
         const { dharma } = this.props;
         const { loanRequest } = this.state;
 
-        const { Tokens } = Dharma.Types;
+        const { Token } = Dharma.Types;
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        console.log("currentAccount: ", currentAccount);
-        const tokens = new Tokens(dharma, currentAccount);
+
         const terms = loanRequest.getTerms();
 
-        const tokenData = await tokens.getTokenDataForSymbol(terms.principalTokenSymbol);
+        const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
 
         const hasSufficientAllowance =
-            tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount;
+        tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount;
 
         this.setState({
             hasSufficientAllowance,
@@ -143,7 +171,24 @@ class LoanRequest extends Component {
     }
 
     render() {
-        const { loanRequest, hasSufficientAllowance, transactions, error } = this.state;
+        const {
+            principal,
+            principalTokenSymbol,
+            collateral,
+            collateralTokenSymbol,
+            termUnit,
+            termLength,
+            interestRate,
+            expirationUnit,
+            expirationLength,
+            disabled,
+            error,
+            hasSufficientAllowance,
+            txHash,
+            LTVRatioValue,
+            loanRequest, 
+            transactions,
+        } = this.state;
 
         const { dharma, onFillComplete } = this.props;
 
@@ -153,67 +198,120 @@ class LoanRequest extends Component {
 
         return (
             <div>
-                <Row>
-                    <Col md={12} className="mb-30">
-                            <Card className="card-statistics h-100 p-3">
-                                <CardBody>
-                                    <Breadcrumb>
-                                        <LinkContainer to="/" exact={true}>
-                                            <Breadcrumb.Item href="#">&lsaquo; All Requests </Breadcrumb.Item>
-                                        </LinkContainer>
 
-                                        <Breadcrumb.Item active>Details</Breadcrumb.Item>
-                                    </Breadcrumb>
-
-                                    {error && <NotFillableAlert>{error.message}</NotFillableAlert>}
-
-                                    {transactions.map((transaction) => {
-                                        const { txHash, description } = transaction;
-
-                                        let onSuccess;
-
-                                        if (description === TRANSACTION_DESCRIPTIONS.fill) {
-                                            onSuccess = onFillComplete;
-                                        } else {
-                                            onSuccess = this.reloadState;
-                                        }
-
-                                        return (
-                                            <TransactionManager
-                                                key={txHash}
-                                                txHash={txHash}
-                                                dharma={dharma}
-                                                description={description}
-                                                onSuccess={onSuccess}
-                                            />
-                                        );
-                                    })}
-                                    <Panel bsStyle="primary">
-                                        <Panel.Heading>
-                                            <Panel.Title componentClass="h3">Loan Request</Panel.Title>
-                                        </Panel.Heading>
-                                        <Panel.Body>
-                                            <Terms terms={loanRequest.getTerms()} />
-                                        </Panel.Body>
-                                        <Panel.Footer>
-                                            <AuthorizableAction
-                                                canTakeAction={!error && hasSufficientAllowance}
-                                                canAuthorize={!hasSufficientAllowance}
-                                                onAction={this.handleFill}
-                                                onAuthorize={this.handleAuthorize}>
-                                                <p>Authorize Token Transfer</p>
-                                                <p>Fill</p>
-                                            </AuthorizableAction>
-                                        </Panel.Footer>
-                                    </Panel>
-                                </CardBody>
-                            </Card>
-                    </Col>
-                </Row>
-                
+            <div className="page-title">
+                    <Row>
+                        <Col sm={6}>
+                            <h4 className="mb-0"> <div className="round-icon round-icon-lg olivegreen"><i className="ti-money"></i></div> Fund Loan</h4>
+                        </Col>
+                        <Col sm={6}>
+                            <Breadcrumb className="float-left float-sm-right">
+                                <BreadcrumbItem><a href="/market">Market</a></BreadcrumbItem>
+                                <BreadcrumbItem active>Fund Loan</BreadcrumbItem>
+                            </Breadcrumb>
+                        </Col>
+                    </Row>
             </div>
+
+            <Row>
+            {transactions.map((transaction) => {
+                const { txHash, description } = transaction;
+
+                let onSuccess;
+
+                if (description === TRANSACTION_DESCRIPTIONS.fill) {
+                    onSuccess = onFillComplete;
+                } else {
+                    onSuccess = this.reloadState;
+                }
+
+                return (
+                    <TransactionManager
+                    key={txHash}
+                    txHash={txHash}
+                    dharma={dharma}
+                    description={description}
+                    onSuccess={onSuccess}
+                    />
+                    );
+            })
+        }
+
+        <Col lg={6} md={6} sm={6} xl={4} className="mb-30">
+        <Card className="card-statistics h-100 p-3">
+        <CardBody>
+        <CardTitle>Summary </CardTitle>
+        <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+        <ListGroup className="list-unstyled to-do">
+        <SummaryItem 
+        labelName = "Loan Amount"
+        labelValue = { principal > 0 ? principal + ' ' + principalTokenSymbol : ' - ' }
+        />
+        <SummaryItem 
+        labelName = "Created Date"
+        labelValue = ""
+        />
+        <SummaryItem 
+        labelName = "Collateral Amount"
+        labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : ' - ' }
+        />
+        <SummaryItem 
+        labelName = "Collateral Value"
+        labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : ' - ' }
+        />
+        <SummaryItem 
+        labelName = "LTV"
+        labelValue = { LTVRatioValue > 0 ? LTVRatioValue + "%" : ' - ' }
+        />
+        <SummaryItem 
+        labelName = "Loan Term"
+        labelValue = { termLength > 0 ? termLength + " " + termUnit : ' - ' }
+        />
+        <SummaryItem 
+        labelName = "Interest Rate(Per Loan Term)"
+        labelValue = { interestRate + "%" }
+        />
+        <SummaryItem 
+        labelName = "Interest Amount"
+        labelValue = "-"
+        />
+        <SummaryItem 
+        labelName = "Total Repayment Amount"
+        labelValue = "-"
+        />
+        </ListGroup>
+
+        <hr />
+
+        <div className="mb-30">
+        <input className="form-check-input" type="checkbox" id="gridCheck" />
+        <label className="form-check-label" htmlFor="gridCheck">
+        I have read and agreed to the Loan Agreement
+        </label>
+        </div>
+
+        <div className="mb-10">
+        {error && <NotFillableAlert>{error.message}</NotFillableAlert>}
+        </div>
+
+        <div className="create-loan-buttons-container">
+        <AuthorizableAction
+        canTakeAction={!error && hasSufficientAllowance}
+        canAuthorize={!hasSufficientAllowance}
+        onAction={this.handleFill}
+        onAuthorize={this.handleAuthorize}>
+        <p>Unlock Tokens</p>
+        <p>Fund Loan</p>
+        </AuthorizableAction>
+        </div>
+        </div>
+        </CardBody>
+        </Card>
+        </Col>
+        </Row>
+
+        </div>
         );
     }
 }
-
 export default LoanRequest;

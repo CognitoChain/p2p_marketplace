@@ -20,7 +20,7 @@ class LoanRequestContainer extends Component {
 
         await api.put("loanRequests", id);
 
-        this.props.history.push(`/investments`);
+        this.props.history.push(`/dashboard`);
     }
 
     render() {
