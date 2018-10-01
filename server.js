@@ -9,11 +9,12 @@ require('./config/env');
 var getProxyRules = new HttpProxyRules({
   rules: {
     '/api/ping': 'http://localhost:3000/ping',
-    '/api/loanRequests/([0-9]+)': 'http://localhost:3000/loanrequest/$1', 
+    '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1',
     '/api/user/loanRequests': 'http://localhost:3000/user/loanrequests',    
     '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all',
     '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
     '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
+    '/api/priceFeed': 'http://localhost:3000/prices/all',
 
     '/api/swagger-ui.html': 'http://localhost:3000/swagger-ui.html',
     '/api/webjars/(.+)': 'http://localhost:3000/webjars/$1',
@@ -33,6 +34,12 @@ var postProxyRules = new HttpProxyRules({
   }
 });
 
+var putProxyRules = new HttpProxyRules({
+  rules: {
+    '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1'
+  }
+});
+
 // Create reverse proxy instance
 var proxy = httpProxy.createProxy();
 const server = jsonServer.create();
@@ -46,8 +53,12 @@ const middlewares = jsonServer.defaults({
 function proxyRequestHandler(req, res, proxyRules) {
   var target = proxyRules.match(req);
   console.log(req.method, "\t", req.originalUrl, " -> ", target)  
-  if (target) {    
-    proxy.web(req, res, { target: target });
+  if (target) {  
+    try {   
+      proxy.web(req, res, { target: target });
+    } catch(err) {
+      console.log("Error: ", err);
+    }
   } else {
     res.statusCode = 404;
     res.json({ error: 'Not Found' })
@@ -63,6 +74,12 @@ server.get("/api/*", function(req, res) {
 // POST requests use 'postProxyRules'
 server.post("/api/*", function(req, res) {
     proxyRequestHandler(req, res, postProxyRules);
+  }
+);
+
+// PUT requests use 'putProxyRules'
+server.put("/api/*", function(req, res) {
+    proxyRequestHandler(req, res, putProxyRules);
   }
 );
 
