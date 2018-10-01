@@ -13,7 +13,7 @@ import Market from '../Market/Market';
 /*import Create from '../Create/Create';*/
 import Create from "../../containers/CreateLoan";
 import WalletContainer from "../../containers/Wallet";
-import Detail from '../Detail/Detail';
+import Success from '../Success/Success';
 import {withRouter} from 'react-router-dom';
 
 import LoanRequestsContainer from "../../containers/LoanRequests";
@@ -21,6 +21,8 @@ import CreateLoanRequestContainer from "../../containers/CreateLoanRequest";
 import TokensContainer from "../../containers/Tokens";
 import LoanRequestContainer from "../../containers/LoanRequest";
 import InvestmentsContainer from "../../containers/Investments";
+import DetailContainer from "../../containers/Detail";
+
 
 const PrivateRoute = ({component: Component, authenticated, ...rest}) => {
     return (
@@ -93,8 +95,9 @@ class Layout extends Component {
                         <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/tokens" component={TokensContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/request/:id" component={LoanRequestContainer} />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={Detail} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/investments" component={InvestmentsContainer} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/success" component={Success} />
                     </Switch>
                 </Base>
             )

@@ -30,7 +30,7 @@ class Base extends Component {
                     <div className="row">
                         <Sidebar />
                         <div className="content-wrapper">
-                            {this.props.children}
+                            <div className="main-content-container">{this.props.children}</div>
                             <Footer />
                         </div>
                     </div>
