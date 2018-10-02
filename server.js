@@ -85,6 +85,10 @@ server.put("/api/*", function(req, res) {
 
 server.use(middlewares);
 
+server.get('/*', function(req, res){
+    res.sendFile(__dirname + '/build/index.html');
+});
+
 server.listen(process.env.PORT || 8080, () => {
   console.log(`JSON Server started  on port ${process.env.PORT }`);
 });
