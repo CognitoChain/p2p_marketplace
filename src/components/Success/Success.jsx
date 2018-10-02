@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row, Col,Breadcrumb ,BreadcrumbItem,Progress,Table,Alert } from 'reactstrap';
+import { Row, Col,Breadcrumb ,BreadcrumbItem,Alert } from 'reactstrap';
 import './Success.css';
-import classnames from 'classnames';
 import { Link } from 'react-router-dom';
 
 class Success extends Component {
