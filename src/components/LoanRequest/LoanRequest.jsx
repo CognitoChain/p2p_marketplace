@@ -1,22 +1,17 @@
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
-import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, InputGroup, Input, InputGroupAddon, ListGroup, Form } from 'reactstrap';
+import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem,  Input, ListGroup } from 'reactstrap';
 import Api from "../../services/api";
-
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
 import Terms from "./Terms/Terms";
 import NotFillableAlert from "./Alert/NotFillableAlert";
-
 import TransactionManager from "../TransactionManager/TransactionManager";
 import Loading from "../Loading/Loading";
-
 import "./LoanRequest.css";
-
-import { LinkContainer } from "react-router-bootstrap";
-
-import {Panel } from "react-bootstrap";
 import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
+import { toast } from 'react-toastify';
+import * as moment from "moment";
 
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
@@ -44,7 +39,10 @@ class LoanRequest extends Component {
             disabled: false,
             error: null,
             hasSufficientAllowance: null,
-            txHash: null
+            txHash: null,
+            createdAt:null,
+            interestAmount:0,
+            totalRepaymentAmount:0
         };
 
         // handlers
@@ -76,17 +74,26 @@ class LoanRequest extends Component {
             console.log(outstandingAmount);
             */
 
-
             this.setState({ loanRequest });
             var get_terms = loanRequest.getTerms();
+            console.log(get_terms);
+
+            let principal = get_terms.principalAmount;
+            let interest_rate =  get_terms.interestRate;
+            let interest_amount = (principal * interest_rate) / 100;
+            let total_reapayment_amount = parseFloat(principal) + parseFloat(interest_amount);
+
             this.setState({
                 principal:get_terms.principalAmount,
                 principalTokenSymbol:get_terms.principalTokenSymbol,
-                collateralAmount:get_terms.collateralAmount,
+                collateral:get_terms.collateralAmount,
                 collateralTokenSymbol:get_terms.collateralTokenSymbol,
                 interestRate:get_terms.interestRate,
                 termLength:get_terms.termDuration,
-                termUnit:get_terms.termUnit              
+                termUnit:get_terms.termUnit,
+                createdAt:moment(loanRequest.data.createdAt).format("DD/MM/YYYY HH:mm:ss"),
+                interestAmount:interest_amount,
+                totalRepaymentAmount:total_reapayment_amount              
             });
             this.reloadState();
         });
@@ -123,13 +130,23 @@ class LoanRequest extends Component {
         const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
         const terms = loanRequest.getTerms();
-        const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
-        if (txHash) {
-            transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
 
-            this.setState({
-                transactions,
-            });
+        if(typeof owner != 'undefined')
+        {
+            const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
+            if (txHash) {
+                transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
+
+                this.setState({
+                    transactions,
+                });
+            }
+        }
+        else
+        {
+            toast.error("Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.", {
+                     autoClose: 8000
+            });   
         }
     }
 
@@ -160,14 +177,23 @@ class LoanRequest extends Component {
 
         const terms = loanRequest.getTerms();
 
-        const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
-
-        const hasSufficientAllowance =
-        tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount;
-
-        this.setState({
-            hasSufficientAllowance,
-        });
+        if(typeof currentAccount != "undefined")
+        {
+            const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
+            const hasSufficientAllowance =
+            tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount;
+            this.setState({
+                hasSufficientAllowance,
+            });
+        }
+        else{
+            toast.error("Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.", {
+                     autoClose: 8000
+            });
+            this.setState({
+                hasSufficientAllowance:'',
+            });
+        }
     }
 
     render() {
@@ -188,6 +214,9 @@ class LoanRequest extends Component {
             LTVRatioValue,
             loanRequest, 
             transactions,
+            createdAt,
+            interestAmount,
+            totalRepaymentAmount
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
@@ -214,28 +243,32 @@ class LoanRequest extends Component {
             </div>
 
             <Row>
-            {transactions.map((transaction) => {
-                const { txHash, description } = transaction;
+                <Col sm={12} md={12} lg={12} xs={12}>
+                    {transactions.map((transaction) => {
+                        const { txHash, description } = transaction;
+                        let onSuccess;
+                        if (description === TRANSACTION_DESCRIPTIONS.fill) {
+                            onSuccess = onFillComplete;
+                        } else {
+                            onSuccess = this.reloadState;
+                        }
 
-                let onSuccess;
+                        return (
+                            <TransactionManager
+                            key={txHash}
+                            txHash={txHash}
+                            dharma={dharma}
+                            description={description}
+                            onSuccess={onSuccess}
+                            />
+                            );
+                        })
+                     }
+                </Col>
+            </Row>
 
-                if (description === TRANSACTION_DESCRIPTIONS.fill) {
-                    onSuccess = onFillComplete;
-                } else {
-                    onSuccess = this.reloadState;
-                }
-
-                return (
-                    <TransactionManager
-                    key={txHash}
-                    txHash={txHash}
-                    dharma={dharma}
-                    description={description}
-                    onSuccess={onSuccess}
-                    />
-                    );
-            })
-        }
+            <Row>
+            
 
         <Col lg={6} md={6} sm={6} xl={4} className="mb-30">
         <Card className="card-statistics h-100 p-3">
@@ -249,7 +282,7 @@ class LoanRequest extends Component {
         />
         <SummaryItem 
         labelName = "Created Date"
-        labelValue = ""
+        labelValue = { createdAt != '' ? createdAt : ' - ' }
         />
         <SummaryItem 
         labelName = "Collateral Amount"
@@ -273,11 +306,11 @@ class LoanRequest extends Component {
         />
         <SummaryItem 
         labelName = "Interest Amount"
-        labelValue = "-"
+        labelValue = { interestAmount > 0 ? interestAmount + ' ' + principalTokenSymbol : ' - ' }
         />
         <SummaryItem 
         labelName = "Total Repayment Amount"
-        labelValue = "-"
+        labelValue = { totalRepaymentAmount > 0 ? totalRepaymentAmount + ' ' + principalTokenSymbol : ' - ' }
         />
         </ListGroup>
 

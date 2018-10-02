@@ -14,7 +14,7 @@ import Api from "../../services/api";
 import "./FundedLoans.css";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
-
+import {amortizationUnitToFrequency} from "../../utils/Util";
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
@@ -24,8 +24,8 @@ const columns = [
         dataField: "createdAt",
         text: "Created Date",
         formatter:function(cell,row,rowIndex,formatExtraData){
-            var date = moment(cell).format("DD/MM/YYYY");
-            var time = moment(cell).format("HH:mm:ss");
+            var date = moment(row.requestedAt).format("DD/MM/YYYY");
+            var time = moment(row.requestedAt).format("HH:mm:ss");
             return (
                 <div>
                     <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
@@ -96,7 +96,7 @@ const columns = [
         formatter:function(cell,row,rowIndex,formatExtraData){
             return (
                 <div>
-                    One-time
+                    {amortizationUnitToFrequency(row.termUnit)}
                 </div>
             )
         }

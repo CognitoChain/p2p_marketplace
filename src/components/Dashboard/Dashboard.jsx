@@ -4,7 +4,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row, Col,Breadcrumb ,BreadcrumbItem,Progress,Table } from 'reactstrap';
 import './Dashboard.css';
 import classnames from 'classnames';
-import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
+import { TableHeaderColumn } from 'react-bootstrap-table';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import MyLoanRequests from "../MyLoanRequests/MyLoanRequests";
 import FundedLoanRequests from "../FundedLoanRequests/FundedLoanRequests";
@@ -37,6 +37,7 @@ class Dashboard extends Component {
             widths:80
         };
         console.log(this.props)
+        this.redirect = this.redirect.bind(this);
     }
     tabsclick(tab) {
         if (this.state.activeTab !== tab) {
@@ -44,6 +45,9 @@ class Dashboard extends Component {
                 activeTab: tab
             });
         }
+    }
+    redirect(location) {
+        this.props.history.push(location);
     }
     componentWillMount() {
 
