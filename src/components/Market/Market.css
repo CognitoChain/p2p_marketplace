@@ -65,3 +65,8 @@
 {
 	text-align: left !important; 
 }
+.filter-disabled{
+  opacity: .4;
+  cursor: default !important;
+  pointer-events: none;
+}
