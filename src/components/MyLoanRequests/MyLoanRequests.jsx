@@ -15,8 +15,7 @@ import "./MyLoanRequests.css";
 import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-/*import { withRouter } from 'react-router';
-import { Redirect } from 'react-router-dom';*/
+import {amortizationUnitToFrequency} from "../../utils/Util";
 
 /**
  * Here we define the columns that appear in the table that holds all of the
@@ -32,7 +31,6 @@ class MyLoanRequests extends Component {
             isLoading: true,
             modal: false
         };
-        
         this.renderShowsTotal = this.renderShowsTotal.bind(this);
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -142,8 +140,7 @@ class MyLoanRequests extends Component {
 
         const rowEvents = {
             onClick: (e, row, rowIndex) => {
-                /*this.props.history.push(`/detail/${row.id}`);
-                this.props.redirect(`/login/`);*/
+                this.props.redirect(`/detail/${row.id}`);
             },
         };
 
@@ -151,9 +148,9 @@ class MyLoanRequests extends Component {
             const rowData = data[rowIndex];
 
             if (rowData.id === highlightRow) {
-                return "loan-request-row1 highlight";
+                return "loan-request-row1 highlight cursor-pointer";
             } else {
-                return "loan-request-row1";
+                return "loan-request-row1 cursor-pointer";
             }
         };
         const columns = [
@@ -161,8 +158,8 @@ class MyLoanRequests extends Component {
                 dataField: "createdAt",
                 text: "Created Date",
                 formatter:function(cell,row,rowIndex,formatExtraData){
-                    var date = moment(cell).format("DD/MM/YYYY");
-                    var time = moment(cell).format("HH:mm:ss");
+                    var date = moment(row.requestedAt).format("DD/MM/YYYY");
+                    var time = moment(row.requestedAt).format("HH:mm:ss");
                     return (
                         <div>
                             <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
@@ -233,7 +230,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            One-time
+                            {amortizationUnitToFrequency(row.termUnit)}
                         </div>
                     )
                 }
