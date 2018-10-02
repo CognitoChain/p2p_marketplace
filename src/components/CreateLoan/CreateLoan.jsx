@@ -11,6 +11,7 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import './CreateLoan.css';
 import Api from "../../services/api";
 import Error from "../Error/Error";
+import { toast } from 'react-toastify';
 
 class CreateLoan extends Component {
 
@@ -39,7 +40,9 @@ class CreateLoan extends Component {
             disabled: false,
             error: null,
             hasSufficientAllowance: null,
-            txHash: null
+            txHash: null,
+            interest_amount:0,
+            total_reapayment_amount:0
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -104,12 +107,22 @@ class CreateLoan extends Component {
         console.log("setHasSufficientAllowance() - currentAccount: ", currentAccount);
         /*const tokens = new Tokens(dharma, currentAccount);*/
         /*const tokenData = await tokens.getTokenDataForSymbol(symbol);*/
-        const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
-        const hasSufficientAllowance =
+        
+        if(typeof currentAccount != "undefined")
+        {
+            const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
+            const hasSufficientAllowance =
             tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount;
-        this.setState({
-            hasSufficientAllowance,
-        });
+            this.setState({
+                hasSufficientAllowance,
+            });
+        }
+        else
+        {
+            toast.error("Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.", {
+                     autoClose: 8000
+            });
+        }
     }
 
     async authorizeCollateralTransfer() {
@@ -131,15 +144,18 @@ class CreateLoan extends Component {
 
         const currentAccount = await dharma.blockchain.getCurrentAccount();
 
-        const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
-            dharma,
-            collateralTokenSymbol,
-            currentAccount,
-        );
+        if(typeof currentAccount != 'undefined')
+        {
+             const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
+                dharma,
+                collateralTokenSymbol,
+                currentAccount,
+            );
 
-        this.setState({
-            txHash,
-        });
+            this.setState({
+                txHash,
+            });
+        }       
     }
 
     async generateLoanRequest_bk(debtorAddress) {
@@ -251,6 +267,18 @@ class CreateLoan extends Component {
                     disabled: false,
                 });
             });
+
+            if(this.state.interest_rate > 0 && value > 0)
+            {
+                let principal = value;
+                let interest_rate =  this.state.interest_rate;
+                let interest_amount = (principal * interest_rate) / 100;
+                let total_reapayment_amount = parseFloat(principal) + parseFloat(interest_amount);
+                this.setState({
+                    interest_amount: interest_amount.toFixed(2),
+                    total_reapayment_amount:total_reapayment_amount.toFixed(2)
+                });
+            }
         }
 
         this.setState({
@@ -264,6 +292,18 @@ class CreateLoan extends Component {
 
             this.setHasSufficientAllowance(value);
         }
+
+        if(name == "interestRate" && value > 0)
+        {
+            let interest_rate = value;
+            let interest_amount = (this.state.principal * interest_rate) / 100;
+            let total_reapayment_amount = parseFloat(this.state.principal) + parseFloat(interest_amount);
+            this.setState({
+                interest_amount: interest_amount.toFixed(2),
+                total_reapayment_amount:total_reapayment_amount.toFixed(2)
+            });
+        }
+
     }
 
     componentWillMount() {
@@ -296,7 +336,9 @@ class CreateLoan extends Component {
             error,
             hasSufficientAllowance,
             txHash,
-            LTVRatioValue
+            LTVRatioValue,
+            interest_amount,
+            total_reapayment_amount
         } = this.state;
 
         return (
@@ -419,23 +461,23 @@ class CreateLoan extends Component {
                                         <ListGroup className="list-unstyled to-do">
                                             <SummaryItem 
                                                 labelName = "Loan Amount"
-                                                labelValue = { principal > 0 ? principal + ' ' + principalTokenSymbol : ' - ' }
+                                                labelValue = { principal > 0 ? principal + ' ' + principalTokenSymbol : 'N/A' }
                                             />
                                             <SummaryItem 
                                                 labelName = "Collateral Amount"
-                                                labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : ' - ' }
+                                                labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : 'N/A' }
                                             />
                                             <SummaryItem 
                                                 labelName = "LTV"
-                                                labelValue = { LTVRatioValue > 0 ? LTVRatioValue + "%" : ' - ' }
+                                                labelValue = { LTVRatioValue > 0 ? LTVRatioValue + "%" : 'N/A' }
                                             />
                                             <SummaryItem 
                                                 labelName = "Loan Term"
-                                                labelValue = { termLength > 0 ? termLength + " " + termUnit : ' - ' }
+                                                labelValue = { termLength > 0 ? termLength + " " + termUnit : 'N/A' }
                                             />
                                             <SummaryItem 
                                                 labelName = "Interest Rate(Per Loan Term)"
-                                                labelValue = { interestRate + "%" }
+                                                labelValue = { interestRate > 0 ? interestRate + "%" + termUnit : 'N/A' }
                                             />
                                             {/*<SummaryItem 
                                                 labelName = "Expiration"
@@ -443,11 +485,11 @@ class CreateLoan extends Component {
                                             />*/}
                                             <SummaryItem 
                                                 labelName = "Interest Amount"
-                                                labelValue = "-"
+                                                labelValue = { interest_amount > 0 ? interest_amount + ' ' + principalTokenSymbol : 'N/A' }
                                             />
                                             <SummaryItem 
                                                 labelName = "Total Repayment Amount"
-                                                labelValue = "-"
+                                                labelValue = { total_reapayment_amount > 0 ? total_reapayment_amount + ' ' + principalTokenSymbol : 'N/A' }
                                             />
                                             {/*<SummaryItem 
                                                 labelName = "Relayer Fee"
