@@ -23,3 +23,6 @@
 .wallet-token-symbol,.wallet-token-balance{
 	font-weight: bolder !important;
 }
+.btn.cognito.btn-danger {
+   	/*background-color: red;*/
+}

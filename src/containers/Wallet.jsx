@@ -12,7 +12,7 @@ class WalletContainer extends Component {
         return (
             <DharmaConsumer>
                 {(dharmaProps) => {
-                    return <Wallet tokens={dharmaProps.tokens} />;
+                    return <Wallet tokens={dharmaProps.tokens} dharma={dharmaProps.dharma} />;
                 }}
             </DharmaConsumer>
         );
