@@ -16,3 +16,6 @@
 	color: white !important;
 	padding:10px 15px;
 }
+.payment-due{
+	opacity: 0.3 !important;
+}
