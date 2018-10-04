@@ -1,5 +1,5 @@
 
-EC2HOST=ec2-18-130-237-108.eu-west-2.compute.amazonaws.com
+EC2HOST=ec2-35-177-152-101.eu-west-2.compute.amazonaws.com
 
 #projdi='cognito/p2p_marketplace'
 projdir=./
@@ -7,10 +7,12 @@ projdir=./
 #dir='cognito/aws'
 dir=../aws/ 
 
+# get dependencies and make prod build
+yarn install
 yarn build
-rm -f $dir/build.zip
 
 # create new build.zip in 'cognito/aws' dir
+rm -f $dir/build.zip
 zip -r $dir/build.zip ./build 
 zip -ru $dir/build.zip ./public
 zip -ru $dir/build.zip ./scripts
@@ -19,7 +21,6 @@ zip -ru $dir/build.zip ./data
 zip -ru $dir/build.zip ./node_modules
 zip -u $dir/build.zip ./server.js 
 zip -u $dir/build.zip ./package.json
-zip -u $dir/build.zip ./package-lock.json
 
 cd $dir
 
