@@ -2,6 +2,8 @@ import React,{Component} from 'react';
 import { Link } from 'react-router-dom';
 import ScrollArea  from 'react-scrollbar';
 import './Header';
+import marketsidebarImg from "../../assets/images/market.png";
+import walletsidebarImg from "../../assets/images/wallet.png";
 class Sidebar extends Component{
    constructor(props)
    {
@@ -145,13 +147,13 @@ class Sidebar extends Component{
               <ul className="nav navbar-nav side-menu" id="sidebarnav">
                 {/* <!-- menu item Dashboard--> */}
                 <li className="">
-                  <Link to="/market"><i className="ti-home"></i><span className="right-nav-text">Market</span></Link>
+                  <Link to="/market"><img src={marketsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> Market</span></Link>
                 </li>  
                 <li className="">
-                  <Link to="/dashboard"><i className="ti-home"></i><span className="right-nav-text">My Loans</span></Link>  
+                  <Link to="/dashboard"><img src={marketsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> My Loans</span></Link>  
                 </li>
                 <li className="">
-                  <Link to="/wallet"><i className="ti-wallet"></i><span className="right-nav-text">My Wallet</span></Link>  
+                  <Link to="/wallet"><img src={walletsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> My Wallet</span></Link>  
                 </li>
               </ul>
             </div>
@@ -169,7 +171,7 @@ class Sidebar extends Component{
                     <Link to="/privacy-policy">Privacy Policy</Link>
                   </li>  
                   <li>
-                    <Link to="/terms-and-conditions">Terms and conditions</Link>  
+                    <Link to="/terms-and-conditions">Terms and Conditions</Link>  
                   </li>
                 </ul>
               </div>
