@@ -28,8 +28,6 @@ class FundedLoanRequests extends Component {
             modal: false,
             investments: []
         };
-
-        this.renderShowsTotal = this.renderShowsTotal.bind(this);
         this.toggle = this.toggle.bind(this);
         /*this.openlink = this.openlink.bind(this);*/
     }
@@ -46,41 +44,21 @@ class FundedLoanRequests extends Component {
         const { dharma } = this.props;
         const { Investments } = Dharma.Types;
         const creditor = await dharma.blockchain.getCurrentAccount();
-
-        const investments = await Investments.getExpandedData(dharma, creditor);
-        console.log("-- investments --");
-        console.log(investments);
-
-        // Test loading a Debt and an Investment by id (agreementId)
-        
-        /*let agreementId = "0x885df2ccdaee227b67c3fb0fc99028c5e33eef74686fee618872ad8c83fdbcf1";
-
-        console.log("-- investment --");
-        const investment = await Investment.fetch(dharma, agreementId);
-        console.log(investment);
-
-        console.log("-- debt --");
-        const debt = await Debt.fetch(dharma, agreementId);
-        console.log(debt);
-
-        const outstandingAmount = await debt.getOutstandingAmount();*/
-        
-        /*const txHash = await debt.makeRepayment(outstandingAmount);*/
-
-        /*const repaymentSchedule =  await dharma.servicing.getRepaymentScheduleAsync(agreementId);
-        
-        console.log("-- REPAYMENT SCHEDULE --");
-        repaymentSchedule.forEach(ts => {
-            var date = new Date(ts * 1000);
-            console.log(date);
-        });*/
-        /* const repayment_schdeule = await adapter.getRepaymentSchedule(debt)
-         console.log(repayment_schdeule);*/
-
-        this.setState({
-            investments,
-            isLoading: false
-        });
+        if(typeof creditor != "undefined")
+        {
+            const investments = await Investments.getExpandedData(dharma, creditor);
+            console.log(investments);
+            this.setState({
+                investments,
+                isLoading: false
+            }); 
+        }
+        else
+        {
+            this.setState({
+                isLoading: false
+            }); 
+        }
     }
 
     /**
@@ -109,13 +87,6 @@ class FundedLoanRequests extends Component {
             };
         });
     }
-    renderShowsTotal(start, to, total) {
-        return (
-            <p style={{ color: 'blue' }}>
-                From {start} to {to}, totals is {total}&nbsp;&nbsp;(its a customize text)
-      </p>
-        );
-    }
     toggle() {
         this.setState({
             modal: !this.state.modal
@@ -128,6 +99,12 @@ class FundedLoanRequests extends Component {
         if (isLoading) {
             return <Loading />;
         }
+
+        const rowEvents = {
+            onClick: (e, row, rowIndex) => {
+                this.props.redirect(`/detail/${row.id}`);
+            },
+        };
 
         const rowClasses = (row, rowIndex) => {
             const rowData = data[rowIndex];
@@ -203,7 +180,7 @@ class FundedLoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.repaidAmount}</span></div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.totalExpectedRepaymentAmount}</span></div>
                         </div>
                     )
                 }
@@ -222,6 +199,12 @@ class FundedLoanRequests extends Component {
             }
         ];
         
+        const pagination = paginationFactory({
+            page: 1,
+            /*showTotal:true,*/
+            alwaysShowAllBtns:true            
+        });
+
         return (
             <div className="LoanRequests">
                 <BootstrapTable
@@ -233,12 +216,9 @@ class FundedLoanRequests extends Component {
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={false}
-                    pagination={ paginationFactory() }
+                    rowEvents={rowEvents}
+                    pagination={ pagination }
                 />
-
-                {
-                    data.length === 0 && <FundedLoanRequestsEmpty />
-                }
             </div>
         );
     }
