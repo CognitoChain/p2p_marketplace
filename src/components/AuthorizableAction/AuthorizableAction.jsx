@@ -12,15 +12,16 @@ class AuthorizableAction extends Component {
     }
 
     render() {
-        const { canTakeAction, canAuthorize, onAction, onAuthorize } = this.props;
+        const { canTakeAction, canAuthorize, onAction, onAuthorize,tokenAuthorised } = this.props;
 
         return (
             <div className="Actions">
-                <Button
+            	<Button
                     onClick={(event) => this.handleClick(event, onAuthorize)}
                     disabled={!canAuthorize}
                     bsStyle="primary"
-                    className="AuthorizableAction-Button unlock-tokens-button btn btn-success cognito">
+                    className={`AuthorizableAction-Button unlock-tokens-button btn btn-success cognito ${tokenAuthorised ? 'd-none' : ''}`}
+                    >
                     {this.props.children[0]}
                 </Button>
 

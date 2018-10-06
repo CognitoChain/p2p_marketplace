@@ -12,6 +12,7 @@ import './CreateLoan.css';
 import Api from "../../services/api";
 import Error from "../Error/Error";
 import { toast } from 'react-toastify';
+import validators from '../../validators';
 
 class CreateLoan extends Component {
 
@@ -26,7 +27,7 @@ class CreateLoan extends Component {
             splitButtonOpen: false,
             principal: 0,
             principalTokenSymbol: "WETH",
-            LTVRatioValue: 0,
+            LTVRatioValue: 5,
             collateral: 0,
             relayerFeeAmount: 0,
             relayerAddress: null,
@@ -42,13 +43,20 @@ class CreateLoan extends Component {
             hasSufficientAllowance: null,
             txHash: null,
             interest_amount:0,
-            total_reapayment_amount:0
+            total_reapayment_amount:0,
+            token_authorised:false,
+            user_loan_agree:false
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleAgreeChange = this.handleAgreeChange.bind(this);
         this.createLoanRequest = this.createLoanRequest.bind(this);
         this.setHasSufficientAllowance = this.setHasSufficientAllowance.bind(this);
         this.authorizeCollateralTransfer = this.authorizeCollateralTransfer.bind(this);
+
+        this.validators = validators;
+        this.displayValidationErrors = this.displayValidationErrors.bind(this);
+        this.updateValidators = this.updateValidators.bind(this);
     }
 
     async componentDidMount() {
@@ -80,21 +88,31 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
-        try {
-            const { dharma } = this.props;
-            const currentAccount = await dharma.blockchain.getCurrentAccount();
-            console.log("createLoanRequest() - currentAccount: ", currentAccount);
-            const loanRequest = await this.generateLoanRequest(currentAccount);
-            /*const id = await api.setToken(this.props.token).create("loanRequests", loanRequest.toJSON());*/
-            const id = await api.setToken(this.props.token).create("loanRequests", {
-                ...loanRequest.toJSON(),
-                id: loanRequest.getAgreementId(),
-            });
-            this.props.onCompletion(loanRequest.getAgreementId());
-        } catch (e) {
-            console.error(e);
-            this.setState({ error: e.message });
+        const {user_loan_agree,principal,collateral} = this.state;
+        const form_valid = this.isFormValid();
+        if(user_loan_agree === true && principal > 0 && collateral > 0)
+        {
+            try {
+                const { dharma } = this.props;
+                const currentAccount = await dharma.blockchain.getCurrentAccount();
+                console.log("createLoanRequest() - currentAccount: ", currentAccount);
+                const loanRequest = await this.generateLoanRequest(currentAccount);
+                const id = api.setToken(this.props.token).create("loanRequests", {
+                    ...loanRequest.toJSON(),
+                    id: loanRequest.getAgreementId(),
+                });
+                console.log("Get agreement ID");
+                console.log(loanRequest.getAgreementId());
+                this.props.onCompletion(loanRequest.getAgreementId());
+            } catch (e) {
+                console.error(e);
+                this.setState({ error: e.message });
+            }
         }
+        else{
+            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : 'Please accept loan agreement terms.');
+            toast.error(msg);
+        }        
     }
 
     async setHasSufficientAllowance(tokenSymbol) {
@@ -116,6 +134,19 @@ class CreateLoan extends Component {
             this.setState({
                 hasSufficientAllowance,
             });
+
+            if(tokenData.hasUnlimitedAllowance === true)
+            {
+                this.setState({
+                    token_authorised:true,
+                });
+            }
+            else
+            {
+                this.setState({
+                    token_authorised:false,
+                });
+            }
         }
         else
         {
@@ -126,24 +157,10 @@ class CreateLoan extends Component {
     }
 
     async authorizeCollateralTransfer() {
-        /*const { dharma } = this.props;
-        const { Allowance } = Dharma.Types;
-        const { collateralTokenSymbol } = this.state;
-        const currentAccount = await dharma.blockchain.getCurrentAccount();
-        console.log("authorizeCollateralTransfer() - currentAccount: ", currentAccount);
-        const allowance = new Allowance(dharma, collateralTokenSymbol, currentAccount);
-        const txHash = await allowance.makeUnlimitedIfNecessary();
-        this.setState({
-            txHash,
-        });*/
         const { dharma } = this.props;
-
         const { Token } = Dharma.Types;
-
         const { collateralTokenSymbol } = this.state;
-
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-
         if(typeof currentAccount != 'undefined')
         {
              const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
@@ -154,48 +171,15 @@ class CreateLoan extends Component {
 
             this.setState({
                 txHash,
+                token_authorised:true
             });
+
+
+
         }       
     }
 
-    async generateLoanRequest_bk(debtorAddress) {
-        const { dharma } = this.props;
-
-        const { LoanRequest } = Dharma.Types;
-
-        const {
-            principal,
-            principalTokenSymbol,
-            collateralTokenSymbol,
-            relayerAddress,
-            relayerFeeAmount,
-            collateral,
-            termUnit,
-            expirationUnit,
-            expirationLength,
-            interestRate,
-            termLength,
-        } = this.state;
-
-        return LoanRequest.create(dharma, {
-            principalAmount: principal,
-            principalToken: principalTokenSymbol,
-            collateralAmount: collateral,
-            collateralToken: collateralTokenSymbol,
-            interestRate,
-            relayerFeeAmount,
-            relayerAddress,
-            termDuration: termLength,
-            termUnit,
-            debtorAddress,
-            expiresInDuration: expirationLength,
-            expiresInUnit: expirationUnit,
-            // Here we simplistically make the creditor pay the relayer fee.
-            creditorFeeAmount: relayerFeeAmount,
-        });
-    }
-
-     async generateLoanRequest(debtor) {
+    async generateLoanRequest(debtor) {
         const { dharma } = this.props;
 
         const { LoanRequest } = Dharma.Types;
@@ -255,7 +239,7 @@ class CreateLoan extends Component {
         const target = event.target;
         const value = target.value;
         const name = target.name;
-
+        console.log(value);
         if (name === "principal") {
             // When the principal changes, the form becomes disabled until the
             // relayer fee has been updated.
@@ -303,7 +287,78 @@ class CreateLoan extends Component {
                 total_reapayment_amount:total_reapayment_amount.toFixed(2)
             });
         }
+        if(name == "principal" || name == "collateral" || name == "termLength" || name == "interestRate")
+        {
+            this.updateValidators(name, value);    
+        }
+    }
 
+    handleAgreeChange(event){
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        if(value == 'y')
+        {
+            this.setState({
+                user_loan_agree:true
+            });
+        }
+        else
+        {
+            this.setState({
+                user_loan_agree:false
+            });
+        }
+
+    }
+
+    updateValidators(fieldName, value) {
+        this.validators[fieldName].errors = [];
+        this.validators[fieldName].state = value;
+        this.validators[fieldName].valid = true;
+        this.validators[fieldName].rules.forEach((rule) => {
+          if (rule.test instanceof RegExp) {
+            if (!rule.test.test(value)) {
+              this.validators[fieldName].errors.push(rule.message);
+              this.validators[fieldName].valid = false;
+            }
+          } else if (typeof rule.test === 'function') {
+            if (!rule.test(value)) {
+              this.validators[fieldName].errors.push(rule.message);
+              this.validators[fieldName].valid = false;
+            }
+          }
+        });
+    }
+
+    isFormValid() {
+        let status = true;
+        Object.keys(this.validators).forEach((field) => {
+          if(field == "principal" || field == "collateral" || field == "termLength" || field == "interestRate"){
+            if (!this.validators[field].valid) {
+              status = false;
+            }
+          }
+        });
+        return status;
+    }
+
+    displayValidationErrors(fieldName) {
+      const validator = this.validators[fieldName];
+      const result = '';
+      if (validator && !validator.valid) {
+        const errors = validator.errors.map((info, index) => {
+          return <span className="error" key={index}>* {info}<br/></span>
+        });
+  
+        return (
+          <div className="col s12 row">
+            {errors}
+          </div>  
+        );
+      }
+      return result;
     }
 
     componentWillMount() {
@@ -338,21 +393,26 @@ class CreateLoan extends Component {
             txHash,
             LTVRatioValue,
             interest_amount,
-            total_reapayment_amount
+            total_reapayment_amount,
+            token_authorised
         } = this.state;
 
         return (
-            <div>
+            <div className="create-loan-container">
                 <div className="page-title">
+
                     <Row>
-                        <Col sm={6}>
-                            <h4 className="mb-0"> <div className="round-icon round-icon-lg orange"><i className="ti-money"></i></div> New Loan</h4>
-                        </Col>
-                        <Col sm={6}>
-                            <Breadcrumb className="float-left float-sm-right">
-                                <BreadcrumbItem><a href="/market">Market</a></BreadcrumbItem>
+                        <Col>
+                            <Breadcrumb className="float-left">
+                                <BreadcrumbItem><a href="/market" className="link-blue">Market</a></BreadcrumbItem>
                                 <BreadcrumbItem active>New Loan</BreadcrumbItem>
                             </Breadcrumb>
+                        </Col>
+                    </Row>
+
+                    <Row className="mt-4 mb-4">
+                        <Col>
+                            <h5 className="mb-0"> <div className="round-icon round-icon-lg orange"><img className="mb-1" src="borrow.png" height="20" /></div> New Loan</h5>
                         </Col>
                     </Row>
                 </div>
@@ -362,7 +422,7 @@ class CreateLoan extends Component {
                         <Col lg={4} md={4} sm={6} xl={4}>
                             <Card className="card-statistics mb-30 h-100 p-4">
                                 <CardBody>
-                                    <CardTitle>Create New Loan Request </CardTitle>
+                                    <CardTitle className="card-title-custom">Create New Loan Request </CardTitle>
 
                                     {txHash && (
                                         <TransactionManager
@@ -374,7 +434,7 @@ class CreateLoan extends Component {
                                         />
                                     )}
 
-                                    <Form disabled={disabled} onSubmit={this.createLoanRequest}>
+                                    <Form disabled={disabled} onSubmit={this.createLoanRequest} className="create-loan-form">
                                         <div className="mt-20">
                                             <label>Loan Amount</label>
                                             <TokenSelect
@@ -387,14 +447,15 @@ class CreateLoan extends Component {
                                                 toggleDropDown={this.toggleDropDown}
                                                 tokens={tokens}
                                             />
+                                            { this.displayValidationErrors('principal') }
                                         </div>
                                         <div className="mt-20 create-loan-slider">
                                             <label>LTV (Loan-to-Value Ratio)</label>
                                             <InputRange
                                                 lassName="mt-20"
-                                                maxValue={100}
+                                                maxValue={60}
                                                 formatLabel={value => `${value} %`}
-                                                minValue={0}
+                                                minValue={5}
                                                 value={LTVRatioValue}
                                                 onChange={value => this.setState({ "LTVRatioValue": value })} />
                                         </div>
@@ -410,6 +471,7 @@ class CreateLoan extends Component {
                                                 toggleDropDown={this.toggleDropDown}
                                                 tokens={tokens}
                                             />
+                                            { this.displayValidationErrors('collateral') }
                                         </div>
                                         <div className="mt-20">
                                             <label>Loan Term</label>
@@ -422,6 +484,7 @@ class CreateLoan extends Component {
                                                 dropdownOpen={termUnitDropdownOpen}
                                                 toggleDropDown={this.toggleDropDown}
                                             />
+                                            { this.displayValidationErrors('termLength') }
                                         </div>
                                         <div className="mt-20">
                                             <label>Interest Rate (% Per Loan Term)</label>
@@ -433,6 +496,7 @@ class CreateLoan extends Component {
                                                     value={interestRate} />
                                                 <InputGroupAddon addonType="append">%</InputGroupAddon>
                                             </InputGroup>
+                                            { this.displayValidationErrors('interestRate') }
                                         </div>
                                         {/*<div className="mt-20">
                                             <label>Expiration</label>
@@ -454,79 +518,100 @@ class CreateLoan extends Component {
 
                         <Col lg={4} md={4} sm={6} xl={4}>
 
-                            <Card className="card-statistics mb-30 h-100 p-4">
-                                <CardBody>
-                                    <CardTitle>Summary </CardTitle>
-                                    <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
-                                        <ListGroup className="list-unstyled to-do">
-                                            <SummaryItem 
-                                                labelName = "Loan Amount"
-                                                labelValue = { principal > 0 ? principal + ' ' + principalTokenSymbol : 'N/A' }
-                                            />
-                                            <SummaryItem 
-                                                labelName = "Collateral Amount"
-                                                labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : 'N/A' }
-                                            />
-                                            <SummaryItem 
-                                                labelName = "LTV"
-                                                labelValue = { LTVRatioValue > 0 ? LTVRatioValue + "%" : 'N/A' }
-                                            />
-                                            <SummaryItem 
-                                                labelName = "Loan Term"
-                                                labelValue = { termLength > 0 ? termLength + " " + termUnit : 'N/A' }
-                                            />
-                                            <SummaryItem 
-                                                labelName = "Interest Rate(Per Loan Term)"
-                                                labelValue = { interestRate > 0 ? interestRate + "%" + termUnit : 'N/A' }
-                                            />
-                                            {/*<SummaryItem 
-                                                labelName = "Expiration"
-                                                labelValue = { expirationLength + " " + expirationUnit }
-                                            />*/}
-                                            <SummaryItem 
-                                                labelName = "Interest Amount"
-                                                labelValue = { interest_amount > 0 ? interest_amount + ' ' + principalTokenSymbol : 'N/A' }
-                                            />
-                                            <SummaryItem 
-                                                labelName = "Total Repayment Amount"
-                                                labelValue = { total_reapayment_amount > 0 ? total_reapayment_amount + ' ' + principalTokenSymbol : 'N/A' }
-                                            />
-                                            {/*<SummaryItem 
-                                                labelName = "Relayer Fee"
-                                                labelValue = {relayerFeeAmount > 0 ? relayerFeeAmount + ' ' + principalTokenSymbol : '-'}
-                                            />*/}
-                                        </ListGroup>
+                            <Card className="card-statistics mb-30 h-100">
+                                <CardBody className="pb-0">
 
-                                        <hr />
+                                    <div className="p-4 pb-0">
+                                            
+                                        <CardTitle className="card-title-custom">Summary </CardTitle>
+                                        <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+                                            <ListGroup className="list-unstyled to-do">
+                                                <SummaryItem 
+                                                    labelName = "Loan Amount"
+                                                    labelValue = { principal > 0 ? principal + ' ' + principalTokenSymbol : 'N/A' }
+                                                />
+                                                <SummaryItem 
+                                                    labelName = "Collateral Amount"
+                                                    labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : 'N/A' }
+                                                />
+                                                <SummaryItem 
+                                                    labelName = "LTV"
+                                                    labelValue = { LTVRatioValue > 0 ? LTVRatioValue + "%" : 'N/A' }
+                                                />
+                                                <SummaryItem 
+                                                    labelName = "Loan Term"
+                                                    labelValue = { termLength > 0 ? termLength + " " + termUnit : 'N/A' }
+                                                />
+                                                <SummaryItem 
+                                                    labelName = "Interest Rate(Per Loan Term)"
+                                                    labelValue = { interestRate > 0 ? interestRate + "%"  : 'N/A' }
+                                                />
+                                                {/*<SummaryItem 
+                                                    labelName = "Expiration"
+                                                    labelValue = { expirationLength + " " + expirationUnit }
+                                                />*/}
+                                                <SummaryItem 
+                                                    labelName = "Interest Amount"
+                                                    labelValue = { interest_amount > 0 ? interest_amount + ' ' + principalTokenSymbol : 'N/A' }
+                                                />
+                                                <SummaryItem 
+                                                    labelName = "Total Repayment Amount"
+                                                    labelValue = { total_reapayment_amount > 0 ? total_reapayment_amount + ' ' + principalTokenSymbol : 'N/A' }
+                                                />
+                                                {/*<SummaryItem 
+                                                    labelName = "Relayer Fee"
+                                                    labelValue = {relayerFeeAmount > 0 ? relayerFeeAmount + ' ' + principalTokenSymbol : '-'}
+                                                />*/}
+                                            </ListGroup>
 
-                                        <div className="mb-30">
-                                            <input className="form-check-input" type="checkbox" id="gridCheck" />
-                                            <label className="form-check-label" htmlFor="gridCheck">
-                                                I have read and agreed to the Loan Agreement
-                                          </label>
-                                        </div>
+                                            <hr />
 
-                                        <div className="mb-10">
-                                            {error && <Error title="Unable to create loan request">{error}</Error>}
-                                        </div>
+                                            <div className="agree-loan-check pt-1 mtb-2">
+                                                <label className="checkbox-container"> I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a>
+                                                  <input type="checkbox" id="loanAgreement" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
+                                                  <span className="checkmark"></span>                   
+                                                </label>
+                                            </div>
 
-                                        <div className="create-loan-buttons-container">
-                                            <AuthorizableAction
-                                                canTakeAction={hasSufficientAllowance}
-                                                canAuthorize={
-                                                    hasSufficientAllowance !== null && !hasSufficientAllowance
-                                                }
-                                                onAction={this.createLoanRequest}
-                                                onAuthorize={this.authorizeCollateralTransfer}>
-                                                <p>Unlock Tokens</p>
-                                                <p>Submit Application</p>
-                                            </AuthorizableAction>
                                         </div>
 
                                     </div>
                                 </CardBody>
-                            </Card>
 
+                                    <div className="mt-10">
+                                        {token_authorised === true &&
+                                            <div className="tokens-authorized-container pl-4 pr-4 token-authorised-text pt-3 pb-3">
+                                                <i className="fa fa-check"></i> 
+                                                <span className="token-authorise-text pl-2">Tokens Authorized.</span>
+                                            </div>  
+                                        }
+                                    </div>
+                                    
+                                    <CardBody className="pl-4 pt-1 mtb-2 mt-10">
+                                        <div>
+                                            <div>
+                                                {error && <Error title="Unable to create loan request">{error}</Error>}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div className="create-loan-buttons-container">
+                                                <AuthorizableAction
+                                                    canTakeAction={hasSufficientAllowance}
+                                                    canAuthorize={
+                                                        hasSufficientAllowance !== null && !hasSufficientAllowance
+                                                    }
+                                                    onAction={this.createLoanRequest}
+                                                    onAuthorize={this.authorizeCollateralTransfer}
+                                                    tokenAuthorised={token_authorised}
+                                                    >
+                                                    <p>Unlock Tokens</p>
+                                                    <p>Submit Application</p>
+                                                </AuthorizableAction>
+                                            </div>
+                                        </div>
+                                    </CardBody>
+                            </Card>
                         </Col>
                     </Row>
                 </div>
