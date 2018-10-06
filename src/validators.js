@@ -20,9 +20,9 @@ const validator = {
           message: 'Password must not be shorter than 6 characters',
         },
         {
-            test: /^[a-z0-9A-Z_]+$/,
+            test: /^[a-z0-9A-Z_!@#$%&*]+$/,
             message: 'Enter Valid Password',
-          },
+        },
       ],
       errors: [],
       valid: false,

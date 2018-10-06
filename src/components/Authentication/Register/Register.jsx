@@ -109,7 +109,12 @@ class Register extends React.Component{
         this.props.history.push("/dashboard");
       }
       else{
-        toast.error(response.status);
+        let error_msg = response.status;
+        if(typeof response.msg == 'undefined' && response.status == "ERROR_REGISTRATION_USER_EXISTS")
+        {
+          error_msg = 'User already exist with this email id.';
+        }
+        toast.error(error_msg);
       }  
     }
     render(){
