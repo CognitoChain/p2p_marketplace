@@ -19,3 +19,18 @@
 .payment-due{
 	opacity: 0.3 !important;
 }
+
+.repayment-details
+{
+	font-size: 16px;
+    margin-top: 20px;
+    text-align: left;
+}
+.text-bold{
+	font-weight: bolder !important;
+}
+.make-repayment-btn:focus
+{
+	-webkit-box-shadow:none !important;
+	box-shadow:none !important;
+}
