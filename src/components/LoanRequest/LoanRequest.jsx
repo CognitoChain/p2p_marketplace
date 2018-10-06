@@ -12,7 +12,7 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
 import { toast } from 'react-toastify';
 import * as moment from "moment";
-
+import fundLoanImg from "../../assets/images/fund_loan.png";
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -42,7 +42,8 @@ class LoanRequest extends Component {
             txHash: null,
             createdAt:null,
             interestAmount:0,
-            totalRepaymentAmount:0
+            totalRepaymentAmount:0,
+            collateralCurrentAmount:0
         };
 
         // handlers
@@ -55,7 +56,7 @@ class LoanRequest extends Component {
         this.assertFillable = this.assertFillable.bind(this);
     }
 
-    componentDidMount() {
+    componentWillMount() {
         const { LoanRequest,Debt } = Dharma.Types;
 
         const { dharma, id } = this.props;
@@ -63,6 +64,7 @@ class LoanRequest extends Component {
         const api = new Api();
 
         api.setToken(this.props.token).get(`loanRequests/${id}`).then(async (loanRequestData) => {
+
             const loanRequest = await LoanRequest.load(dharma, loanRequestData);
             console.log(loanRequest);
             
@@ -73,10 +75,20 @@ class LoanRequest extends Component {
             const outstandingAmount = await debt.getOutstandingAmount();
             console.log(outstandingAmount);
             */
-
+            let collateralCurrentAmount = 0;
             this.setState({ loanRequest });
             var get_terms = loanRequest.getTerms();
             console.log(get_terms);
+
+            const all_token_price = await api.setToken(this.props.token).get(`priceFeed`)
+              .then(async priceFeedData => {
+                let collateralTokenCurrentPrice =
+                  priceFeedData[get_terms.collateralTokenSymbol].USD;
+                collateralCurrentAmount =
+                  parseFloat(get_terms.collateralAmount) *
+                  collateralTokenCurrentPrice;
+            });
+
 
             let principal = get_terms.principalAmount;
             let interest_rate =  get_terms.interestRate;
@@ -93,7 +105,8 @@ class LoanRequest extends Component {
                 termUnit:get_terms.termUnit,
                 createdAt:moment(loanRequest.data.createdAt).format("DD/MM/YYYY HH:mm:ss"),
                 interestAmount:interest_amount,
-                totalRepaymentAmount:total_reapayment_amount              
+                totalRepaymentAmount:total_reapayment_amount,
+                collateralCurrentAmount:collateralCurrentAmount              
             });
             this.reloadState();
         });
@@ -216,7 +229,8 @@ class LoanRequest extends Component {
             transactions,
             createdAt,
             interestAmount,
-            totalRepaymentAmount
+            totalRepaymentAmount,
+            collateralCurrentAmount
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
@@ -230,14 +244,17 @@ class LoanRequest extends Component {
 
             <div className="page-title">
                     <Row>
-                        <Col sm={6}>
-                            <h4 className="mb-0"> <div className="round-icon round-icon-lg olivegreen"><i className="ti-money"></i></div> Fund Loan</h4>
-                        </Col>
-                        <Col sm={6}>
-                            <Breadcrumb className="float-left float-sm-right">
-                                <BreadcrumbItem><a href="/market">Market</a></BreadcrumbItem>
+                        <Col>
+                            <Breadcrumb>
+                                <BreadcrumbItem><a href="/market" className="link-blue">Market</a></BreadcrumbItem>
                                 <BreadcrumbItem active>Fund Loan</BreadcrumbItem>
                             </Breadcrumb>
+                        </Col>
+                    </Row>
+
+                    <Row className="mt-4 mb-4">
+                        <Col>
+                            <h4 className="mb-0"> <div className="round-icon round-icon-lg olivegreen"><img className="mb-1" src={fundLoanImg} height="20" /></div> Fund Loan</h4>
                         </Col>
                     </Row>
             </div>
@@ -290,7 +307,7 @@ class LoanRequest extends Component {
         />
         <SummaryItem 
         labelName = "Collateral Value"
-        labelValue = { collateral > 0 ? collateral + ' ' + collateralTokenSymbol : ' - ' }
+        labelValue = { collateralCurrentAmount > 0 ? collateralCurrentAmount+'$' : ' - ' }
         />
         <SummaryItem 
         labelName = "LTV"
@@ -316,12 +333,13 @@ class LoanRequest extends Component {
 
         <hr />
 
-        <div className="mb-30">
-        <input className="form-check-input" type="checkbox" id="gridCheck" />
-        <label className="form-check-label" htmlFor="gridCheck">
-        I have read and agreed to the Loan Agreement
-        </label>
+        <div className="agree-loan-check pt-1 mtb-2 mb-30">
+            <label className="checkbox-container"> I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a>
+                <input type="checkbox" id="gridCheck" />
+                <span className="checkmark"></span>
+            </label>
         </div>
+
 
         <div className="mb-10">
         {error && <NotFillableAlert>{error.message}</NotFillableAlert>}

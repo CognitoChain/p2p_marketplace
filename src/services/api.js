@@ -106,15 +106,22 @@ class Api {
      * @param id
      * @returns {Promise}
      */
-    put(resource, id) {
+    put(resource, id, data) {
         console.log("PUT ", this.apiUrl, "/", resource, "/", id)
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${resource}/${id}`, { method: "PUT" })
+            fetch(`${this.apiUrl}/${resource}/${id}`, { 
+                    method: "PUT",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": this.token
+                    },
+                    body: JSON.stringify(data),
+                })
                 .then((response) => resolve(response.json()))
                 .catch((reason) => reject(reason));
         });
     }
-
 
     /**
      * Creates a new resource by posting the given data to the API.
