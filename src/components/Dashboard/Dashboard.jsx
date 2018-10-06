@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 /*import { Dharma } from "@dharmaprotocol/dharma.js";*/
-import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row, Col,Breadcrumb ,BreadcrumbItem,Progress,Table } from 'reactstrap';
+import { Card,CardBody,CardTitle,TabContent, TabPane, Nav, NavItem, NavLink, Row, Col,Progress,Table } from 'reactstrap';
 import './Dashboard.css';
 import classnames from 'classnames';
-import { TableHeaderColumn } from 'react-bootstrap-table';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import MyLoanRequests from "../MyLoanRequests/MyLoanRequests";
 import FundedLoanRequests from "../FundedLoanRequests/FundedLoanRequests";
@@ -56,17 +55,11 @@ class Dashboard extends Component {
     render() {
         return (
             <div>
-                <div className="page-title">
+                <div className="page-title mb-20">
                     <Row>
-                        <Col sm={6}>
+                        <Col>
                             <h4 className="mb-0"> Dashboard</h4>
                             <div className='delete-button' onClick={(item) => { if (window.confirm('Are you sure you wish to delete this item?')) this.onCancel(item) }} />
-                        </Col>
-                        <Col sm={6}>
-                        <Breadcrumb className="float-left float-sm-right">
-                                    <BreadcrumbItem><a href="#">Home</a></BreadcrumbItem>
-                                    <BreadcrumbItem active>Dashboard</BreadcrumbItem>
-                            </Breadcrumb>
                         </Col>
                     </Row>
                 </div>
