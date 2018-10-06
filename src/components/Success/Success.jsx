@@ -42,7 +42,7 @@ class Success extends Component {
                         </Col>
                     </Row>
                 </div>
-                <Row className="mb-30">
+                <Row className="mb-30 mt-80">
                     
                     <Col lg={12} md={12} sm={12} xl={12} className="loan-success-msg">
                             <Alert color="info" className="p-5">
