@@ -35,8 +35,6 @@ class LoanRequests extends Component {
             isLoading: true,
             modal: false
         };
-        
-        this.renderShowsTotal = this.renderShowsTotal.bind(this);
         this.parseLoanRequests = this.parseLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
         this.toggle = this.toggle.bind(this);
@@ -121,13 +119,6 @@ class LoanRequests extends Component {
                 authenticated:this.props.authenticated
             };
         });
-    }
-    renderShowsTotal(start, to, total) {
-        return (
-          <p style={ { color: 'blue' } }>
-            From { start } to { to }, totals is { total }&nbsp;&nbsp;(its a customize text)
-          </p>
-        );
     }
     toggle() {
         this.setState({
@@ -277,6 +268,12 @@ class LoanRequests extends Component {
                 }
             }
         ];
+
+        const pagination = paginationFactory({
+            page: 1,
+            /*showTotal:true,*/
+            alwaysShowAllBtns:true            
+        });
         
         return (
             <div className="LoanRequests">
@@ -289,12 +286,8 @@ class LoanRequests extends Component {
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
-                    pagination={ paginationFactory() }
+                    pagination={pagination}                    
                 />
-
-                {
-                    data.length === 0 && <LoanRequestsEmpty/>
-                }
             </div>
         );
     }

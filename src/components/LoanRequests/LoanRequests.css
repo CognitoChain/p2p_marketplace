@@ -29,3 +29,9 @@
 .dispaly-inline-block{
   display: inline-block !important;
 }
+
+.react-bootstrap-table-pagination .btn-secondary{
+  background-color: #fff !important;
+  border:#163955 !important;; 
+  color:#163955 !important;
+}

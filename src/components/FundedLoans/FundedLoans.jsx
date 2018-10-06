@@ -15,6 +15,7 @@ import "./FundedLoans.css";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
 import {amortizationUnitToFrequency} from "../../utils/Util";
+import paginationFactory from 'react-bootstrap-table2-paginator';
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
@@ -111,8 +112,6 @@ class FundedLoans extends Component {
             highlightRow: null,
             isLoading: true,
         };
-
-        this.renderShowsTotal = this.renderShowsTotal.bind(this);
         this.fundedLoansRequests = this.fundedLoansRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
     }
@@ -202,13 +201,6 @@ class FundedLoans extends Component {
             };
         });
     }
-    renderShowsTotal(start, to, total) {
-        return (
-          <p style={ { color: 'blue' } }>
-            From { start } to { to }, totals is { total }&nbsp;&nbsp;(its a customize text)
-          </p>
-        );
-    }
     render() {
         const { highlightRow, isLoading } = this.state;
 
@@ -218,16 +210,28 @@ class FundedLoans extends Component {
             return <Loading/>;
         }
 
+        const rowEvents = {
+            onClick: (e, row, rowIndex) => {
+                this.props.redirect(`/detail/${row.id}`);
+            },
+        };
+
         const rowClasses = (row, rowIndex) => {
             const rowData = data[rowIndex];
 
             if (rowData.id === highlightRow) {
-                return "funded-loans-row1 highlight";
+                return "funded-loans-row1 highlight cursor-pointer";
             } else {
-                return "funded-loans-row1";
+                return "funded-loans-row1 cursor-pointer";
             }
         };
-       
+        
+        const pagination = paginationFactory({
+            page: 1,
+            /*showTotal:true,*/
+            alwaysShowAllBtns:true
+        });
+
         return (
             <div className="FundedLoansList">
                 <BootstrapTable
@@ -239,11 +243,9 @@ class FundedLoans extends Component {
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
+                    rowEvents={rowEvents}
+                    pagination={pagination}
                 />
-
-                {
-                    data.length === 0 && <FundedLoansEmpty/>
-                }
             </div>
         );
     }
