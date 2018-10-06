@@ -109,7 +109,7 @@ class Wallet extends Component {
     const { ethAddress, tokenlist, loading } = this.state;
 
     return (
-      <div>
+      <div className="wallet-page">
         <div className="page-title">
           <Row>
             <Col sm={6}>
