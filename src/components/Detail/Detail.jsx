@@ -16,7 +16,9 @@ import * as moment from "moment";
 import Api from "../../services/api";
 import BootstrapTable from "react-bootstrap-table-next";
 import Loading from "../Loading/Loading";
-
+import { toast } from "react-toastify";
+import Modal from "react-responsive-modal";
+import _ from "lodash";
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -33,55 +35,126 @@ class Detail extends Component {
       createdTime: null,
       interestAmount: 0,
       totalRepaymentAmount: 0,
+      outstandingAmount: 0,
       repaymentLoans: [],
-      isLoading: true
+      isLoading: true,
+      modalOpen: false,
+      repaymentAmount: 0,
+      agreementId: "",
+      totalRepaidAmount: 0,
+      collateralBtnDisplay: false,
+      repaymentBtnDisplay: false,
+      collateralSeizeBtnDisplay: false,
+      creditorEthAddress: "",
+      debtorEthAddress: "",
+      currentEthAddress: "",
+      collateralCurrentAmount: 0
     };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.processRepayment = this.processRepayment.bind(this);
   }
-  componentWillMount() {}
-
-  componentDidMount() {
+  async componentWillMount() {
     const { LoanRequest, Investments, Investment, Debt } = Dharma.Types;
     const { dharma, id } = this.props;
+    const currentAccount = await dharma.blockchain.getCurrentAccount();
+    let current_time = moment();
+    let collateralReturnable = false;
+    console.log(" Current Time " + current_time);
+
+    console.log(currentAccount);
+    let stateObj = {};
     const api = new Api();
+
     api
       .setToken(this.props.token)
       .get(`loanRequests/${id}`)
       .then(async loanRequestData => {
         const loanRequest = await LoanRequest.load(dharma, loanRequestData);
-        console.log(loanRequest);
-        this.setState({ loanRequest });
+
+        let creditorEthAddress = loanRequest.data.creditor;
+        let debtorEthAddress = loanRequest.data.debtor;
+
+        const debt = await Debt.fetch(dharma, id);
+        const outstandingAmount = await debt.getOutstandingAmount();
+
+        if (outstandingAmount == 0) {
+          const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+            id
+          );
+          const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
+            debtRegistryEntry.termsContract
+          );
+          let issuanceHash = id;
+          collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+            issuanceHash
+          );
+        }
+
+        /*this.setState({ loanRequest });*/
         var get_terms = loanRequest.getTerms();
 
         let principal = get_terms.principalAmount;
         let interest_rate = get_terms.interestRate;
-        let interest_amount = (principal * interest_rate) / 100;
-        let total_repayment_amount =
-          parseFloat(principal) + parseFloat(interest_amount);
+        let interestAmount = (principal * interest_rate) / 100;
+        let totalRepaymentAmount =
+          parseFloat(principal) + parseFloat(interestAmount);
 
-        this.setState({
-          principal: get_terms.principalAmount,
-          principalTokenSymbol: get_terms.principalTokenSymbol,
-          collateralAmount: get_terms.collateralAmount,
-          collateralTokenSymbol: get_terms.collateralTokenSymbol,
-          interestRate: get_terms.interestRate,
-          termLength: get_terms.termDuration,
-          termUnit: get_terms.termUnit,
-          createdDate: moment(loanRequest.data.createdAt).format("DD/MM/YYYY"),
-          createdTime: moment(loanRequest.data.createdAt).format("HH:mm:ss"),
-          interestAmount: interest_amount,
-          totalRepaymentAmount: total_repayment_amount
-        });
+        let totalRepaidAmount =
+          parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
+        let displayAgreementId = _(id).truncate(4);
+
+        const all_token_price = api
+          .setToken(this.props.token)
+          .get(`priceFeed`)
+          .then(async priceFeedData => {
+            let principalTokenCurrentPrice =
+              priceFeedData[get_terms.collateralTokenSymbol].USD;
+            let collateralCurrentAmount =
+              parseFloat(get_terms.collateralAmount) *
+              principalTokenCurrentPrice;
+            stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
+          });
+
+        stateObj["principal"] = get_terms.principalAmount;
+        stateObj["principalTokenSymbol"] = get_terms.principalTokenSymbol;
+        stateObj["collateralAmount"] = get_terms.collateralAmount;
+        stateObj["collateralTokenSymbol"] = get_terms.collateralTokenSymbol;
+        stateObj["interestRate"] = get_terms.interestRate;
+        stateObj["termLength"] = get_terms.termDuration;
+        stateObj["termUnit"] = get_terms.termUnit;
+        stateObj["createdDate"] = moment(loanRequest.data.createdAt).format(
+          "DD/MM/YYYY"
+        );
+        stateObj["createdTime"] = moment(loanRequest.data.createdAt).format(
+          "HH:mm:ss"
+        );
+        stateObj["interestAmount"] = interestAmount;
+        stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
+        stateObj["outstandingAmount"] = outstandingAmount;
+        stateObj["agreementId"] = displayAgreementId;
+        stateObj["nextRepaymentAmount"] = "";
+        stateObj["nextRepaymentDate"] = "";
+        stateObj["totalRepaidAmount"] = totalRepaidAmount;
+        stateObj["creditorEthAddress"] = creditorEthAddress;
+        stateObj["debtorEthAddress"] = debtorEthAddress;
+
         let agreementId = id;
         const repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
           agreementId
         );
+
+        const expectedRepaymentAmount = await dharma.servicing.getExpectedAmountPerRepayment(
+          agreementId
+        );
+
         const repaymentLoanstemp = [];
         let i = 1;
         repaymentSchedule.forEach(ts => {
           var date = new Date(ts * 1000);
+
           repaymentLoanstemp.push({
             id: i,
-            createdDate: moment(date).format("DD/MM/YYYY HH:mm:ss"),
+            createdDate: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
             principalAmount: get_terms.principalAmount,
             principalTokenSymbol: get_terms.principalTokenSymbol,
             interestAmount: 0,
@@ -90,8 +163,168 @@ class Detail extends Component {
           });
           i++;
         });
-        this.setState({ repaymentLoans: repaymentLoanstemp, isLoading: false });
+        stateObj["repaymentLoans"] = repaymentLoanstemp;
+        stateObj["isLoading"] = false;
+        stateObj["nextRepaymentAmount"] = expectedRepaymentAmount.toNumber();
+        stateObj["currentEthAddress"] = currentAccount;
+        if (
+          typeof debtorEthAddress != "undefined" &&
+          debtorEthAddress == currentAccount
+        ) {
+          if (outstandingAmount > 0) {
+            stateObj["repaymentBtnDisplay"] = true;
+          }
+          if (outstandingAmount == 0 && collateralReturnable === true) {
+            stateObj["collateralBtnDisplay"] = true;
+          }
+        }
+
+        if (
+          typeof creditorEthAddress != "undefined" &&
+          creditorEthAddress == currentAccount
+        ) {
+          stateObj["collateralSeizeBtnDisplay"] = true;
+        }
+        console.log(stateObj);
+
+        this.setState(stateObj);
       });
+  }
+
+  componentDidMount() {}
+
+  makeRepayment(event, callback) {
+    this.setState({ modalOpen: true });
+  }
+
+  async processRepayment() {
+    const { Debt } = Dharma.Types;
+    const { dharma, id } = this.props;
+    const { repaymentAmount, debtorEthAddress } = this.state;
+    const currentAccount = await dharma.blockchain.getCurrentAccount();
+    let collateralReturnable = false;
+    let stateObj = {};
+    if (
+      typeof currentAccount != "undefined" &&
+      debtorEthAddress == currentAccount &&
+      repaymentAmount > 0
+    ) {
+      const debt = await Debt.fetch(dharma, id);
+      if (typeof debt != "undefined") {
+        const outstandingAmount = await debt.getOutstandingAmount();
+        if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
+          const txHash = await debt.makeRepayment(repaymentAmount);
+          if (txHash != "") {
+            toast.success(
+              "Transaction submited successfully.We will notify you once it is completed.",
+              {
+                autoClose: 8000
+              }
+            );
+            const outstandingAmount = await debt.getOutstandingAmount();
+
+            console.log("Outstanding amount after repayment made");
+            console.log(outstandingAmount);
+
+            stateObj["outstandingAmount"] = outstandingAmount;
+            stateObj["modalOpen"] = false;
+            stateObj["repaymentAmount"] = 0;
+            if (outstandingAmount == 0) {
+              const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+                id
+              );
+              const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
+                debtRegistryEntry.termsContract
+              );
+              let issuanceHash = id;
+              collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+                issuanceHash
+              );
+              if (collateralReturnable === true) {
+                stateObj["collateralBtnDisplay"] = true;
+              }
+
+              stateObj["repaymentBtnDisplay"] = false;
+            }
+            this.setState(stateObj);
+          }
+        } else {
+          toast.error(
+            "Repayment amount can not be more then outstanding amount."
+          );
+        }
+      }
+    } else {
+      let msg =
+        currentAccount != debtorEthAddress
+          ? "Invalid access."
+          : repaymentAmount == 0
+            ? "Payment amount must be greater then zero."
+            : "Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.";
+      toast.error(msg, {
+        autoClose: 8000
+      });
+    }
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    console.log(value);
+    console.log(name);
+    this.setState({ repaymentAmount: value });
+  }
+
+  async unblockCollateral(event, callback) {
+    console.log("Collateral back inside");
+    const { LoanRequest, Debt } = Dharma.Types;
+    const { dharma, id } = this.props;
+    const { repaymentAmount, debtorEthAddress } = this.state;
+    const debt = await Debt.fetch(dharma, id);
+    if (typeof debt != "undefined") {
+      const outstandingAmount = await debt.getOutstandingAmount();
+      if (outstandingAmount == 0) {
+        const txHash = await debt.returnCollateral();
+        console.log(txHash);
+        if (txHash != "") {
+          toast.success("Collateral return requested successfully.", {
+            autoClose: 8000
+          });
+        }
+      }
+    }
+  }
+
+  async seizeCollateral(event, callback) {
+    console.log("Seize Collateral back inside");
+    const { LoanRequest, Debt, Investment } = Dharma.Types;
+    const { dharma, id } = this.props;
+    const investment = await Investment.fetch(dharma, id);
+    const isRepaid = await investment.isRepaid();
+    console.log("Is Repaid or not");
+    console.log(isRepaid);
+
+    if (typeof investment != "undefined" && isRepaid === false) {
+      const isCollateralSeizable = await investment.isCollateralSeizable();
+      console.log(isCollateralSeizable);
+      if (isCollateralSeizable === true) {
+        const txHash = await investment.seizeCollateral();
+        if (txHash != "") {
+          toast.success("Collateral seize requested successfully.", {
+            autoClose: 8000
+          });
+        } else {
+          toast.error("Something went wrong.Please try again.", {
+            autoClose: 8000
+          });
+        }
+      } else {
+        toast.error("Collateral can not be seized.", {
+          autoClose: 8000
+        });
+      }
+    }
   }
 
   getData() {
@@ -103,6 +336,10 @@ class Detail extends Component {
       };
     });
   }
+
+  onCloseModal = () => {
+    this.setState({ modalOpen: false });
+  };
 
   render() {
     const data = this.getData();
@@ -170,10 +407,22 @@ class Detail extends Component {
         dataField: "status",
         text: "Status",
         formatter: function(cell, row, rowIndex, formatExtraData) {
-          return <div className="payment-due">
-                <i className="fa fa-check-circle"></i><br />
-                Due
-          </div>;
+          let label = "Due";
+          let icon = "fa-check-circle";
+          if (row.status == "missed") {
+            label = "Failed";
+            icon = "fa-trash";
+          } else if (row.status == "paid") {
+            label = "Success";
+            icon = "fa-check-circle";
+          }
+          return (
+            <div className="payment-due">
+              <i className="fa fa-check-circle" />
+              <br />
+              {label}
+            </div>
+          );
         }
       }
     ];
@@ -191,23 +440,41 @@ class Detail extends Component {
       interestAmount,
       totalRepaymentAmount,
       repaymentLoans,
-      isLoading
+      isLoading,
+      outstandingAmount,
+      modalOpen,
+      nextRepaymentAmount,
+      totalRepaidAmount,
+      agreementId,
+      repaymentAmount,
+      collateralBtnDisplay,
+      repaymentBtnDisplay,
+      collateralSeizeBtnDisplay,
+      currentEthAddress,
+      debtorEthAddress,
+      creditorEthAddress,
+      collateralCurrentAmount
     } = this.state;
 
     return (
       <div>
         <div className="page-title">
           <Row>
-            <Col sm={6}>
-              <h4 className="mb-0"> Loan Detail</h4>
-            </Col>
-            <Col sm={6}>
-              <Breadcrumb className="float-left float-sm-right">
+            <Col>
+              <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href="#">My Loans</a>
+                  <a href="/dashboard" className="link-blue">
+                    My Loans
+                  </a>
                 </BreadcrumbItem>
                 <BreadcrumbItem active>Loan Detail</BreadcrumbItem>
               </Breadcrumb>
+            </Col>
+          </Row>
+
+          <Row className="mt-4 mb-4">
+            <Col>
+              <h4 className="mb-0"> Loan Detail</h4>
             </Col>
           </Row>
         </div>
@@ -225,9 +492,9 @@ class Detail extends Component {
                         <span>Loan Amount</span>
                         <br />
                         <span className="loan-detail-numbers">
-                          {principal > 0 ? principal : " - "}
+                          {principal > 0 ? principal : "N/A"}
                         </span>{" "}
-                        {principal > 0 ? principalTokenSymbol : " - "}
+                        {principal > 0 ? principalTokenSymbol : ""}
                       </div>
                     </Col>
 
@@ -236,30 +503,60 @@ class Detail extends Component {
                         <span>Outstanding Amount</span>
                         <br />
                         <span className="loan-detail-numbers">
-                          9,333.33
+                          {outstandingAmount > 0 ? outstandingAmount : "N/A"}
                         </span>{" "}
-                        REP
+                        {outstandingAmount > 0 ? principalTokenSymbol : ""}
                       </div>
                     </Col>
                   </Row>
 
                   <Row className="mt-20">
+                    {outstandingAmount > 0 &&
+                      currentEthAddress == debtorEthAddress && (
+                        <Col lg={6} md={6} sm={6} xl={6}>
+                          <div className="pull-left">
+                            <span>Next Repayment</span>
+                            <br />
+                            <span className="loan-detail-numbers">
+                              {nextRepaymentAmount > 0
+                                ? nextRepaymentAmount
+                                : "N/A"}
+                            </span>{" "}
+                            {outstandingAmount > 0 ? principalTokenSymbol : ""}
+                            <br />
+                            01/09/2018
+                          </div>
+                        </Col>
+                      )}
+
                     <Col lg={6} md={6} sm={6} xl={6}>
-                      <div className="pull-left">
-                        <span>Next Repayment</span>
-                        <br />
-                        <span className="loan-detail-numbers">
-                          1,866.67
-                        </span>{" "}
-                        REP
-                        <br />
-                        01/09/2018
-                      </div>
-                    </Col>
-                    <Col lg={6} md={6} sm={6} xl={6}>
-                      <span className="btn cognito repayment-button icon mb-15 btn-make-repayment">
-                        Make Repayment
-                      </span>
+                      {repaymentBtnDisplay === true && (
+                        <button
+                          className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                          onClick={event => this.makeRepayment()}
+                        >
+                          Make Repayment
+                        </button>
+                      )}
+
+                      {outstandingAmount == 0 &&
+                        collateralBtnDisplay === true && (
+                          <button
+                            className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                            onClick={event => this.unblockCollateral()}
+                          >
+                            Get collateral back
+                          </button>
+                        )}
+
+                      {collateralSeizeBtnDisplay === true && (
+                        <button
+                          className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                          onClick={event => this.seizeCollateral()}
+                        >
+                          Seize Collateral
+                        </button>
+                      )}
                     </Col>
                   </Row>
                 </CardBody>
@@ -284,13 +581,17 @@ class Detail extends Component {
                       <SummaryItem
                         labelName="Collateral Amount"
                         labelValue={
-                          collateralAmount > 0 ? collateralAmount : " - "
+                          collateralAmount > 0 ? collateralAmount : "N/A"
                         }
                         labelValue2={collateralTokenSymbol}
                       />
                       <SummaryItem
                         labelName="Collateral Value"
-                        labelValue="222.2"
+                        labelValue={
+                          collateralCurrentAmount > 0
+                            ? collateralCurrentAmount
+                            : "N/A"
+                        }
                         labelValue2="$"
                       />
                       <SummaryItem
@@ -357,6 +658,52 @@ class Detail extends Component {
             </Card>
           </Col>
         </Row>
+
+        <Modal open={modalOpen} onClose={this.onCloseModal} center>
+          <Row>
+            <Col lg={12} md={12} sm={6} xl={12}>
+              <h2 className="text-center text-bold">Make Repayment</h2>
+
+              <p className="repayment-details mt-15 mb-15">
+                You are making a repayment for debt agreement{" "}
+                <span className="text-bold">{agreementId}</span>. You owe{" "}
+                <span className="text-bold">
+                  {totalRepaymentAmount} {principalTokenSymbol}
+                </span>{" "}
+                in total, of which you've already repaid{" "}
+                <span className="text-bold">{totalRepaidAmount} ICX</span>.
+              </p>
+
+              <p className="repayment-details mt-15 mb-15">
+                How large of a repayment would you like to make?
+              </p>
+
+              <input
+                type="text"
+                className="form-control"
+                name="repaymentAmount"
+                id="repayment_amount"
+                value={repaymentAmount}
+                onChange={this.handleInputChange}
+              />
+
+              <div className="mt-20 text-center">
+                <button
+                  className="btn cognito orange small icon mb-15 make-repayment-btn"
+                  onClick={this.processRepayment}
+                >
+                  Make Repayment
+                </button>
+                <button
+                  className="btn cognito small icon mb-15 ml-10"
+                  onClick={this.onCloseModal}
+                >
+                  Cancel
+                </button>
+              </div>
+            </Col>
+          </Row>
+        </Modal>
       </div>
     );
   }

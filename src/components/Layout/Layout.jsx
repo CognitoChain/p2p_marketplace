@@ -22,7 +22,7 @@ import TokensContainer from "../../containers/Tokens";
 import LoanRequestContainer from "../../containers/LoanRequest";
 import InvestmentsContainer from "../../containers/Investments";
 import DetailContainer from "../../containers/Detail";
-
+import FundContainer from '../../containers/Fund';
 
 const PrivateRoute = ({component: Component, authenticated, ...rest}) => {
     return (
@@ -98,6 +98,8 @@ class Layout extends Component {
                         <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/investments" component={InvestmentsContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/success" component={Success} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/fund/:id" component={FundContainer} />
+
                     </Switch>
                 </Base>
             )

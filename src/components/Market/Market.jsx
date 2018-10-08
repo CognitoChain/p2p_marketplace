@@ -130,7 +130,10 @@ class Market extends Component {
                                 <CardTitle>Recent Funded Loans</CardTitle>
                                 <DharmaConsumer>
                                     { (dharmaProps) => {
-                                        return <FundedLoans dharma={ dharmaProps.dharma }/>
+                                        return <FundedLoans 
+                                        dharma={ dharmaProps.dharma }
+                                        redirect={this.redirect}
+                                        />
                                     } }
                                 </DharmaConsumer>
                             </CardBody>

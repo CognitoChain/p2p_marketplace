@@ -16,7 +16,7 @@ import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {amortizationUnitToFrequency} from "../../utils/Util";
-
+import paginationFactory from 'react-bootstrap-table2-paginator';
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
@@ -66,8 +66,8 @@ class MyLoanRequests extends Component {
     }
 
     parseMyLoanRequests(loanRequestData) {
-        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
-        return Promise.all(filteredRequestData.map(this.parseLoanRequest));
+        /*var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });*/
+        return Promise.all(loanRequestData.map(this.parseLoanRequest));
     }
 
     /**
@@ -216,9 +216,16 @@ class MyLoanRequests extends Component {
                 isDummyField: true,
                 text: "Total Repayment",
                 formatter:function(cell,row,rowIndex,formatExtraData){
+
+                    let principal = row.principalAmount;
+                    let interest_rate = row.interestRate;
+                    let interestAmount = (principal * interest_rate) / 100;
+                    let totalRepaymentAmount =
+                      parseFloat(principal) + parseFloat(interestAmount);
+
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.collateralAmount}</span><br />{row.collateralTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{totalRepaymentAmount}</span><br />{row.principalTokenSymbol}</div>
                         </div>
                     )
                 }
@@ -237,6 +244,12 @@ class MyLoanRequests extends Component {
             }            
         ];
         
+        const pagination = paginationFactory({
+            page: 1,
+            /*showTotal:true,*/
+            alwaysShowAllBtns:true,            
+        });
+
         return (
             <div className="LoanRequests">
                 <BootstrapTable
@@ -249,11 +262,8 @@ class MyLoanRequests extends Component {
                     rowClasses={rowClasses}
                     bordered={ false }
                     rowEvents={rowEvents}
-                />
-
-                {
-                    data.length === 0 && <MyLoanRequestsEmpty/>
-                }
+                    pagination={ pagination }
+                />                
             </div>
         );
     }

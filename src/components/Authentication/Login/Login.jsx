@@ -115,7 +115,7 @@ class Login extends React.Component {
       this.props.history.push("/");
     }
     else {
-      toast.error("Failed");
+      toast.error("Invalid email or password.");
     }
   }
   render() {
@@ -137,7 +137,7 @@ class Login extends React.Component {
                 </h2>
                 <p className="mb-20 text-white">Create tailor-cut websites with the exclusive multi-purpose responsive template along with powerful features.</p>
                 <ul className="list-unstyled  pos-bot pb-30">
-                  <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use</a> </li>
+                  <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use | </a> </li>
                   <li className="list-inline-item"><a className="text-white" href="#"> Privacy Policy</a></li>
                 </ul>
               </div>

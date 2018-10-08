@@ -20,9 +20,9 @@ const validator = {
           message: 'Password must not be shorter than 6 characters',
         },
         {
-            test: /^[a-z0-9A-Z_]+$/,
+            test: /^[a-z0-9A-Z_!@#$%&*]+$/,
             message: 'Enter Valid Password',
-          },
+        },
       ],
       errors: [],
       valid: false,
@@ -50,6 +50,54 @@ const validator = {
       valid: false,
       state: '',
     },
+    principal: {
+      rules: [
+        {
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          message: 'Pricipal amount must be greater then zero',
+        },
+        {
+            test: /^[0-9.]+$/,
+            message: 'Enter Valid Principal Amount',
+        },
+      ],
+      errors: [],
+      valid: false,
+      state: ''
+    },
+    collateral: {
+      rules: [
+        {
+            test: /^[0-9.]+$/,
+            message: 'Enter Valid Collateral Amount',
+        },
+      ],
+      errors: [],
+      valid: false,
+      state: ''
+    },
+    termLength: {
+      rules: [
+        {
+            test: /^[0-9]+$/,
+            message: 'Enter Valid Term Length',
+        },
+      ],
+      errors: [],
+      valid: false,
+      state: ''
+    },
+    interestRate: {
+      rules: [
+        {
+            test: /^[0-9]+$/,
+            message: 'Enter valid interest rate.',
+        },
+      ],
+      errors: [],
+      valid: false,
+      state: ''
+    }
   };
   
   export default validator;

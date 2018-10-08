@@ -15,7 +15,7 @@ class NotFillableAlert extends Component {
             return (
                 <Alert className="NotFillableAlert" bsStyle="info">
                     <h4 className="NotFillableAlert-Title">Steps Required</h4>
-                    <p>Token transfer authorization required. Click "Authorize Token Transfer".</p>
+                    <p>Token transfer authorization required. Click "Unlock Tokens".</p>
                 </Alert>
             );
         }
