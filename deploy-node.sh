@@ -1,6 +1,19 @@
 
+env=$1
+
+if [ "$env" = "int" ];
+then
+    echo "Deploying to Integration environment"
+elif [ "$env" = "stg" ];
+then
+    echo "Deploying to Staging environment"
+else 
+    echo "usage: $0 [int|stg]"
+    exit 1
+fi
+
 dir=../aws
-source ${dir}/.config
+source ${dir}/.config-${env}
 
 EC2HOST=$relayer_host
 EC2KEY=$relayer_key
@@ -12,6 +25,7 @@ projdir=./
 dir=../aws/ 
 
 # get dependencies and make prod build
+rm -rf ./node_modules
 yarn install
 yarn build
 
