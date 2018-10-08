@@ -1,5 +1,9 @@
 
-EC2HOST=ec2-35-177-152-101.eu-west-2.compute.amazonaws.com
+dir=../aws
+source ${dir}/.config
+
+EC2HOST=$relayer_host
+EC2KEY=$relayer_key
 
 #projdi='cognito/p2p_marketplace'
 projdir=./
@@ -24,9 +28,9 @@ zip -u $dir/build.zip ./package.json
 
 cd $dir
 
-scp -i "MyEC2Key.pem" build.zip ec2-user@${EC2HOST}:
+scp -i ${EC2KEY} build.zip ec2-user@${EC2HOST}:
 rm -f $dir/build.zip
-ssh -i "MyEC2Key.pem"  ec2-user@${EC2HOST} <<'ENDSSH'
+ssh -i ${EC2KEY}  ec2-user@${EC2HOST} <<'ENDSSH'
     echo "1. deleting ~/deploy dir ..."
     rm -rf ~/deploy
     mkdir -p ~/deploy/build
@@ -41,7 +45,7 @@ ssh -i "MyEC2Key.pem"  ec2-user@${EC2HOST} <<'ENDSSH'
     cp -R ~/deploy/* /usr/local/cognitochain/relayer/
 
     echo "5. starting 'relayer' service ..."
-    sudo systemctl daemon-reload
+    #sudo systemctl daemon-reload
     sudo systemctl start relayer
     sudo systemctl status relayer
 
