@@ -146,7 +146,8 @@ class Detail extends Component {
         const expectedRepaymentAmount = await dharma.servicing.getExpectedAmountPerRepayment(
           agreementId
         );
-
+        const expectedRepaymentAmountBignumber = expectedRepaymentAmount.toNumber();
+        const expectedRepaymentAmountDecimal = "1E"+expectedRepaymentAmount.e;
         const repaymentLoanstemp = [];
         let i = 1;
         repaymentSchedule.forEach(ts => {
@@ -165,7 +166,7 @@ class Detail extends Component {
         });
         stateObj["repaymentLoans"] = repaymentLoanstemp;
         stateObj["isLoading"] = false;
-        stateObj["nextRepaymentAmount"] = expectedRepaymentAmount.toNumber();
+        stateObj["nextRepaymentAmount"] = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
         stateObj["currentEthAddress"] = currentAccount;
         if (
           typeof debtorEthAddress != "undefined" &&
@@ -522,9 +523,7 @@ class Detail extends Component {
                                 ? nextRepaymentAmount
                                 : "N/A"}
                             </span>{" "}
-                            {outstandingAmount > 0 ? principalTokenSymbol : ""}
-                            <br />
-                            01/09/2018
+                            {outstandingAmount > 0 ? principalTokenSymbol : ""}                            
                           </div>
                         </Col>
                       )}
