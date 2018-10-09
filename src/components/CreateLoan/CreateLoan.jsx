@@ -45,7 +45,8 @@ class CreateLoan extends Component {
             interest_amount:0,
             total_reapayment_amount:0,
             token_authorised:false,
-            user_loan_agree:false
+            user_loan_agree:false,
+            collateralCurrentBalance:0
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -88,9 +89,9 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
-        const {user_loan_agree,principal,collateral} = this.state;
+        const {user_loan_agree,principal,collateral,collateralCurrentBalance} = this.state;
         const form_valid = this.isFormValid();
-        if(user_loan_agree === true && principal > 0 && collateral > 0)
+        if(user_loan_agree === true && principal > 0 && collateral > 0 && collateral < collateralCurrentBalance && collateralCurrentBalance > 0)
         {
             try {
                 const { dharma } = this.props;
@@ -110,7 +111,7 @@ class CreateLoan extends Component {
             }
         }
         else{
-            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : 'Please accept loan agreement terms.');
+            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : ((collateral > collateralCurrentBalance) ? 'You does not have sufficient collateral balance in wallet.' : 'Please accept loan agreement terms.'));
             toast.error(msg);
         }        
     }
@@ -133,6 +134,7 @@ class CreateLoan extends Component {
             tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount;
             this.setState({
                 hasSufficientAllowance,
+                collateralCurrentBalance:tokenData.balance
             });
 
             if(tokenData.hasUnlimitedAllowance === true)
@@ -235,7 +237,7 @@ class CreateLoan extends Component {
         });
     }
 
-    handleInputChange(event) {
+    async handleInputChange(event) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
@@ -271,10 +273,9 @@ class CreateLoan extends Component {
 
         if (name === "collateralTokenSymbol") {
             this.setState({
-                setHasSufficientAllowance: null,
+                handleInputChange: null,
             });
-
-            this.setHasSufficientAllowance(value);
+            this.setHasSufficientAllowance(value);           
         }
 
         if(name == "interestRate" && value > 0)
