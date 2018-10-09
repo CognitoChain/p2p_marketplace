@@ -89,6 +89,10 @@ server.get('/*', function(req, res){
     res.sendFile(__dirname + '/build/index.html');
 });
 
+process.on('uncaughtException', function (err) {
+  console.log("uncaughtException:", err);
+}); 
+
 server.listen(process.env.PORT || 8080, () => {
   console.log(`JSON Server started  on port ${process.env.PORT }`);
 });
