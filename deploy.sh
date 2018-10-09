@@ -12,38 +12,25 @@ else
     exit 1
 fi
 
-dir=../aws
-source ${dir}/.config-${env}
+source ../aws/.config-${env}
 
 EC2HOST=$relayer_host
 EC2KEY=$relayer_key
 
-#projdi='cognito/p2p_marketplace'
-projdir=./
+if [ -z "$build_file" ]; 
+then 
+    build_file="build.zip"
+fi
 
-#dir='cognito/aws'
-dir=../aws/ 
+if [ ! -f $build_file ]; then
+    echo "build file $build_file not found!"
+    exit 1;
+fi
 
-# get dependencies and make prod build
-rm -rf ./node_modules
-yarn install
-yarn build
+echo "Uploading $build_file to $EC2HOST"
 
-# create new build.zip in 'cognito/aws' dir
-rm -f $dir/build.zip
-zip -r $dir/build.zip ./build 
-zip -ru $dir/build.zip ./public
-zip -ru $dir/build.zip ./scripts
-zip -ru $dir/build.zip ./config
-zip -ru $dir/build.zip ./data
-zip -ru $dir/build.zip ./node_modules
-zip -u $dir/build.zip ./server.js 
-zip -u $dir/build.zip ./package.json
+scp -i ${EC2KEY} ${build_file} ec2-user@${EC2HOST}:
 
-cd $dir
-
-scp -i ${EC2KEY} build.zip ec2-user@${EC2HOST}:
-rm -f $dir/build.zip
 ssh -i ${EC2KEY}  ec2-user@${EC2HOST} <<'ENDSSH'
     echo "1. deleting ~/deploy dir ..."
     rm -rf ~/deploy
@@ -64,6 +51,3 @@ ssh -i ${EC2KEY}  ec2-user@${EC2HOST} <<'ENDSSH'
     sudo systemctl status relayer
 
 ENDSSH
-
-cd $projdir
-echo "done."
