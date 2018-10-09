@@ -43,12 +43,14 @@ class LoanRequest extends Component {
             createdAt:null,
             interestAmount:0,
             totalRepaymentAmount:0,
-            collateralCurrentAmount:0
+            collateralCurrentAmount:0,
+            user_loan_agree:false
         };
 
         // handlers
         this.handleFill = this.handleFill.bind(this);
         this.handleAuthorize = this.handleAuthorize.bind(this);
+        this.handleAgreeChange = this.handleAgreeChange.bind(this);
 
         // setters
         this.reloadState = this.reloadState.bind(this);
@@ -118,23 +120,30 @@ class LoanRequest extends Component {
     }
 
     async handleFill() {
-        const { loanRequest } = this.state;
+        const { loanRequest,user_loan_agree } = this.state;
+        
+        if(user_loan_agree === true)
+        {
+            loanRequest
+            .fillAsCreditor()
+            .then((txHash) => {
+                const { transactions } = this.state;
+                transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
 
-        loanRequest
-        .fillAsCreditor()
-        .then((txHash) => {
-            const { transactions } = this.state;
-            transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
-
-            this.setState({
-                transactions,
+                this.setState({
+                    transactions,
+                });
+            })
+            .catch((error) => {
+                this.setState({
+                    error,
+                });
             });
-        })
-        .catch((error) => {
-            this.setState({
-                error,
-            });
-        });
+        }
+        else
+        {
+            toast.error('Please accept loan agreement terms.');
+        }
     }
 
     async handleAuthorize() {
@@ -205,6 +214,25 @@ class LoanRequest extends Component {
             });
             this.setState({
                 hasSufficientAllowance:'',
+            });
+        }
+    }
+
+    handleAgreeChange(event){
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        if(value == 'y')
+        {
+            this.setState({
+                user_loan_agree:true
+            });
+        }
+        else
+        {
+            this.setState({
+                user_loan_agree:false
             });
         }
     }
@@ -335,7 +363,7 @@ class LoanRequest extends Component {
 
         <div className="agree-loan-check pt-1 mtb-2 mb-30">
             <label className="checkbox-container"> I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a>
-                <input type="checkbox" id="gridCheck" />
+                <input type="checkbox" id="gridCheck" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
                 <span className="checkmark"></span>
             </label>
         </div>
