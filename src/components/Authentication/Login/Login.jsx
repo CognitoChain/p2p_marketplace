@@ -135,7 +135,7 @@ class Login extends React.Component {
                 <h2 className="text-white mb-20 text-center">
                   <a href="/"><img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" /></a>
                 </h2>
-                <p className="mb-20 text-white">Create tailor-cut websites with the exclusive multi-purpose responsive template along with powerful features.</p>
+                <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
                 <ul className="list-unstyled  pos-bot pb-30">
                   <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use | </a> </li>
                   <li className="list-inline-item"><a className="text-white" href="#"> Privacy Policy</a></li>
