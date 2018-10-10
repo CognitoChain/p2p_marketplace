@@ -22,12 +22,25 @@ then
 fi
 
 
-# get dependencies and make prod build
+# get dependencies
 mkdir -p $target/
 rm -rf ./build
 rm -rf ./node_modules
+
 yarn install
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo "yarn install exited with error $retVal"
+    exit 1
+fi
+
+# build the app
 yarn build
+retVal=$?
+if [ $retVal -ne 0 ]; then
+    echo "yarn build exited with error $retVal"
+    exit 1
+fi
 
 # create new build.zip in 'cognito/aws' dir
 rm -f $target/*
