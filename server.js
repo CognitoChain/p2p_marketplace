@@ -15,6 +15,7 @@ var getProxyRules = new HttpProxyRules({
     '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
     '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
     '/api/priceFeed': 'http://localhost:3000/prices/all',
+    '/api/stats/([a-zA-Z0-9]+)': 'http://localhost:3000/stats/$1',
 
     '/api/swagger-ui.html': 'http://localhost:3000/swagger-ui.html',
     '/api/webjars/(.+)': 'http://localhost:3000/webjars/$1',
@@ -30,7 +31,8 @@ var postProxyRules = new HttpProxyRules({
     '/api/loanRequests': 'http://localhost:3000/loanrequest/save',
     '/api/goauthlogin': 'http://localhost:3000/goauthlogin',
     '/api/login': 'http://localhost:3000/login',
-    '/api/sign-up': 'http://localhost:3000/sign-up'
+    '/api/sign-up': 'http://localhost:3000/sign-up',
+    '/api/email/([a-zA-Z0-9]+)': 'http://localhost:3000/email/$1'    
   }
 });
 
