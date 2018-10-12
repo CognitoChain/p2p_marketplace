@@ -24,7 +24,7 @@ class Wallet extends Component {
     this.tabsclick = this.tabsclick.bind(this);
     this.state = {
       activeTab: "1",
-      ethAddress: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxz",
+      ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
       loading: true
     };
@@ -45,6 +45,7 @@ class Wallet extends Component {
 
     if(typeof currentAccount != "undefined")
     {
+        localStorage.setItem('currentMetamaskAccount', currentAccount);
         dharma.blockchain.getAccounts().then(accounts => {
         const owner = accounts[0];
           this.setState({
@@ -53,7 +54,24 @@ class Wallet extends Component {
         });  
     }
   }
+  async checkAccount(){
+    const { dharma } = this.props;
+    let currentAccount = await dharma.blockchain.getCurrentAccount();
+    let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
+    if(currentMetamaskAccount != currentAccount)
+    {
+      window.location.reload();
+      localStorage.setItem('currentMetamaskAccount', currentAccount);
+    }
+  }
 
+  componentDidMount() {
+    const intervalId = setInterval(
+            () => this.checkAccount(),
+            1500,
+    );
+  }
+  
   componentWillReceiveProps(nextProps) {
     if (nextProps.tokens.length !== this.props.tokens.length) {
       this.setState({
