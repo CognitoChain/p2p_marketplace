@@ -117,19 +117,6 @@ class FundedLoanRequests extends Component {
         };
         const columns = [
             {
-                dataField: "createdAt",
-                text: "Created Date",
-                formatter: function (cell, row, rowIndex, formatExtraData) {
-                    var date = moment(row.requestedAt).format("DD/MM/YYYY");
-                    var time = moment(row.requestedAt).format("HH:mm:ss");
-                    return (
-                        <div>
-                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
-                        </div>
-                    )
-                }
-            },
-            {
                 dataField: "principalAmount",
                 text: "Amount",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
@@ -181,6 +168,18 @@ class FundedLoanRequests extends Component {
                     return (
                         <div>
                             <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.totalExpectedRepaymentAmount}</span></div>
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "repaidAmount",
+                isDummyField: true,
+                text: "Total Earned",
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    return (
+                        <div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.repaidAmount}</span></div>
                         </div>
                     )
                 }
