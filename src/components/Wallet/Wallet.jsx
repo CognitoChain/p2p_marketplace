@@ -21,9 +21,7 @@ import Loading from "../Loading/Loading";
 class Wallet extends Component {
   constructor(props) {
     super(props);
-    this.tabsclick = this.tabsclick.bind(this);
     this.state = {
-      activeTab: "1",
       ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
       loading: true
@@ -31,18 +29,9 @@ class Wallet extends Component {
     console.log(this.props.tokens);
   }
 
-  tabsclick(tab) {
-    if (this.state.activeTab !== tab) {
-      this.setState({
-        activeTab: tab
-      });
-    }
-  }
-
   async componentWillMount() {
     const { dharma } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
-
     if(typeof currentAccount != "undefined")
     {
         localStorage.setItem('currentMetamaskAccount', currentAccount);
@@ -128,70 +117,28 @@ class Wallet extends Component {
 
     return (
       <div className="wallet-page">
+
         <div className="page-title">
-          <Row>
-            <Col sm={6}>
-              <h4 className="mb-0"> My Wallet</h4>
-            </Col>
-            <Col sm={6}>
-              <Breadcrumb className="float-left float-sm-right">
-                <BreadcrumbItem>
-                  <a href="#">Home</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem active>Wallet</BreadcrumbItem>
-              </Breadcrumb>
-            </Col>
-          </Row>
+            <Row>
+                <Col>
+                    <Breadcrumb className="float-left">
+                        <BreadcrumbItem><a href="/market" className="link-blue">Home</a></BreadcrumbItem>
+                        <BreadcrumbItem active>Wallet</BreadcrumbItem>
+                    </Breadcrumb>
+                </Col>
+            </Row>
+
+            <Row className="mt-4 mb-4">
+                <Col>
+                    <h5 className="mb-0"> My Wallet</h5>
+                </Col>
+            </Row>
         </div>
 
-        <Row className="mb-30">
+        <Row className="mb-30 mt-30">
           <Col lg={12} md={12} sm={12} xl={12}>
             <div className="tab nav-border" style={{ position: "relative" }}>
-              <div className="d-block d-md-flex justify-content-between">
-                <div className="d-block d-md-flex">
-                  <Nav tabs>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "1"
-                        })}
-                        onClick={() => {
-                          this.tabsclick("1");
-                        }}
-                      >
-                        My Wallet
-                      </NavLink>
-                    </NavItem>
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "2"
-                        })}
-                        onClick={() => {
-                          this.tabsclick("2");
-                        }}
-                      >
-                        Transactions History
-                      </NavLink>
-                    </NavItem>
-
-                    <NavItem>
-                      <NavLink
-                        className={classnames({
-                          active: this.state.activeTab === "3"
-                        })}
-                        onClick={() => {
-                          this.tabsclick("3");
-                        }}
-                      >
-                        Deposits & Withdrawals
-                      </NavLink>
-                    </NavItem>
-                  </Nav>
-                </div>
-              </div>
-              <TabContent activeTab={this.state.activeTab}>
-                <TabPane tabId="1" title="">
+                  
                   <div className="mb-30">
                     <div>Ethereum Address</div>
                     <div className="eth-address">{ethAddress}</div>
@@ -279,12 +226,7 @@ class Wallet extends Component {
 
                     </Row>
                   </div>
-                </TabPane>
-
-                <TabPane tabId="2" title="Borrowed Loans" />
-
-                <TabPane tabId="3" title="Archive" />
-              </TabContent>
+              
             </div>
           </Col>
         </Row>
