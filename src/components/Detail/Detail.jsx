@@ -112,7 +112,7 @@ class Detail extends Component {
             let collateralCurrentAmount =
               parseFloat(get_terms.collateralAmount) *
               principalTokenCurrentPrice;
-            stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
+            stateObj["collateralCurrentAmount"] = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
           });
 
         stateObj["principal"] = get_terms.principalAmount;

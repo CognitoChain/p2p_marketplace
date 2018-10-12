@@ -89,8 +89,9 @@ class LoanRequest extends Component {
                 collateralCurrentAmount =
                   parseFloat(get_terms.collateralAmount) *
                   collateralTokenCurrentPrice;
+                collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
             });
-
+              
 
             let principal = get_terms.principalAmount;
             let interest_rate =  get_terms.interestRate;
