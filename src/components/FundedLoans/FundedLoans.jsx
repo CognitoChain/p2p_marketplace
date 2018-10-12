@@ -83,9 +83,11 @@ const columns = [
         isDummyField: true,
         text: "Total Repayment",
         formatter:function(cell,row,rowIndex,formatExtraData){
+            let interest_amount = (row.principalAmount * row.interestRate) / 100;
+            let repayment_amount = row.principalAmount + interest_amount;
             return (
                 <div>
-                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.collateralAmount}</span><br />{row.principalTokenSymbol}</div>
+                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{repayment_amount}</span><br />{row.principalTokenSymbol}</div>
                 </div>
             )
         }
