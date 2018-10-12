@@ -89,9 +89,9 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
-        const {user_loan_agree,principal,collateral,collateralCurrentBalance} = this.state;
+        const {user_loan_agree,principal,collateral,collateralCurrentBalance,termLength} = this.state;
         const form_valid = this.isFormValid();
-        if(user_loan_agree === true && principal > 0 && collateral > 0 && collateral < collateralCurrentBalance && collateralCurrentBalance > 0)
+        if(user_loan_agree === true && principal > 0 && collateral > 0 && collateral < collateralCurrentBalance && collateralCurrentBalance > 0 && termLength > 0)
         {
             try {
                 const { dharma } = this.props;
@@ -111,7 +111,7 @@ class CreateLoan extends Component {
             }
         }
         else{
-            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : ((collateral > collateralCurrentBalance) ? 'You does not have sufficient collateral balance in wallet.' : 'Please accept loan agreement terms.'));
+            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : ((collateral > collateralCurrentBalance) ? 'You does not have sufficient collateral balance in wallet.' : ((termLength == 0) ? 'Please enter valid loan term.' : 'Please accept loan agreement terms.')));
             toast.error(msg);
         }        
     }
