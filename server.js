@@ -16,6 +16,7 @@ var getProxyRules = new HttpProxyRules({
     '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
     '/api/priceFeed': 'http://localhost:3000/prices/all',
     '/api/stats/([a-zA-Z0-9]+)': 'http://localhost:3000/stats/$1',
+    '/api/loan/([a-zA-Z0-9]+)': 'http://localhost:3000/loan/$1',
 
     '/api/swagger-ui.html': 'http://localhost:3000/swagger-ui.html',
     '/api/webjars/(.+)': 'http://localhost:3000/webjars/$1',
