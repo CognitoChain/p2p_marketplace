@@ -52,3 +52,5 @@ zip -ru $target/$build_file ./data
 zip -ru $target/$build_file ./node_modules
 zip -u $target/$build_file ./server.js 
 zip -u $target/$build_file ./package.json
+zip -u $target/$build_file ./yarn.lock
+
