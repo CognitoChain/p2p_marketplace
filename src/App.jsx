@@ -21,7 +21,23 @@ class App extends Component {
 		if (!window.web3 || !window.web3.currentProvider.isMetaMask) {
 			this.setState({ modalOpen: true });
 		}
+		/*if (typeof window.web3 !== 'undefined') {
+		    console.log('web3 is enabled');
+		    if (window.web3.currentProvider.isMetaMask === true) {
+		      console.log('MetaMask is active')
+		    } else {
+		      console.log('MetaMask is not available')
+		    }
+		}
+		else 
+		{
+		    
+		}*/
 	}
+
+	onCloseModal = () => {
+    	
+  	};
 
 	render() {
 		const { modalOpen } = this.state;
@@ -29,7 +45,7 @@ class App extends Component {
 			<div className="App">
 				<Layout />
 
-				<Modal open={modalOpen} center closeOnEsc={false} closeOnOverlayClick={false} showCloseIcon={false}>
+				<Modal open={modalOpen} center closeOnEsc={false} closeOnOverlayClick={false} showCloseIcon={false} onClose={this.onCloseModal}>
 					<div className="web3-header">
 						<i className="fa fa-exclamation-triangle web3-exclamation-triangle"></i><br />
 						<h2 className="text-center text-bold">

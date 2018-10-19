@@ -26,6 +26,7 @@ function getWeb3Provider() {
         return window.web3.currentProvider;
     } else {
         /*throw new Error("No web3 provider reachable.");*/
+        return false;
     }
 }
 
