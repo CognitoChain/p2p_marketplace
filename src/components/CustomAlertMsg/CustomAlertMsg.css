@@ -1,0 +1,19 @@
+.custom-alert-msg{
+    border-radius: 0 !important;
+    /* padding: 1rem 1rem !important; */
+}
+.header-notice{
+    padding:0.1rem 0.2rem!important;
+}
+.custom-alert-msg.alert-success{
+    background-color: #CFECE8 !important;
+}
+.custom-alert-msg h6{
+    margin-bottom: 0 !important;
+}
+.custom-alert-msg.alert-success h6,.custom-alert-msg.alert-success .fa{
+    color: #30AE94 !important;
+}
+.custom-alert-msg.alert-error h6,.custom-alert-msg.alert-error .fa{
+    color: red !important;
+}
