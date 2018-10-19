@@ -26,3 +26,15 @@
 .btn.cognito.btn-danger {
    	/*background-color: red;*/
 }
+/* .lock-button{
+	border-color: #dc3545 !important;
+}
+.lock-button:hover {
+    color: #dc3545 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: #dc3545 !important;
+} */
+.unlock-button:focus{
+	box-shadow: none !important;
+}

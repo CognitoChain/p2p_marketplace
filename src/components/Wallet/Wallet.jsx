@@ -10,7 +10,8 @@ import {
   Row,
   Col,
   Breadcrumb,
-  BreadcrumbItem
+  BreadcrumbItem,
+  Alert
 } from "reactstrap";
 import "./Wallet.css";
 import classnames from "classnames";
@@ -18,6 +19,8 @@ import classnames from "classnames";
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import _ from "lodash";
 import Loading from "../Loading/Loading";
+import walletLogos from '../../utils/WalletLogo';
+import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -26,48 +29,38 @@ class Wallet extends Component {
       tokenlist: this.props.tokens,
       loading: true
     };
-    console.log(this.props.tokens);
   }
 
   async componentWillMount() {
     const { dharma } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
-    if(typeof currentAccount != "undefined")
-    {
-        localStorage.setItem('currentMetamaskAccount', currentAccount);
-        dharma.blockchain.getAccounts().then(accounts => {
+    if (typeof currentAccount != "undefined") {
+      dharma.blockchain.getAccounts().then(accounts => {
         const owner = accounts[0];
-          this.setState({
-            ethAddress: owner
-          });
-        });  
+        this.setState({
+          ethAddress: owner
+        });
+      });
     }
-  }
-  async checkAccount(){
-    const { dharma } = this.props;
-    let currentAccount = await dharma.blockchain.getCurrentAccount();
-    let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
-    if(currentMetamaskAccount != currentAccount)
-    {
-      window.location.reload();
-      localStorage.setItem('currentMetamaskAccount', currentAccount);
-    }
-  }
-
-  componentDidMount() {
-    const intervalId = setInterval(
-            () => this.checkAccount(),
-            1500,
-    );
   }
   
   componentWillReceiveProps(nextProps) {
+    console.log(nextProps.tokens)
     if (nextProps.tokens.length !== this.props.tokens.length) {
       this.setState({
         tokenlist: nextProps.tokens,
         loading: false
       });
     }
+    if(!this.state.loading){
+      setTimeout(()=>{
+        this.setState({
+          tokenlist: nextProps.tokens,
+          loading: false
+        });
+      },5000)
+    }
+    
   }
 
   async updateProxyAllowanceAsync(symbol) {
@@ -110,123 +103,134 @@ class Wallet extends Component {
       });
     }
   }
+  renderTokenBalances() {
+    const { loading, tokenlist } = this.state;
+    if (loading) {
+      return <Loading />
+    }
+    else if (tokenlist.length == 0) {
+      return <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={"Could not find tokens in your wallet."} />
+    }
+    else {
+      return (
 
+
+        <Row>
+
+          {tokenlist.map(token => {
+            if (token.balance > 0) {
+              return (
+                <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
+                  <Card className="card card-statistics h-100">
+                    <CardBody>
+                      <div className="clearfix mb-10">
+                        <div className="float-left icon-box rounded-circle">
+                          <span className="text-white">
+                            <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" />
+                          </span>
+                        </div>
+
+                        <div>
+                          <div className="float-left text-left crypto-currency-text">
+                            <div className="wallet-token-symbol">
+                              {token.symbol}
+                            </div>
+                            <div>{token.name}</div>
+                          </div>
+                          <div className="float-right text-right">
+                            <p className="card-text text-dark">
+                              <span className="wallet-token-balance">
+                                {token.balance}
+                              </span>{" "}
+                              {token.symbol}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-right">
+                        {token.hasUnlimitedAllowance === true && (
+                          <a
+                            className="btn btn-outline-success btn-success cognito x-small lock-button"
+                            href="javascript:void(0);"
+                            onClick={() =>
+                              this.RevokeAllowanceAsync(
+                                token.symbol
+                              )
+                            }
+                          >
+                            Lock
+                          </a>
+                        )}
+
+                        {token.hasUnlimitedAllowance === false && (
+                          <a
+                            className="btn cognito x-small btn-success unlock-button"
+                            href="javascript:void(0);"
+                            onClick={() =>
+                              this.updateProxyAllowanceAsync(
+                                token.symbol
+                              )
+                            }
+                          >
+                            Unlock
+                            </a>
+                        )}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              );
+            }
+          })}
+
+        </Row>
+      )
+    }
+
+  }
   render() {
     let _self = this;
     const { ethAddress, tokenlist, loading } = this.state;
+
 
     return (
       <div className="wallet-page">
 
         <div className="page-title">
-            <Row>
-                <Col>
-                    <Breadcrumb className="float-left">
-                        <BreadcrumbItem><a href="/market" className="link-blue">Home</a></BreadcrumbItem>
-                        <BreadcrumbItem active>Wallet</BreadcrumbItem>
-                    </Breadcrumb>
-                </Col>
-            </Row>
+          <Row>
+            <Col>
+              <Breadcrumb className="float-left">
+                <BreadcrumbItem><a href="/market" className="link-blue">Home</a></BreadcrumbItem>
+                <BreadcrumbItem active>Wallet</BreadcrumbItem>
+              </Breadcrumb>
+            </Col>
+          </Row>
 
-            <Row className="mt-4 mb-4">
-                <Col>
-                    <h5 className="mb-0"> My Wallet</h5>
-                </Col>
-            </Row>
+          <Row className="mt-4 mb-4">
+            <Col>
+              <h5 className="mb-0"> My Wallet</h5>
+            </Col>
+          </Row>
         </div>
 
         <Row className="mb-30 mt-30">
           <Col lg={12} md={12} sm={12} xl={12}>
             <div className="tab nav-border" style={{ position: "relative" }}>
-                  
-                  <div className="mb-30">
-                    <div>Ethereum Address</div>
-                    <div className="eth-address">{ethAddress}</div>
-                  </div>
 
-                  <div>
-                    <h5>Token Balances</h5>
+              <Alert color="warning" className="mb-30">
+                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link">https://wallet.dharma.io/</a>.
+                  </Alert>
 
-                    <Row>
-                      
-                      {tokenlist.map(token => {
-                        if (token.balance > 0) {
-                          return (
-                            <Col
-                              xl={3}
-                              md={6}
-                              lg={6}
-                              className="mb-30"
-                              key={token.symbol}
-                            >
-                              <Card className="card card-statistics h-100">
-                                <CardBody>
-                                  <div className="clearfix mb-10">
-                                    <div className="float-left icon-box bg-danger rounded-circle">
-                                      <span className="text-white">
-                                        <i
-                                          className="fa fa-bar-chart-o highlight-icon"
-                                          aria-hidden="true"
-                                        />
-                                      </span>
-                                    </div>
+              <div className="mb-30">
+                <div>Ethereum Address</div>
+                <div className="eth-address">{ethAddress}</div>
+              </div>
 
-                                    <div>
-                                      <div className="float-left text-left crypto-currency-text">
-                                        <div className="wallet-token-symbol">
-                                          {token.symbol}
-                                        </div>
-                                        <div>{token.name}</div>
-                                      </div>
-                                      <div className="float-right text-right">
-                                        <p className="card-text text-dark">
-                                          <span className="wallet-token-balance">
-                                            {token.balance}
-                                          </span>{" "}
-                                          {token.symbol}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="mt-3 text-right">
-                                    {token.hasUnlimitedAllowance === true && (
-                                      <a
-                                        className="btn btn-danger cognito x-small"
-                                        href="javascript:void(0);"
-                                        onClick={() =>
-                                          _self.RevokeAllowanceAsync(
-                                            token.symbol
-                                          )
-                                        }
-                                      >
-                                        Lock
-                                      </a>
-                                    )}
+              <div>
+                <h5>Token Balances</h5>
+                {this.renderTokenBalances()}
+              </div>
 
-                                    {token.hasUnlimitedAllowance === false && (
-                                      <a
-                                        className="btn btn-outline-success cognito x-small"
-                                        href="javascript:void(0);"
-                                        onClick={() =>
-                                          _self.updateProxyAllowanceAsync(
-                                            token.symbol
-                                          )
-                                        }
-                                      >
-                                        Unlock
-                                      </a>
-                                    )}
-                                  </div>
-                                </CardBody>
-                              </Card>
-                            </Col>
-                          );
-                        }
-                      })}
-
-                    </Row>
-                  </div>
-              
             </div>
           </Col>
         </Row>
