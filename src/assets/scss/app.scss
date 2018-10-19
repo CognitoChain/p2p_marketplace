@@ -1,3 +1,7 @@
+body{
+  position: relative;
+  background-color:#fafafa !important;
+}
 .btn.cognito{
 	text-transform: capitalize;
 	padding: 10px 30px; 
@@ -123,11 +127,11 @@
   border: 1px solid #18a2b8;
 }
 .footer-container{
-  position: absolute;
-  bottom: 0;
   left: 30px;
   right: 30px;
-  margin-bottom: 40px;
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
 }
 .main-content-container{
   padding-bottom:60px
@@ -144,3 +148,194 @@
 .web3-error-description{
   font-size:16px;
 }
+.google-login-btn{
+  font-weight:400;
+  font-family:'Poppins', sans-serif;  
+  font-size:0.95rem;
+}
+.bg-green{
+  background-color: $green;
+}
+.transaction-detail-link{
+  color:#2A80B9 !important;
+}
+#loading{
+  background-color: #090606 !important;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 3;
+  margin-top: 0px;
+  top: 0px;
+  opacity: 0.85;
+}
+#loading-center{
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#loading-center-absolute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 200px;
+  width: 200px;
+  margin-top: -100px;
+  margin-left: -100px;
+  -ms-transform: rotate(-135deg); 
+  -webkit-transform: rotate(-135deg); 
+  transform: rotate(-135deg);
+
+}
+.object{
+  -moz-border-radius: 50% 50% 50% 50%;
+  -webkit-border-radius: 50% 50% 50% 50%;
+  border-radius: 50% 50% 50% 50%;
+  position: absolute;
+  border-top: 5px solid #FFF;
+  border-bottom: 5px solid transparent;
+  border-left:  5px solid #FFF;
+  border-right: 5px solid transparent;
+  -webkit-animation: animate 2s infinite;
+  animation: animate 2s infinite; 
+}
+#object_one{
+  left: 75px;
+  top: 75px;
+  width: 50px;
+  height: 50px;
+}
+#object_two{
+  left: 65px;
+  top: 65px;
+  width: 70px;
+  height: 70px;
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+#object_three{
+  left: 55px;
+  top: 55px;
+  width: 90px;
+  height: 90px;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+#object_four{
+  left: 45px;
+  top: 45px;
+  width: 110px;
+  height: 110px;
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s;  
+} 
+.custom-alert-msg h6{
+  color :inherit;
+}
+.react-bootstrap-table thead>tr>th{
+  border-top: none!important;
+}
+.agree-loan-check{
+	// margin:10px 0 !important;
+	padding-top: 15px !important;
+	font-size: 10px !important;
+}
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 10px !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.checkbox-container span{
+    line-height: 25px;
+ }
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.react-bootstrap-table-pagination .btn-secondary {
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  color: $light-gray!important;
+}
+.pagination .page-item.active .page-link{
+    background: #163955 !important;
+    outline: 0;
+    border: 1px solid #163956 !important;
+}
+.page-link{
+  padding: .375rem .75rem!important;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.header-right-block{
+  margin-top:0.7rem;
+}
+@-webkit-keyframes animate {
+  50% {
+    -ms-transform: rotate(360deg) scale(0.8); 
+    -webkit-transform: rotate(360deg) scale(0.8); 
+    transform: rotate(360deg) scale(0.8); 
+  }
+}
+@keyframes animate {
+  50% {
+    -ms-transform: rotate(360deg) scale(0.8); 
+    -webkit-transform: rotate(360deg) scale(0.8); 
+    transform: rotate(360deg) scale(0.8); 
+  } 
+}
+
