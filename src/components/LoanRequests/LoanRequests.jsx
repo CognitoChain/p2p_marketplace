@@ -49,24 +49,27 @@ class LoanRequests extends Component {
      * This function assumes that there is a database with Loan Request data, and that we have
      * access to Dharma.js, which is connected to a blockchain.
      */
-    componentDidMount() {
-        const { highlightRow } = this.props;
-        this.setState({
-            highlightRow,
-        });
-        const api = new Api();
-
-        const sort = "createdAt";
-        const order = "desc";
-
-        api.setToken(this.props.token).get("loanRequests", { sort, order })
-            .then(this.parseLoanRequests)
-            .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
-            .catch((error) => {
-                if(error.status && error.status === 403){
-                    this.props.redirect(`/login/`);
-                }
+    async componentDidMount() {
+        const { highlightRow,dharma } = this.props;
+        const currentAccount = await dharma.blockchain.getCurrentAccount();
+        // if(typeof currentAccount != "undefined")
+        // {
+            this.setState({
+                highlightRow,
             });
+            const api = new Api();
+            const sort = "createdAt";
+            const order = "desc";
+
+            api.setToken(this.props.token).get("loanRequests", { sort, order })
+                .then(this.parseLoanRequests)
+                .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
+                .catch((error) => {
+                    if(error.status && error.status === 403){
+                        this.props.redirect(`/login/`);
+                    }
+            });
+        // }        
     }
 
     parseLoanRequests(loanRequestData) {
@@ -276,7 +279,9 @@ class LoanRequests extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns:true            
         });
-        
+        if(data.length==0){
+            return <LoanRequestsEmpty />
+        }
         return (
             <div className="LoanRequests">
                 <BootstrapTable

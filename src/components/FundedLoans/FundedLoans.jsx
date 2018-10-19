@@ -11,6 +11,7 @@ import Loading from "../Loading/Loading";
 import Api from "../../services/api";
 
 // Styling
+
 import "./FundedLoans.css";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
@@ -126,26 +127,29 @@ class FundedLoans extends Component {
      * This function assumes that there is a database with Loan Request data, and that we have
      * access to Dharma.js, which is connected to a blockchain.
      */
-    componentDidMount() {
-        const { highlightRow } = this.props;
-
-        this.setState({
-            highlightRow,
-        });
-
-        const api = new Api();
-
-        const sort = "createdAt";
-        const order = "desc";
-
-        api.setToken(this.props.token).get("loanRequests", { sort, order })
-            .then(this.fundedLoansRequests)
-            .then((fundedLoansLists) => this.setState({ fundedLoansLists, isLoading: false }))
-            .catch((error) => {
-                if(error.status && error.status === 403){
-                    this.props.redirect(`/login/`);
-                }
+    async componentDidMount() {
+        const { highlightRow,dharma } = this.props;
+        const currentAccount = await dharma.blockchain.getCurrentAccount();
+        // if(typeof currentAccount != "undefined")
+        // {
+            this.setState({
+                highlightRow,
             });
+
+            const api = new Api();
+
+            const sort = "createdAt";
+            const order = "desc";
+
+            api.setToken(this.props.token).get("loanRequests", { sort, order })
+                .then(this.fundedLoansRequests)
+                .then((fundedLoansLists) => this.setState({ fundedLoansLists, isLoading: false }))
+                .catch((error) => {
+                    if(error.status && error.status === 403){
+                        this.props.redirect(`/login/`);
+                    }
+            });
+        // }
     }
 
     fundedLoansRequests(FundedData) {
@@ -233,7 +237,9 @@ class FundedLoans extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns:true
         });
-
+        if(data.length==0){
+            return <FundedLoansEmpty />
+        }
         return (
             <div className="FundedLoansList">
                 <BootstrapTable
