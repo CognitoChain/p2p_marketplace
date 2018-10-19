@@ -12,8 +12,16 @@ class AuthorizableAction extends Component {
     }
 
     render() {
-        const { canTakeAction, canAuthorize, onAction, onAuthorize,tokenAuthorised } = this.props;
-
+        const { canTakeAction, canAuthorize, onAction, onAuthorize,tokenAuthorised,disableSubmitBtn } = this.props;
+        let disableSubmitButton;
+        console.log(canTakeAction);
+        if(disableSubmitBtn === true || canTakeAction !== true)
+        {
+            disableSubmitButton = false;
+        }
+        else if(disableSubmitBtn === false && canTakeAction === true){
+            disableSubmitButton = true;
+        }
         return (
             <div className="Actions">
             	<Button
@@ -27,7 +35,7 @@ class AuthorizableAction extends Component {
 
                 <Button
                     onClick={(event) => this.handleClick(event, onAction)}
-                    disabled={!canTakeAction}
+                    disabled={!disableSubmitButton}
                     bsStyle="primary"
                     className="AuthorizableAction-Button btn btn-primary cognito">
                     {this.props.children[1]}

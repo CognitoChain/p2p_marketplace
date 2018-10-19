@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Alert } from "react-bootstrap";
+import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 
 const MAX_RETRIES = 10;
 
@@ -18,24 +18,47 @@ const TX_STATE_TO_STYLE = {
 const TX_STATE_TO_TITLE = {
     awaiting: "Awaiting Transaction to be Mined",
     timedOut: "This Transaction seems to be taking a while...",
-    success: "Transaction Complete",
+    success: "Collateral Token Authorised.",    
+};
+
+const TX_STATE_TO_ICON = {
+    awaiting: "fa fa-info fa-2x pull-left mr-2",
+    timedOut: "fa fa-exclamation-triangle fa-2x pull-left mr-2",
+    success: "fa fa-check fa-2x pull-left mr-2",
 };
 
 class TransactionManager extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            txState: TX_STATES.awaiting,
-            numRetries: 0,
-        };
-
+        const { tokenAuthorised } = this.props;
+        if(tokenAuthorised === true)
+        {
+            this.state = {
+                txState: TX_STATES.success,
+            };
+        }
+        else{
+            this.state = {
+                txState: TX_STATES.awaiting,
+                numRetries: 0,
+            };
+        }
         this.retry = this.retry.bind(this);
         this.awaitTransactionMined = this.awaitTransactionMined.bind(this);
     }
 
     componentDidMount() {
-        this.awaitTransactionMined();
+        const { tokenAuthorised } = this.props;
+        if(tokenAuthorised === false)
+        {
+            this.awaitTransactionMined();    
+        }
+        else if(tokenAuthorised === true)
+        {
+            this.state = {
+                txState: TX_STATES.success,
+            };
+        }
     }
 
     awaitTransactionMined() {
@@ -74,18 +97,15 @@ class TransactionManager extends Component {
 
     render() {
         const { txState } = this.state;
-        const { txHash, description } = this.props;
-
+        const { txHash, description,tokenAuthorised } = this.props;
         return (
-            <Alert bsStyle={TX_STATE_TO_STYLE[txState]}>
-                <h4>{TX_STATE_TO_TITLE[txState]}</h4>
-                <p>{description}</p>
-                <p>
-                    <a href={`https://etherscan.io/tx/${txHash}`} target="_blank">
-                        Transaction Details
-                    </a>
-                </p>
-            </Alert>
+            <CustomAlertMsg 
+                bsStyle={TX_STATE_TO_STYLE[txState]}
+                className={TX_STATE_TO_ICON[txState]}
+                title={TX_STATE_TO_TITLE[txState]}
+                txHash={txHash}
+                description={description}                
+            />
         );
     }
 }

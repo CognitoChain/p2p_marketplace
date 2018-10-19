@@ -2,8 +2,17 @@ import React, { Component } from "react";
 import { DropdownToggle, DropdownMenu, DropdownItem, InputGroup, Input, InputGroupButtonDropdown, InputGroupAddon} from 'reactstrap';
 
 class TokenSelect extends Component {
+
+    keyCallback(evt){
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if ((charCode >= 48 && charCode <= 57) || (charCode >= 96 && charCode <= 105)) { 
+            return true;
+        }
+        return false;
+    }
+
     render() {
-        const { name, dropdownFieldName, dropdownFieldDefaultValue, onChange, defaultValue, tokens, dropdownOpen, toggleDropDown } = this.props;
+        const { name, dropdownFieldName, dropdownFieldDefaultValue, onChange, defaultValue, tokens, dropdownOpen, toggleDropDown,allowedTokens } = this.props;
         return (
             <InputGroup>
                 <InputGroupButtonDropdown addonType="prepend" isOpen={dropdownOpen} toggle={() => toggleDropDown(dropdownFieldName)}>
@@ -11,14 +20,16 @@ class TokenSelect extends Component {
                         {dropdownFieldDefaultValue}
                     </DropdownToggle>
                     <DropdownMenu>
-                        {tokens.map((token) => (
-                            <DropdownItem key={token.symbol} value={token.symbol} name={dropdownFieldName} onClick={onChange}>
-                                {`${token.symbol} (${token.name})`}
-                            </DropdownItem>
-                        ))}
+                        {tokens.map((token) => {
+                            if(allowedTokens === false || (allowedTokens === true && token.balance > 0)){
+                                return  <DropdownItem key={token.symbol} value={token.symbol} name={dropdownFieldName}          onClick={onChange}>
+                                            {`${token.symbol} (${token.name})`}
+                                        </DropdownItem>;        
+                            }
+                        })}
                     </DropdownMenu>
                 </InputGroupButtonDropdown>
-                <Input name={name} onChange={onChange} type="number" value={defaultValue}/>
+                <Input name={name} onChange={onChange} type="number" min="0" onKeyPress={this.keyCallback} value={defaultValue}/>
                 <InputGroupAddon addonType="append">{dropdownFieldDefaultValue}</InputGroupAddon>
             </InputGroup>
         );
