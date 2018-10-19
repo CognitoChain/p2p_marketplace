@@ -12,9 +12,10 @@ import {
 } from "reactstrap";
 import "./Detail.css";
 import SummaryItem from "./SummaryItem/SummaryItem";
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 import Api from "../../services/api";
 import BootstrapTable from "react-bootstrap-table-next";
+import LoadingFull from "../LoadingFull/LoadingFull";
 import Loading from "../Loading/Loading";
 import { toast } from "react-toastify";
 import Modal from "react-responsive-modal";
@@ -48,20 +49,33 @@ class Detail extends Component {
       creditorEthAddress: "",
       debtorEthAddress: "",
       currentEthAddress: "",
-      collateralCurrentAmount: 0
+      collateralCurrentAmount: 0,
+      LTVRatioValue: 0,
+      loanScheduleDisplay: false
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
   }
+  convert_big_number(obj) {
+    let expectedRepaymentAmountScheduleTime = obj.toNumber();
+    let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
+    let expectedRepaidAmount = expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
+    return expectedRepaidAmount;
+  }
+
+  async asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
+  }
+
   async componentWillMount() {
     const { LoanRequest, Investments, Investment, Debt } = Dharma.Types;
     const { dharma, id } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
+
     let current_time = moment();
     let collateralReturnable = false;
-    console.log(" Current Time " + current_time);
-
-    console.log(currentAccount);
     let stateObj = {};
     const api = new Api();
 
@@ -90,6 +104,10 @@ class Detail extends Component {
           );
         }
 
+        const investment = await Investment.fetch(dharma, id);
+        const isRepaid = await investment.isRepaid();
+        const isCollateralSeizable = await investment.isCollateralSeizable();
+
         /*this.setState({ loanRequest });*/
         var get_terms = loanRequest.getTerms();
 
@@ -108,11 +126,20 @@ class Detail extends Component {
           .get(`priceFeed`)
           .then(async priceFeedData => {
             let principalTokenCurrentPrice =
-              priceFeedData[get_terms.collateralTokenSymbol].USD;
+              priceFeedData[get_terms.principalTokenSymbol].USD;
+            let principalCurrentAmount =
+              parseFloat(get_terms.principalAmount) *
+              principalTokenCurrentPrice;
             let collateralCurrentAmount =
               parseFloat(get_terms.collateralAmount) *
               principalTokenCurrentPrice;
             stateObj["collateralCurrentAmount"] = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
+
+            if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
+              let LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
+              stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
+            }
+
           });
 
         stateObj["principal"] = get_terms.principalAmount;
@@ -143,30 +170,51 @@ class Detail extends Component {
           agreementId
         );
 
-        const expectedRepaymentAmount = await dharma.servicing.getExpectedAmountPerRepayment(
+        const expectedRepaymentAmountAr = await dharma.servicing.getExpectedAmountPerRepayment(
           agreementId
         );
-        const expectedRepaymentAmountBignumber = expectedRepaymentAmount.toNumber();
-        const expectedRepaymentAmountDecimal = "1E"+expectedRepaymentAmount.e;
+
+        const valueRepaidAr = await dharma.servicing.getValueRepaid(
+          agreementId
+        );
+
+        const expectedRepaymentAmount = this.convert_big_number(expectedRepaymentAmountAr);
+        const valueRepaid = this.convert_big_number(valueRepaidAr);
+
+        const expectedRepaymentAmountBignumber = expectedRepaymentAmountAr.toNumber();
+        const expectedRepaymentAmountDecimal = "1E" + expectedRepaymentAmountAr.e;
         const repaymentLoanstemp = [];
         let i = 1;
-        repaymentSchedule.forEach(ts => {
-          var date = new Date(ts * 1000);
+        let userTimezone = moment.tz.guess();
+        console.log(userTimezone);
+        await this.asyncForEach(repaymentSchedule, async ts => {
 
+          let date = new Date(ts * 1000);
+          /*console.log(moment(date, "DD/MM/YYYY HH:mm:ss", true).format());*/
+          let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+            agreementId,
+            ts
+          );
+          let expectedRepaymentAmountScheduleTime = expectedRepaidAmountBigNumber.toNumber();
+          let expectedScheduleTimeAmountDecimal = "1E" + expectedRepaidAmountBigNumber.e;
+          let expectedRepaidAmount = expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
+          /*let temp = expectedRepaidAmount - valueRepaid + expectedRepaymentAmount;*/
           repaymentLoanstemp.push({
             id: i,
-            createdDate: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+            ts: ts,
+            /*createdDate: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),*/
+            createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
             principalAmount: get_terms.principalAmount,
             principalTokenSymbol: get_terms.principalTokenSymbol,
             interestAmount: 0,
-            totalRepaymentAmount: 0,
+            totalRepaymentAmount: expectedRepaidAmount,
             status: ""
           });
           i++;
         });
         stateObj["repaymentLoans"] = repaymentLoanstemp;
         stateObj["isLoading"] = false;
-        stateObj["nextRepaymentAmount"] = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
+        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
         stateObj["currentEthAddress"] = currentAccount;
         if (
           typeof debtorEthAddress != "undefined" &&
@@ -180,19 +228,16 @@ class Detail extends Component {
           }
         }
 
-        if (
-          typeof creditorEthAddress != "undefined" &&
-          creditorEthAddress == currentAccount
-        ) {
+        if (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount && isCollateralSeizable === true && isRepaid === false) {
           stateObj["collateralSeizeBtnDisplay"] = true;
         }
-        console.log(stateObj);
 
+        if ((typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) || (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount)) {
+          stateObj["loanScheduleDisplay"] = true;
+        }
         this.setState(stateObj);
       });
   }
-
-  componentDidMount() {}
 
   makeRepayment(event, callback) {
     this.setState({ modalOpen: true });
@@ -308,7 +353,6 @@ class Detail extends Component {
 
     if (typeof investment != "undefined" && isRepaid === false) {
       const isCollateralSeizable = await investment.isCollateralSeizable();
-      console.log(isCollateralSeizable);
       if (isCollateralSeizable === true) {
         const txHash = await investment.seizeCollateral();
         if (txHash != "") {
@@ -349,7 +393,7 @@ class Detail extends Component {
       {
         dataField: "createdDate",
         text: "Repayment Date",
-        formatter: function(cell, row, rowIndex, formatExtraData) {
+        formatter: function (cell, row, rowIndex, formatExtraData) {
           var date = moment(cell).format("DD/MM/YYYY");
           var time = moment(cell).format("HH:mm:ss");
           return (
@@ -368,7 +412,7 @@ class Detail extends Component {
       {
         dataField: "principalAmount",
         text: "Principle Amount",
-        formatter: function(cell, row, rowIndex, formatExtraData) {
+        formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div>
               <div className="text-right dispaly-inline-block">
@@ -383,7 +427,7 @@ class Detail extends Component {
       {
         dataField: "interestAmount",
         text: "Interest Amount",
-        formatter: function(cell, row, rowIndex, formatExtraData) {
+        formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div>
               <span className="number-highlight">{cell}</span> <br />
@@ -395,7 +439,7 @@ class Detail extends Component {
       {
         dataField: "totalRepaymentAmount",
         text: "Total Repaymnet Amount",
-        formatter: function(cell, row, rowIndex, formatExtraData) {
+        formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div>
               <span className="number-highlight">{cell}</span> <br />
@@ -407,7 +451,7 @@ class Detail extends Component {
       {
         dataField: "status",
         text: "Status",
-        formatter: function(cell, row, rowIndex, formatExtraData) {
+        formatter: function (cell, row, rowIndex, formatExtraData) {
           let label = "Due";
           let icon = "fa-check-circle";
           if (row.status == "missed") {
@@ -454,7 +498,9 @@ class Detail extends Component {
       currentEthAddress,
       debtorEthAddress,
       creditorEthAddress,
-      collateralCurrentAmount
+      collateralCurrentAmount,
+      LTVRatioValue,
+      loanScheduleDisplay
     } = this.state;
 
     return (
@@ -479,230 +525,238 @@ class Detail extends Component {
             </Col>
           </Row>
         </div>
-
-        <Row className="mb-30">
-          <Col lg={4} md={4} sm={6} xl={4}>
-            <div>
-              <Card className="card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics">
-                <CardBody>
-                  <CardTitle>Overview</CardTitle>
-
-                  <Row>
-                    <Col lg={6} md={6} sm={6} xl={6}>
-                      <div className="pull-left">
-                        <span>Loan Amount</span>
-                        <br />
-                        <span className="loan-detail-numbers">
-                          {principal > 0 ? principal : "N/A"}
-                        </span>{" "}
-                        {principal > 0 ? principalTokenSymbol : ""}
-                      </div>
-                    </Col>
-
-                    <Col lg={6} md={6} sm={6} xl={6}>
-                      <div className="">
-                        <span>Outstanding Amount</span>
-                        <br />
-                        <span className="loan-detail-numbers">
-                          {outstandingAmount > 0 ? outstandingAmount : "N/A"}
-                        </span>{" "}
-                        {outstandingAmount > 0 ? principalTokenSymbol : ""}
-                      </div>
-                    </Col>
-                  </Row>
-
-                  <Row className="mt-20">
-                    {outstandingAmount > 0 &&
-                      currentEthAddress == debtorEthAddress && (
+        {
+          isLoading && <LoadingFull />
+        }
+        {
+          !isLoading &&
+          <div>
+            <Row className="mb-30">
+              <Col lg={4} md={4} sm={6} xl={4}>
+                <div>
+                  <Card className="card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics">
+                    <CardBody>
+                      <CardTitle>Overview</CardTitle>
+                      <Row>
                         <Col lg={6} md={6} sm={6} xl={6}>
                           <div className="pull-left">
-                            <span>Next Repayment</span>
+                            <span>Loan Amount</span>
                             <br />
                             <span className="loan-detail-numbers">
-                              {nextRepaymentAmount > 0
-                                ? nextRepaymentAmount
-                                : "N/A"}
+                              {principal > 0 ? principal : "N/A"}
                             </span>{" "}
-                            {outstandingAmount > 0 ? principalTokenSymbol : ""}                            
+                            {principal > 0 ? principalTokenSymbol : ""}
                           </div>
                         </Col>
-                      )}
 
-                    <Col lg={6} md={6} sm={6} xl={6}>
-                      {repaymentBtnDisplay === true && (
-                        <button
-                          className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                          onClick={event => this.makeRepayment()}
-                        >
-                          Make Repayment
+                        <Col lg={6} md={6} sm={6} xl={6}>
+                          <div className="">
+                            <span>Outstanding Amount</span>
+                            <br />
+                            <span className="loan-detail-numbers">
+                              {outstandingAmount > 0 ? outstandingAmount : "N/A"}
+                            </span>{" "}
+                            {outstandingAmount > 0 ? principalTokenSymbol : ""}
+                          </div>
+                        </Col>
+                      </Row>
+
+                      <Row className="mt-20">
+                        {outstandingAmount > 0 &&
+                          currentEthAddress == debtorEthAddress && (
+                            <Col lg={6} md={6} sm={6} xl={6}>
+                              <div className="pull-left">
+                                <span>Next Repayment</span>
+                                <br />
+                                <span className="loan-detail-numbers">
+                                  {nextRepaymentAmount > 0
+                                    ? nextRepaymentAmount
+                                    : "N/A"}
+                                </span>{" "}
+                                {outstandingAmount > 0 ? principalTokenSymbol : ""}
+                              </div>
+                            </Col>
+                          )}
+
+                        <Col lg={6} md={6} sm={6} xl={6}>
+                          {repaymentBtnDisplay === true && (
+                            <button
+                              className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                              onClick={event => this.makeRepayment()}
+                            >
+                              Make Repayment
                         </button>
-                      )}
+                          )}
 
-                      {outstandingAmount == 0 &&
-                        collateralBtnDisplay === true && (
-                          <button
-                            className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                            onClick={event => this.unblockCollateral()}
-                          >
-                            Get collateral back
+                          {outstandingAmount == 0 &&
+                            collateralBtnDisplay === true && (
+                              <button
+                                className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                                onClick={event => this.unblockCollateral()}
+                              >
+                                Get collateral back
                           </button>
-                        )}
+                            )}
 
-                      {collateralSeizeBtnDisplay === true && (
-                        <button
-                          className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                          onClick={event => this.seizeCollateral()}
-                        >
-                          Seize Collateral
+                          {collateralSeizeBtnDisplay === true && (
+                            <button
+                              className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                              onClick={event => this.seizeCollateral()}
+                            >
+                              Seize Collateral
                         </button>
+                          )}
+                        </Col>
+                      </Row>
+                    </CardBody>
+                  </Card>
+                </div>
+
+                <div className="mt-30">
+                  <Card className="card-statistics mb-30 h-100 p-4">
+                    <CardBody>
+                      <CardTitle>More Details </CardTitle>
+                      <div
+                        className="scrollbar"
+                        tabIndex={2}
+                        style={{ overflowY: "hidden", outline: "none" }}
+                      >
+                        <ListGroup className="list-unstyled to-do">
+                          <SummaryItem
+                            labelName="Created Date"
+                            labelValue={createdDate != "" ? createdDate : "N/A"}
+                            labelValue2={createdTime != "" ? createdTime : "N/A"}
+                          />
+                          <SummaryItem
+                            labelName="Collateral Amount"
+                            labelValue={
+                              collateralAmount > 0 ? collateralAmount : "N/A"
+                            }
+                            labelValue2={collateralTokenSymbol}
+                          />
+                          <SummaryItem
+                            labelName="Collateral Value"
+                            labelValue={
+                              collateralCurrentAmount > 0
+                                ? collateralCurrentAmount
+                                : "N/A"
+                            }
+                            labelValue2="$"
+                          />
+                          <SummaryItem
+                            labelName="LTV"
+                            labelValue={LTVRatioValue > 0 ? LTVRatioValue : "N/A"}
+                            labelValue2="%"
+                          />
+                          <SummaryItem
+                            labelName="Loan Term"
+                            labelValue={termLength > 0 ? termLength : "N/A"}
+                            labelValue2={termUnit}
+                          />
+                          <SummaryItem
+                            labelName="Interest Rate(Per Loan Term)"
+                            labelValue={interestRate > 0 ? interestRate : "N/A"}
+                            labelValue2="%"
+                          />
+                          <SummaryItem
+                            labelName="Interest Amount"
+                            labelValue={interestAmount > 0 ? interestAmount : "N/A"}
+                            labelValue2={
+                              interestAmount > 0 ? principalTokenSymbol : "N/A"
+                            }
+                          />
+                          <SummaryItem
+                            labelName="Total Repayment Amount"
+                            labelValue={
+                              totalRepaymentAmount > 0
+                                ? totalRepaymentAmount
+                                : "N/A"
+                            }
+                            labelValue2={
+                              totalRepaymentAmount > 0
+                                ? principalTokenSymbol
+                                : "N/A"
+                            }
+                          />
+                        </ListGroup>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+              </Col>
+
+              {loanScheduleDisplay === true && (
+                <Col lg={8} md={8} sm={6} xl={8}>
+                  <Card className="card-statistics mb-30 p-4">
+                    <CardBody>
+                      <CardTitle>Repayment Schedule</CardTitle>
+
+                      {isLoading === true && <Loading />}
+
+                      {isLoading === false && (
+                        <BootstrapTable
+                          hover={false}
+                          keyField="id"
+                          classes={"open-request"}
+                          columns={columns}
+                          data={data}
+                          headerClasses={"text-center"}
+                          bordered={false}
+                        />
                       )}
-                    </Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              )}
+            </Row>
 
-            <div className="mt-30">
-              <Card className="card-statistics mb-30 h-100 p-4">
-                <CardBody>
-                  <CardTitle>More Details </CardTitle>
-                  <div
-                    className="scrollbar"
-                    tabIndex={2}
-                    style={{ overflowY: "hidden", outline: "none" }}
-                  >
-                    <ListGroup className="list-unstyled to-do">
-                      <SummaryItem
-                        labelName="Created Date"
-                        labelValue={createdDate != "" ? createdDate : "N/A"}
-                        labelValue2={createdTime != "" ? createdTime : "N/A"}
-                      />
-                      <SummaryItem
-                        labelName="Collateral Amount"
-                        labelValue={
-                          collateralAmount > 0 ? collateralAmount : "N/A"
-                        }
-                        labelValue2={collateralTokenSymbol}
-                      />
-                      <SummaryItem
-                        labelName="Collateral Value"
-                        labelValue={
-                          collateralCurrentAmount > 0
-                            ? collateralCurrentAmount
-                            : "N/A"
-                        }
-                        labelValue2="$"
-                      />
-                      <SummaryItem
-                        labelName="LTV"
-                        labelValue="68"
-                        labelValue2="%"
-                      />
-                      <SummaryItem
-                        labelName="Loan Term"
-                        labelValue={termLength > 0 ? termLength : "N/A"}
-                        labelValue2={termUnit}
-                      />
-                      <SummaryItem
-                        labelName="Interest Rate(Per Loan Term)"
-                        labelValue={interestRate > 0 ? interestRate : "N/A"}
-                        labelValue2="%"
-                      />
-                      <SummaryItem
-                        labelName="Interest Amount"
-                        labelValue={interestAmount > 0 ? interestAmount : "N/A"}
-                        labelValue2={
-                          interestAmount > 0 ? principalTokenSymbol : "N/A"
-                        }
-                      />
-                      <SummaryItem
-                        labelName="Total Repayment Amount"
-                        labelValue={
-                          totalRepaymentAmount > 0
-                            ? totalRepaymentAmount
-                            : "N/A"
-                        }
-                        labelValue2={
-                          totalRepaymentAmount > 0
-                            ? principalTokenSymbol
-                            : "N/A"
-                        }
-                      />
-                    </ListGroup>
-                  </div>
-                </CardBody>
-              </Card>
-            </div>
-          </Col>
+            <Modal open={modalOpen} onClose={this.onCloseModal} center>
+              <Row>
+                <Col lg={12} md={12} sm={6} xl={12}>
+                  <h2 className="text-center text-bold">Make Repayment</h2>
 
-          <Col lg={8} md={8} sm={6} xl={8}>
-            <Card className="card-statistics mb-30 p-4">
-              <CardBody>
-                <CardTitle>Repayment Schedule</CardTitle>
+                  <p className="repayment-details mt-15 mb-15">
+                    You are making a repayment for debt agreement{" "}
+                    <span className="text-bold">{agreementId}</span>. You owe{" "}
+                    <span className="text-bold">
+                      {totalRepaymentAmount} {principalTokenSymbol}
+                    </span>{" "}
+                    in total, of which you've already repaid{" "}
+                    <span className="text-bold">{totalRepaidAmount} {principalTokenSymbol}</span>.
+              </p>
 
-                {isLoading === true && <Loading />}
+                  <p className="repayment-details mt-15 mb-15">
+                    How large of a repayment would you like to make?
+              </p>
 
-                {isLoading === false && (
-                  <BootstrapTable
-                    hover={false}
-                    keyField="id"
-                    classes={"open-request"}
-                    columns={columns}
-                    data={data}
-                    headerClasses={"text-center"}
-                    bordered={false}
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="repaymentAmount"
+                    id="repayment_amount"
+                    value={repaymentAmount}
+                    onChange={this.handleInputChange}
                   />
-                )}
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
 
-        <Modal open={modalOpen} onClose={this.onCloseModal} center>
-          <Row>
-            <Col lg={12} md={12} sm={6} xl={12}>
-              <h2 className="text-center text-bold">Make Repayment</h2>
-
-              <p className="repayment-details mt-15 mb-15">
-                You are making a repayment for debt agreement{" "}
-                <span className="text-bold">{agreementId}</span>. You owe{" "}
-                <span className="text-bold">
-                  {totalRepaymentAmount} {principalTokenSymbol}
-                </span>{" "}
-                in total, of which you've already repaid{" "}
-                <span className="text-bold">{totalRepaidAmount} ICX</span>.
-              </p>
-
-              <p className="repayment-details mt-15 mb-15">
-                How large of a repayment would you like to make?
-              </p>
-
-              <input
-                type="text"
-                className="form-control"
-                name="repaymentAmount"
-                id="repayment_amount"
-                value={repaymentAmount}
-                onChange={this.handleInputChange}
-              />
-
-              <div className="mt-20 text-center">
-                <button
-                  className="btn cognito orange small icon mb-15 make-repayment-btn"
-                  onClick={this.processRepayment}
-                >
-                  Make Repayment
+                  <div className="mt-20 text-center">
+                    <button
+                      className="btn cognito orange small icon mb-15 make-repayment-btn"
+                      onClick={this.processRepayment}
+                    >
+                      Make Repayment
                 </button>
-                <button
-                  className="btn cognito small icon mb-15 ml-10"
-                  onClick={this.onCloseModal}
-                >
-                  Cancel
+                    <button
+                      className="btn cognito small icon mb-15 ml-10"
+                      onClick={this.onCloseModal}
+                    >
+                      Cancel
                 </button>
-              </div>
-            </Col>
-          </Row>
-        </Modal>
+                  </div>
+                </Col>
+              </Row>
+            </Modal>
+          </div>
+        }
       </div>
     );
   }
