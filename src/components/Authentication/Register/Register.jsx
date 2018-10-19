@@ -15,6 +15,7 @@ class Register extends React.Component{
             email: '',
             password: '',
             error: null,
+            apiError:""
         };
         this.validators = validators;
         this.onchange=this.onchange.bind(this);
@@ -101,12 +102,16 @@ class Register extends React.Component{
       } = this.state;
       const api = new Api();
       const response = await api.create("sign-up", {
-        username:email,
+        email:email,
         password:password
       });
       
       if(response.status === "SUCCESS"){
-        this.props.history.push("/dashboard");
+        this.props.history.push({
+          pathname: '/login',
+          state: { message: "REGISTER_SUCCESS",email}
+        });
+       // toast.success()
       }
       else{
         let error_msg = response.status;
@@ -127,14 +132,14 @@ class Register extends React.Component{
             <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{backgroundImage: 'url(assets/images/register-bg.png)'}}>
               <Container>
                 <Row className="justify-content-center no-gutters vertical-align row">
-                  <Col lg={4} md={6} className="offset-lg-1 login-fancy-bg bg parallax" style={{backgroundImage: 'url(assets/images/register-inner-bg.png)'}}>
+                  <Col lg={4} md={6} className="login-fancy-bg bg parallax" style={{backgroundImage: 'url(assets/images/register-inner-bg.png)'}}>
                     <div className="login-fancy">
                       <h2 className="text-white mb-20 text-center">
                         <a href="/">
                           <img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" />
                         </a>
                       </h2>
-                      <p className="mb-20 text-white">Create tailor-cut websites with the exclusive multi-purpose responsive template along with powerful features.</p>
+                      <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
                       <ul className="list-unstyled pos-bot pb-30">
                         <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use</a> </li>
                         <li className="list-inline-item"><a className="text-white" href="#"> Privacy Policy</a></li>
