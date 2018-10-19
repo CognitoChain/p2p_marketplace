@@ -1,11 +1,11 @@
 // NOTE: This file contains typography SCSS.
-
+@import url('https://fonts.googleapis.com/css?family=Proxima+Nova');
 html { 
 	font-size: 14px;  
 }
 
 body { 
-	font-family: 'Poppins', sans-serif; 
+	font-family: 'Proxima Nova', sans-serif;
 	margin: 0; 
 	padding: 0; 
 	font-size: 0.95rem; 
@@ -20,7 +20,7 @@ h1, h2, h3, h4, h5, h6, p, span, ul, li, a, ol {
 h1, h2, h3, h4, h5, h6 {
 	color: $dark-gray;
 	font-weight: $font-medium;
-	font-family: 'Poppins', sans-serif;
+	font-family: 'Proxima Nova', sans-serif;
 	margin-bottom: 0.5rem;
 }
 h1 {
