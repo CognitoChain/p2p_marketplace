@@ -1,0 +1,31 @@
+.my-activities-container thead{
+    display: none;
+}
+/* .my-activities-container .card-title{
+    border-bottom: none !important
+} */
+.my-activities-container table tr:nth-child(1) td{
+    border-top:0
+}
+.my-activities-container table td:nth-child(1) {
+    width:10% !important;
+    text-align: left !important;
+}
+.my-activities-container table td:nth-child(2) {
+    width:35% !important;
+    text-align: left !important;
+}
+.my-activities-container table td:nth-child(3) {
+    width: 20% !important;
+    text-align: left !important;
+}
+.my-activities-container table td:nth-child(4) {
+    width:25% !important;
+}
+.my-activities-container table td:nth-child(5) {
+    width:20% !important;
+    text-align: left !important;
+}
+.color-green{
+    color:#08CF9B !important;
+}
