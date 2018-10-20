@@ -113,11 +113,12 @@ class CreateLoan extends Component {
                 console.log(loanRequest.getAgreementId());
                 this.props.onCompletion(loanRequest.getAgreementId());
             } catch (e) {
+                let msg = (e.message.length > 3000) ? 'Transaction cancelled successfully.' : e.message; 
                 this.setState({
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                    customAlertMsgTitle: e.message,
+                    customAlertMsgTitle: msg,
                     disableSubmitBtn: false,
                 });
             }
