@@ -47,8 +47,9 @@ class Wallet extends Component {
   componentWillReceiveProps(nextProps) {
     console.log(nextProps.tokens)
     if (nextProps.tokens.length !== this.props.tokens.length) {
+      let tokensSorted = _.orderBy(nextProps.tokens, ['symbol'], ['asc']);
       this.setState({
-        tokenlist: nextProps.tokens,
+        tokenlist: tokensSorted,
         loading: false
       });
     }
