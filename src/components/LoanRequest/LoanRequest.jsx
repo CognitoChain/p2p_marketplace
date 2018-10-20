@@ -129,7 +129,8 @@ class LoanRequest extends Component {
         const { loanRequest, userLoanAgree } = this.state;
 
         if (userLoanAgree === true) {
-            loanRequest
+            try {
+                loanRequest
                 .fillAsCreditor()
                 .then((txHash) => {
                     console.log("txHash");
@@ -140,16 +141,19 @@ class LoanRequest extends Component {
                         transactions,
                         tokenAuthorised:true
                     });
-                })
-                .catch((error) => {
-                    this.setState({
-                        customAlertMsgDisplay: true,
-                        customAlertMsgStyle: 'danger',
-                        customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                        customAlertMsgTitle: error,
-                        disableSubmitBtn: false,
-                    });
                 });
+            } 
+            catch (e) {
+                console.log("In error it comes.");
+                let msg = (e.message.length > 3000 || e.length > 3000) ? 'Transaction cancelled successfully.' : e.message; 
+                this.setState({
+                    customAlertMsgDisplay: true,
+                    customAlertMsgStyle: 'danger',
+                    customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                    customAlertMsgTitle: 'Transaction cancelled.',
+                    disableSubmitBtn: false,
+                });
+            }   
         }
         else {
             toast.error('Please accept loan agreement terms.');
