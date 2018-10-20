@@ -90,7 +90,7 @@ const validator = {
     interestRate: {
       rules: [
         {
-            test: /^[0-9]+$/,
+            test: /^[0-9.]+$/,
             message: 'Enter valid interest rate.',
         },
       ],
