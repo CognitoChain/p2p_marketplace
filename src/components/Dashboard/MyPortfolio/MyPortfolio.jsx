@@ -41,35 +41,45 @@ class MyPortfolio extends Component {
         let totalAssetAmount = 0;
         let totalLiablitiesAmount = 0;
         const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-        if(typeof userTokens != 'undefined' && typeof priceFeedData != "undefined" && typeof CurrentAccount != "undefined")
+        if(typeof priceFeedData != "undefined" && typeof CurrentAccount != "undefined")
         {
-            userTokens.forEach(ts => {
-                if(ts.balance > 0)
-                {
-                    let tokenBalance = ts.balance;
-                    let tokenSymbol = ts.symbol;
-                    if(typeof priceFeedData[tokenSymbol] != "undefined")
+            if(typeof userTokens != 'undefined')
+            {
+               userTokens.forEach(ts => {
+                    if(ts.balance > 0)
                     {
-                        let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
-                        let tokenCurrentAmount = parseFloat(tokenBalance) * parseFloat(tokenCurrentPrice);
-                        totalAssetAmount += tokenCurrentAmount;
+                        let tokenBalance = ts.balance;
+                        let tokenSymbol = ts.symbol;
+                        if(typeof priceFeedData[tokenSymbol] != "undefined")
+                        {
+                            let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
+                            let tokenCurrentAmount = parseFloat(tokenBalance) * parseFloat(tokenCurrentPrice);
+                            totalAssetAmount += tokenCurrentAmount;
+                        }
                     }
-                }
-            });  
+                }); 
+            }
 
-            myloanRequests.forEach(ml => {
-                let principal = ml.principalAmount;
-                let principalTokenSymbol = ml.principalTokenSymbol;
-                if(typeof priceFeedData[principalTokenSymbol] != "undefined")
-                {
-                    let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
-                    let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
-                    totalLiablitiesAmount += principalCurrentAmount;    
-                }
-                this.setState({ totalLiablitiesAmount: totalLiablitiesAmount });
-            }); 
+            this.setState({ totalAssetAmount: totalAssetAmount });
 
-            if(totalAssetAmount > 0 && totalLiablitiesAmount > 0)
+            if(typeof myloanRequests != 'undefined')
+            {
+                myloanRequests.forEach(ml => {
+                    let principal = ml.principalAmount;
+                    let principalTokenSymbol = ml.principalTokenSymbol;
+                    if(typeof priceFeedData[principalTokenSymbol] != "undefined")
+                    {
+                        let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
+                        let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
+                        totalLiablitiesAmount += principalCurrentAmount;    
+                    }
+                    this.setState({ totalLiablitiesAmount: totalLiablitiesAmount });
+                });    
+            }  
+
+            
+
+            if(this.state.totalAssetAmount && this.state.totalLiablitiesAmount)
             {
                 let assetLiabilitiesPercentage = (totalAssetAmount /  totalLiablitiesAmount) * 100;   
                 const data = {
@@ -91,7 +101,6 @@ class MyPortfolio extends Component {
                 };
 
                 this.setState({ 
-                    totalAssetAmount:totalAssetAmount,
                     assetLiabilitiesPercentage: assetLiabilitiesPercentage,
                     doughnutData:data,
                     isLoading:false 
