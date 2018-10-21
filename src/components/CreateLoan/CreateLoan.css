@@ -24,7 +24,7 @@
 	color:#74ABBE !important;
 }
 .create-loan-container .dropdown-menu.show{
-	height: 250px !important;
+	max-height: 250px !important;
 	overflow-y: auto !important;
 }
 
