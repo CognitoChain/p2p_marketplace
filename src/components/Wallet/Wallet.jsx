@@ -27,7 +27,7 @@ class Wallet extends Component {
     this.state = {
       ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
-      loading: true
+      loading: this.props.tokens.length>0 ? false:true
     };
   }
 
@@ -45,7 +45,6 @@ class Wallet extends Component {
   }
   
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.tokens)
     if (nextProps.tokens.length !== this.props.tokens.length) {
       let tokensSorted = _.orderBy(nextProps.tokens, ['symbol'], ['asc']);
       this.setState({
