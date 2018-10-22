@@ -45,6 +45,16 @@ class Dashboard extends Component {
                     this.props.redirect(`/login/`);
                 }
         });
+
+        ///////// TEST CODE - REMOVE
+        console.log("---- LOADING TOKENS ----")
+        const { dharma } = this.props;
+        const { Token } = Dharma.Types;
+        const owner = "0x8774706FA996Ac8F2D0360447eFF687D8F21B7AA";
+        Token.all(dharma, owner).then(result => {
+            console.log(result);
+        });
+
     }
     tabsclick(tab) {
         if (this.state.activeTab !== tab) {
