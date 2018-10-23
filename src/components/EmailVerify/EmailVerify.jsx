@@ -202,6 +202,7 @@ class EmailVerify extends React.Component {
                       <i className="fa fa-check text-white" />
                     </a>
                   </div>
+                  <p className="mt-20 mb-0 remember-checkbox">After Verification  <Link to="login"> Login here</Link></p>
                 </div>
               </Col>
             </Row>
