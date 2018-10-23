@@ -36,7 +36,6 @@ class Header extends Component {
         
         this.interval = setInterval(
         () => {
-            console.log("A")
             this.checkAccount()
         },2500);
     }
