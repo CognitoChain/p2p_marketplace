@@ -21,17 +21,27 @@ import _ from "lodash";
 import Loading from "../Loading/Loading";
 import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
+let timer ;
 class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
       ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
-      loading: this.props.tokens.length>0 ? false:true
+      isWalletMounted:true,
+      loading: this.props.tokens.length>0 ? false : true
     };
   }
 
-  async componentWillMount() {
+  componentWillMount() {
+    this.getETH();
+  }
+  componentWillUnmount(){
+    this.setState({
+      isWalletMounted: false    
+    });
+  }
+  async getETH(){
     const { dharma } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     if (typeof currentAccount != "undefined") {
@@ -43,25 +53,28 @@ class Wallet extends Component {
       });
     }
   }
+  // componentDidMount(){
+  //   console.log("componentDidMount")
+  //   clearTimeout(timer);
+  //   timer = setTimeout(()=>{
+  //       console.log("setTimeout")
+  //       if(this.state.loading && this.state.isWalletMounted){
+  //           this.setState({
+  //             loading: false
+  //           });
+  //       }
+  //     },50000)
+  // }
   
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.tokens.length !== this.props.tokens.length) {
-      let tokensSorted = _.orderBy(nextProps.tokens, ['symbol'], ['asc']);
-      this.setState({
-        tokenlist: tokensSorted,
-        loading: false
-      });
-    }
-    if(!this.state.loading){
-      setTimeout(()=>{
-        this.setState({
-          tokenlist: nextProps.tokens,
-          loading: false
-        });
-      },5000)
-    }
-    
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   console.log(nextProps)
+  //   if (nextProps.tokens.length != this.props.tokens.length) {
+  //     this.setState({
+  //       tokenlist: nextProps.tokens,
+  //       loading: false
+  //     });
+  //   }  
+  // }
 
   async updateProxyAllowanceAsync(symbol) {
     const { dharma } = this.props;
@@ -104,7 +117,10 @@ class Wallet extends Component {
     }
   }
   renderTokenBalances() {
+ 
     const { loading, tokenlist } = this.state;
+    console.log("render")
+    console.log(tokenlist)
     if (loading) {
       return <Loading />
     }
@@ -112,12 +128,11 @@ class Wallet extends Component {
       return <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={"Could not find tokens in your wallet."} />
     }
     else {
+      const tokensSorted =  _.orderBy(tokenlist, ['symbol'], ['asc']);
       return (
-
-
         <Row>
 
-          {tokenlist.map(token => {
+          {tokensSorted.map(token => {
             if (token.balance > 0) {
               return (
                 <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
