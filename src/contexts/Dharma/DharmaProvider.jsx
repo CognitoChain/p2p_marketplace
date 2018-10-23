@@ -43,6 +43,7 @@ class DharmaProvider extends Component {
         this.state = {
             // The tokens that the user has in their wallet.
             tokens: [],
+            isTokenLoading:true,
             dharma: null,
             // The tokens available for lending on Dharma Protocol.
             supportedTokens: [],
@@ -77,6 +78,7 @@ class DharmaProvider extends Component {
                 Token.all(dharma, owner).then((tokenData) => {
                     this.setState({
                         tokens: tokenData,
+                        isTokenLoading:false
                     });
                 });    
             }            
@@ -87,6 +89,7 @@ class DharmaProvider extends Component {
         const dharmaProps = {
             dharma: dharma,
             tokens: this.state.tokens,
+            isTokenLoading:this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
             refreshTokens: this.getUserTokens,
         };

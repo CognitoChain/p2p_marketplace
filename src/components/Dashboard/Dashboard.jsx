@@ -179,6 +179,8 @@ class Dashboard extends Component {
                         authenticated={this.props.authenticated}
                         dharma={this.props.dharma}
                         tokens={this.props.tokens}
+                        isTokenLoading = {this.props.isTokenLoading}
+                        myBorrowedLoading={myBorrowedLoading}
                         token={this.props.token}
                         myLoanRequests={myLoanRequests}
                     />

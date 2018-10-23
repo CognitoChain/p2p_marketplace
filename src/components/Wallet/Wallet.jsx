@@ -28,13 +28,17 @@ class Wallet extends Component {
     this.state = {
       ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
-      isWalletMounted:true,
-      loading: this.props.tokens.length>0 ? false : true
+      isWalletMounted:true
     };
   }
 
   componentWillMount() {
     this.getETH();
+  }
+  componentWillReceiveProps(nextProps){
+    if(nextProps.tokens!=this.props.tokenlist){
+      this.setState({tokenlist:nextProps.tokens})
+    }
   }
   componentWillUnmount(){
     this.setState({
@@ -53,28 +57,6 @@ class Wallet extends Component {
       });
     }
   }
-  // componentDidMount(){
-  //   console.log("componentDidMount")
-  //   clearTimeout(timer);
-  //   timer = setTimeout(()=>{
-  //       console.log("setTimeout")
-  //       if(this.state.loading && this.state.isWalletMounted){
-  //           this.setState({
-  //             loading: false
-  //           });
-  //       }
-  //     },50000)
-  // }
-  
-  // componentWillReceiveProps(nextProps) {
-  //   console.log(nextProps)
-  //   if (nextProps.tokens.length != this.props.tokens.length) {
-  //     this.setState({
-  //       tokenlist: nextProps.tokens,
-  //       loading: false
-  //     });
-  //   }  
-  // }
 
   async updateProxyAllowanceAsync(symbol) {
     const { dharma } = this.props;
@@ -117,11 +99,12 @@ class Wallet extends Component {
     }
   }
   renderTokenBalances() {
- 
-    const { loading, tokenlist } = this.state;
-    console.log("render")
-    console.log(tokenlist)
-    if (loading) {
+    
+    const { tokenlist } = this.state;
+    const {isTokenLoading} = this.props;
+    console.log(this.props)
+    console.log(this.state)
+    if (isTokenLoading) {
       return <Loading />
     }
     else if (tokenlist.length == 0) {
@@ -205,7 +188,7 @@ class Wallet extends Component {
   }
   render() {
     let _self = this;
-    const { ethAddress, tokenlist, loading } = this.state;
+    const { ethAddress, tokenlist } = this.state;
 
 
     return (
