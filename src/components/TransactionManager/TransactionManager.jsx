@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-
+import _ from "lodash";
 const MAX_RETRIES = 10;
 
 const TX_STATES = {
@@ -18,7 +18,7 @@ const TX_STATE_TO_STYLE = {
 const TX_STATE_TO_TITLE = {
     awaiting: "Awaiting Transaction to be Mined",
     timedOut: "This Transaction seems to be taking a while...",
-    success: "Collateral Token Authorised.",    
+    success: "Token Authorised.",
 };
 
 const TX_STATE_TO_ICON = {
@@ -30,34 +30,24 @@ const TX_STATE_TO_ICON = {
 class TransactionManager extends Component {
     constructor(props) {
         super(props);
-        const { tokenAuthorised } = this.props;
-        if(tokenAuthorised === true)
-        {
-            this.state = {
-                txState: TX_STATES.success,
-            };
-        }
-        else{
-            this.state = {
-                txState: TX_STATES.awaiting,
-                numRetries: 0,
-            };
-        }
+        const { canAuthorize } = this.props;
+        console.log("canAuthorizeTransactionManager");
+        console.log(canAuthorize);
+
+        this.state = {
+            txState: (canAuthorize) ? TX_STATES.success : TX_STATES.awaiting,
+            numRetries: 0,
+            canAuthorize: canAuthorize
+        };
+
         this.retry = this.retry.bind(this);
         this.awaitTransactionMined = this.awaitTransactionMined.bind(this);
     }
 
     componentDidMount() {
-        const { tokenAuthorised } = this.props;
-        if(tokenAuthorised === false)
-        {
-            this.awaitTransactionMined();    
-        }
-        else if(tokenAuthorised === true)
-        {
-            this.state = {
-                txState: TX_STATES.success,
-            };
+        const { txHash } = this.props;
+        if(txHash){
+            this.awaitTransactionMined();
         }
     }
 
@@ -72,7 +62,7 @@ class TransactionManager extends Component {
                     numRetries: 0,
                 });
 
-                onSuccess();
+                onSuccess(null, "success");
             })
             .catch(this.retry);
     }
@@ -97,14 +87,22 @@ class TransactionManager extends Component {
 
     render() {
         const { txState } = this.state;
-        const { txHash, description,tokenAuthorised } = this.props;
+        const { txHash, description, tokenAuthorised } = this.props;
+        let extraTitle = '';
+
+        if (txHash != '' && txHash != null) {
+            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
+        }
+        console.log("this.state.canAuthorize")
+        console.log(this.state.canAuthorize)
+
         return (
-            <CustomAlertMsg 
+
+            <CustomAlertMsg
                 bsStyle={TX_STATE_TO_STYLE[txState]}
                 className={TX_STATE_TO_ICON[txState]}
-                title={TX_STATE_TO_TITLE[txState]}
-                txHash={txHash}
-                description={description}                
+                title={[TX_STATE_TO_TITLE[txState], ' ', extraTitle]}
+                description={description}
             />
         );
     }

@@ -68,6 +68,10 @@ const validator = {
     collateral: {
       rules: [
         {
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          message: 'Collateral amount must be greater then zero',
+        },
+        {
             test: /^[0-9.]+$/,
             message: 'Enter Valid Collateral Amount',
         },
@@ -79,6 +83,10 @@ const validator = {
     termLength: {
       rules: [
         {
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          message: 'Term Length must be greater then zero',
+        },
+        {
             test: /^[0-9]+$/,
             message: 'Enter Valid Term Length',
         },
@@ -89,6 +97,10 @@ const validator = {
     },
     interestRate: {
       rules: [
+        {
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          message: 'Interest rate must be greater then zero',
+        },
         {
             test: /^[0-9.]+$/,
             message: 'Enter valid interest rate.',

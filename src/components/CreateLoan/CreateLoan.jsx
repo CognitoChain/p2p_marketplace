@@ -12,10 +12,10 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import './CreateLoan.css';
 import Api from "../../services/api";
 import Error from "../Error/Error";
-import { toast } from 'react-toastify';
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import borrowImg from "../../assets/images/borrow.png";
+import _ from "lodash";
 
 class CreateLoan extends Component {
 
@@ -42,19 +42,18 @@ class CreateLoan extends Component {
             expirationUnit: "days",
             disabled: false,
             error: null,
-            hasSufficientAllowance: null,
+            hasSufficientAllowance: false,
             txHash: '',
             interestAmount: 0,
             totalReapaymentAmount: 0,
-            tokenAuthorised: false,
-            userLoanAgree: false,
+            userLoanAgree: '',
             collateralCurrentBalance: 0,
             customAlertMsgDisplay: false,
             customAlertMsgStyle: '',
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
-            disableSubmitBtn: true,
-            metaMaskMsg:false
+            metaMaskMsg: false,
+            isBottomButtonLoading: true
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -66,6 +65,23 @@ class CreateLoan extends Component {
         this.validators = validators;
         this.displayValidationErrors = this.displayValidationErrors.bind(this);
         this.updateValidators = this.updateValidators.bind(this);
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.tokens.length > 0 && this.props.tokens.length == 0) {
+            let firstToken = '';
+            let principalTokenSymbol = this.state.principalTokenSymbol;
+            let collateralTokenSymbol = this.state.collateralTokenSymbol;
+            _.every(nextProps.tokens, function (token) {
+                if (token.balance > 0 && firstToken == '' && token.symbol != principalTokenSymbol) {
+                    firstToken = token.symbol;
+                    return false;
+                }
+                return true;
+            })
+            this.setState({
+                collateralTokenSymbol: firstToken || this.state.collateralTokenSymbol
+            })
+        }
     }
 
     async componentDidMount() {
@@ -98,8 +114,7 @@ class CreateLoan extends Component {
     async createLoanRequest() {
         const api = new Api();
         const { userLoanAgree, principal, collateral, collateralCurrentBalance, termLength } = this.state;
-        const form_valid = this.isFormValid();
-        if (userLoanAgree === true && principal > 0 && collateral > 0 && collateral < collateralCurrentBalance && collateralCurrentBalance > 0 && termLength > 0) {
+        if (this.isFormValid()) {
             try {
                 const { dharma } = this.props;
                 const currentAccount = await dharma.blockchain.getCurrentAccount();
@@ -113,53 +128,48 @@ class CreateLoan extends Component {
                 console.log(loanRequest.getAgreementId());
                 this.props.onCompletion(loanRequest.getAgreementId());
             } catch (e) {
-                let msg = (e.message.length > 3000) ? 'Transaction cancelled successfully.' : e.message; 
+                let error = new Error(e);
+                error = error.props.message.split(".")
+                
                 this.setState({
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                    customAlertMsgTitle: msg,
-                    disableSubmitBtn: false,
+                    customAlertMsgTitle: error[0]
                 });
             }
         }
         else {
-            let msg = (principal == 0) ? 'Pricipal amount must be greater then zero.' : ((collateral == 0) ? 'Collateral amount must be greater then zero.' : ((collateral > collateralCurrentBalance) ? 'You does not have sufficient collateral balance in wallet.' : ((termLength == 0) ? 'Please enter valid loan term.' : 'Please accept loan agreement terms.')));
-            toast.error(msg);
+            this.setState({
+                customAlertMsgDisplay: true,
+                customAlertMsgStyle: 'danger',
+                customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                customAlertMsgTitle: "Please complete required fields",
+                disableSubmitBtn: true,
+            });
         }
     }
 
-    async setHasSufficientAllowance(tokenSymbol) {
+    async setHasSufficientAllowance(tokenSymbol, status) {
         const { dharma } = this.props;
-        const { collateralTokenSymbol, collateralAmount } = this.state;
+        const { collateralTokenSymbol, collateralAmount, principal, collateral, LTVRatioValue, interestRate, termLength, userLoanAgree } = this.state;
         const symbol = tokenSymbol ? tokenSymbol : collateralTokenSymbol;
-        /*const { Tokens } = Dharma.Types;*/
+        const isCompleted = status && status == "success" ? true : false;
         const { Token } = Dharma.Types;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        console.log("setHasSufficientAllowance() - currentAccount: ", currentAccount);
+        let stateObj = {};
         /*const tokens = new Tokens(dharma, currentAccount);*/
         /*const tokenData = await tokens.getTokenDataForSymbol(symbol);*/
-
+        stateObj["hasSufficientAllowance"] = false;
+        stateObj["isBottomButtonLoading"] = false;
         if (typeof currentAccount != "undefined") {
             const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
             const hasSufficientAllowance =
-                tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount;
-            this.setState({
-                hasSufficientAllowance,
-                collateralCurrentBalance: tokenData.balance
-            });
-
-            if (tokenData.hasUnlimitedAllowance === true) {
-                this.setState({
-                    tokenAuthorised: true,
-                });
-            }
-            else {
-                this.setState({
-                    tokenAuthorised: false,
-                });
-            }
+                tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount || isCompleted;
+            stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
+            stateObj["collateralCurrentBalance"] = tokenData.balance;
         }
+        this.setState(stateObj);
     }
 
     async authorizeCollateralTransfer() {
@@ -167,17 +177,29 @@ class CreateLoan extends Component {
         const { Token } = Dharma.Types;
         const { collateralTokenSymbol } = this.state;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        if (typeof currentAccount != 'undefined') {
-            const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
-                dharma,
-                collateralTokenSymbol,
-                currentAccount,
-            );
 
-            this.setState({
-                txHash,
-                /*tokenAuthorised:true*/
-            });
+        if (typeof currentAccount != 'undefined') {
+            try {
+                const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
+                    dharma,
+                    collateralTokenSymbol,
+                    currentAccount,
+                );
+                this.setState({
+                    customAlertMsgDisplay: false,
+                    txHash
+                });
+            }
+            catch (e) {
+                let error = new Error(e);
+                this.setState({
+                    customAlertMsgDisplay: true,
+                    customAlertMsgStyle: 'danger',
+                    customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                    customAlertMsgTitle: error.props.message,
+                    disableSubmitBtn: false,
+                });
+            }
         }
     }
 
@@ -222,7 +244,8 @@ class CreateLoan extends Component {
     toggleDropDown(field) {
         field = field + "DropdownOpen";
         this.setState({
-            [field]: !this.state[field]
+            [field]: !this.state[field],
+            customAlertMsgDisplay:false
         });
     }
     onDropdownItemClick(field, element) {
@@ -236,71 +259,52 @@ class CreateLoan extends Component {
             splitButtonOpen: !this.state.splitButtonOpen
         });
     }
-
+    calculateInterestRate() {
+        const { principal, interestRate } = this.state;
+        let interestAmount = 0;
+        let totalReapaymentAmount = 0;
+        let stateObj = {};
+        if (interestRate > 0) {
+            interestAmount = (principal * interestRate) / 100;
+            totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
+            stateObj["interestAmount"] = interestAmount;
+            stateObj["totalReapaymentAmount"] = totalReapaymentAmount.toFixed(2);
+        }
+        this.setState(stateObj);
+    }
+    setRelayerFee(principal) {
+        if (principal <= 0) {
+            return;
+        }
+        this.setState({ disabled: true });
+        this.getRelayerFee(principal).then((relayerFeeAmount) => {
+            this.setState({
+                relayerFeeAmount,
+                disabled: false,
+            });
+        });
+    }
     async handleInputChange(event) {
         const target = event.target;
         const value = target.value;
         const name = target.name;
-        console.log(value);
         if (name === "principal") {
-            // When the principal changes, the form becomes disabled until the
-            // relayer fee has been updated.
-            this.setState({ disabled: true });
-
-            this.getRelayerFee(value).then((relayerFeeAmount) => {
-                this.setState({
-                    relayerFeeAmount,
-                    disabled: false,
-                });
-            });
-
-            if (this.state.interest_rate > 0 && value > 0) {
-                let principal = value;
-                let interest_rate = this.state.interest_rate;
-                let interestAmount = (principal * interest_rate) / 100;
-                let totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
-                this.setState({
-                    interestAmount: interestAmount.toFixed(2),
-                    totalReapaymentAmount: totalReapaymentAmount.toFixed(2)
-                });
-            }
+            this.setRelayerFee(value);
         }
-
         this.setState({ [name]: value }, () => {
             if (name == "principal" || name == "collateral" || name === "collateralTokenSymbol" || name == "principalTokenSymbol") {
                 this.countLtv(name);
             }
-
-            if (this.state.principal > 0 && this.state.collateral > 0 && this.state.LTVRatioValue <= 60 && this.state.interestRate > 0 && this.state.termLength > 0 && this.state.userLoanAgree === true) {
-                this.setState({
-                    disableSubmitBtn: false
-                });
-            }
-            else {
-                this.setState({
-                    disableSubmitBtn: true
-                });
+            if (name == "principal" || name == "interestRate") {
+                this.calculateInterestRate();
             }
         });
-
         if (name === "collateralTokenSymbol") {
             this.setState({
-                handleInputChange: null,
+                hasSufficientAllowance: false,
+                isBottomButtonLoading: true
             });
             this.setHasSufficientAllowance(value);
-        }
-
-        if (name == "interestRate" && value > 0) {
-            let interest_rate = value;
-            let interestAmount = (this.state.principal * interest_rate) / 100;
-            let totalReapaymentAmount = parseFloat(this.state.principal) + parseFloat(interestAmount);
-            this.setState({
-                interestAmount: interestAmount.toFixed(2),
-                totalReapaymentAmount: totalReapaymentAmount.toFixed(2)
-            });
-        }
-        if (name == "principal" || name == "collateral" || name == "termLength" || name == "interestRate") {
-            this.updateValidators(name, value);
         }
     }
 
@@ -313,56 +317,59 @@ class CreateLoan extends Component {
 
     handleAgreeChange(event) {
         let checked = event.target.checked;
-        let stateObj = {};
-        const {
-            principal,
-            principalTokenSymbol,
-            collateral,
-            collateralTokenSymbol,
-            LTVRatioValue,
-            interestRate,
-            termLength
-        } = this.state;
-
-        if (checked === true) {
-            stateObj["userLoanAgree"] = true;
-            if (principal > 0 && collateral > 0 && LTVRatioValue <= 60 && interestRate > 0 && termLength > 0) {
-                stateObj["disableSubmitBtn"] = false;
-            }
-        }
-        else {
-            stateObj["userLoanAgree"] = false;
-            stateObj["disableSubmitBtn"] = true;
-        }
-        this.setState(stateObj);
+        this.setState({ userLoanAgree: checked });
     }
 
     updateValidators(fieldName, value) {
+        const { collateralCurrentBalance, hasSufficientAllowance, principalTokenSymbol, collateralTokenSymbol } = this.state;
+        if (!this.validators[fieldName]) {
+            this.validators[fieldName] = {}
+        }
         this.validators[fieldName].errors = [];
         this.validators[fieldName].state = value;
         this.validators[fieldName].valid = true;
-        this.validators[fieldName].rules.forEach((rule) => {
-            if (rule.test instanceof RegExp) {
-                if (!rule.test.test(value)) {
-                    this.validators[fieldName].errors.push(rule.message);
-                    this.validators[fieldName].valid = false;
+        if (this.validators[fieldName].rules) {
+            this.validators[fieldName].rules.forEach((rule) => {
+                if (rule.test instanceof RegExp) {
+                    if (!rule.test.test(value)) {
+                        this.validators[fieldName].errors.push(rule.message);
+                        this.validators[fieldName].valid = false;
+                    }
+                } else if (typeof rule.test === 'function') {
+                    if (!rule.test(value)) {
+                        this.validators[fieldName].errors.push(rule.message);
+                        this.validators[fieldName].valid = false;
+                    }
                 }
-            } else if (typeof rule.test === 'function') {
-                if (!rule.test(value)) {
-                    this.validators[fieldName].errors.push(rule.message);
-                    this.validators[fieldName].valid = false;
-                }
-            }
-        });
+            });
+        }
+        if (fieldName == "collateral" && hasSufficientAllowance && value > collateralCurrentBalance && collateralCurrentBalance > 0) {
+            this.validators[fieldName].errors.push("You does not have sufficient collateral balance in wallet.'");
+            this.validators[fieldName].valid = false;
+        }
+        if (fieldName == "collateralTokenSymbol" && principalTokenSymbol == collateralTokenSymbol) {
+            this.validators[fieldName].errors.push("Please choose another token.");
+            this.validators[fieldName].valid = false;
+        }
+        if (fieldName == "userLoanAgree" && !value) {
+            this.validators[fieldName].errors.push("Please accept loan agreement terms.");
+            this.validators[fieldName].valid = false;
+        }
+        console.log(value)
+        if (fieldName == "LTVRatioValue" && value > 60) {
+            this.validators[fieldName].errors.push("LTV ratio can not be greater then 60.");
+            this.validators[fieldName].valid = false;
+        }
     }
 
     isFormValid() {
         let status = true;
-        Object.keys(this.validators).forEach((field) => {
-            if (field == "principal" || field == "collateral" || field == "termLength" || field == "interestRate") {
-                if (!this.validators[field].valid) {
-                    status = false;
-                }
+        const { LTVRatioValue } = this.state;
+        const validationFields = ["principal", "collateral", "collateralTokenSymbol", "termLength", "interestRate", "userLoanAgree", "LTVRatioValue"];
+        validationFields.forEach((field) => {
+            this.updateValidators(field, this.state[field])
+            if (!this.validators[field].valid) {
+                status = false;
             }
         });
         return status;
@@ -389,10 +396,9 @@ class CreateLoan extends Component {
         const { dharma } = this.props;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
 
-        if(typeof currentAccount == "undefined")
-        {
-            this.setState({ 
-                metaMaskMsg:true
+        if (typeof currentAccount == "undefined") {
+            this.setState({
+                metaMaskMsg: true
             });
         }
     }
@@ -408,16 +414,13 @@ class CreateLoan extends Component {
             termLength,
             userLoanAgree
         } = this.state;
-        let stateObj = {};
-        let ltv = 0;
-        let userCollateral = 0;
         const api = new Api();
         const all_token_price = api
             .setToken(this.props.token)
             .get(`priceFeed`)
             .then(async priceFeedData => {
-                if (typeof priceFeedData[principalTokenSymbol] != "undefined" && typeof priceFeedData[collateralTokenSymbol] != "undefined") {
-                    stateObj["hasSufficientAllowance"] = true;
+                if (!_.isUndefined(priceFeedData[principalTokenSymbol]) && !_.isUndefined(priceFeedData[collateralTokenSymbol])) {
+                    /*stateObj["hasSufficientAllowance"] = true;*/
                     let principalTokenCurrentPrice =
                         priceFeedData[principalTokenSymbol].USD;
                     let collateralTokenCurrentPrice =
@@ -427,46 +430,21 @@ class CreateLoan extends Component {
                     if (countCollateral.indexOf(name) > -1 && principal > 0 && LTVRatioValue > 0) {
                         let collateralCount = (pricinipalMarketValue / LTVRatioValue) * 100;
                         let collateralPurchasable = parseFloat(collateralCount) / parseFloat(collateralTokenCurrentPrice);
-                        /*console.log(collateralPurchasable);*/
-                        stateObj["collateral"] = (collateralPurchasable > 0) ? collateralPurchasable.toFixed(2) : 0;
-                        stateObj["customAlertMsgDisplay"] = false;
-                        stateObj["customAlertMsgStyle"] = stateObj["customAlertMsgClassname"] = stateObj["customAlertMsgTitle"] = '';
-                        stateObj["disableSubmitBtn"] = false;
+                        collateralPurchasable = (collateralPurchasable > 0) ? collateralPurchasable.toFixed(2) : 0;
+                        this.setState({ collateral: collateralPurchasable });
                     }
-
                     if (name == "collateral" && principal > 0 && collateral > 0) {
                         let collateralMarketValue = parseFloat(collateral) * parseFloat(collateralTokenCurrentPrice);
                         let newLTVRatio = (pricinipalMarketValue / collateralMarketValue) * 100;
-                        if (newLTVRatio > 60) {
-                            stateObj["customAlertMsgDisplay"] = true;
-                            stateObj["customAlertMsgStyle"] = 'danger';
-                            stateObj["customAlertMsgClassname"] = 'fa fa-exclamation-triangle fa-2x pull-left mr-2';
-                            stateObj["customAlertMsgTitle"] = 'LTV ratio can not be greater then 60.';
-                            
-                            if(principal > 0 && collateral > 0 && LTVRatioValue <= 60 && interestRate > 0 && termLength > 0 && userLoanAgree === true)
-                            {
-                                stateObj["disableSubmitBtn"] = false;
-                            }
-                        }
-                        else {
-                            stateObj["LTVRatioValue"] = (newLTVRatio > 0) ? newLTVRatio.toFixed(2) : 0;
-                            stateObj["customAlertMsgDisplay"] = false;
-                            stateObj["customAlertMsgStyle"] = stateObj["customAlertMsgClassname"] = stateObj["customAlertMsgTitle"] = '';
-                            stateObj["disableSubmitBtn"] = false;
-                        }
+                        newLTVRatio = (newLTVRatio > 0) ? newLTVRatio.toFixed(2) : 0;
+                        this.setState({ LTVRatioValue: newLTVRatio });
                     }
-                }
-
-                if (typeof stateObj != "undefined") {
-                    this.setState(stateObj);
                 }
             });
     }
 
     render() {
         const { tokens, dharma } = this.props;
-
-
         const {
             principalTokenSymbolDropdownOpen,
             collateralTokenSymbolDropdownOpen,
@@ -489,23 +467,22 @@ class CreateLoan extends Component {
             LTVRatioValue,
             interestAmount,
             totalReapaymentAmount,
-            tokenAuthorised,
             customAlertMsgDisplay,
             customAlertMsgStyle,
             customAlertMsgClassname,
             customAlertMsgTitle,
-            disableSubmitBtn,
-            metaMaskMsg
+            metaMaskMsg,
+            isBottomButtonLoading,
+            userLoanAgree
         } = this.state;
 
         let msgDisplay = false;
-        if (txHash != '' || tokenAuthorised === true) {
+        if (txHash != '' || hasSufficientAllowance) {
             msgDisplay = true;
         }
-
-        if (customAlertMsgDisplay === true) {
-            msgDisplay = false;
-        }
+        const isFormValid = this.isFormValid();
+        let sortedTokens = _.orderBy(tokens, ['symbol'], ['asc']);
+        let LTVRatio = LTVRatioValue <= 60 ? LTVRatioValue : 60
         return (
             <div className="create-loan-container">
                 <div className="page-title">
@@ -533,8 +510,8 @@ class CreateLoan extends Component {
                         </Col>
                     </Row>
                 }
-                {tokens.length === 0 && !metaMaskMsg && <LoadingFull />}
-                {tokens.length > 0 &&
+                {sortedTokens.length === 0 && !metaMaskMsg && <LoadingFull />}
+                {sortedTokens.length > 0 &&
                     <div>
                         <Row className="row-eq-height">
                             <Col lg={4} md={4} sm={6} xl={4}>
@@ -553,20 +530,24 @@ class CreateLoan extends Component {
                                                     dropdownFieldDefaultValue={principalTokenSymbol}
                                                     dropdownOpen={principalTokenSymbolDropdownOpen}
                                                     toggleDropDown={this.toggleDropDown}
-                                                    tokens={tokens}
+                                                    tokens={sortedTokens}
                                                     allowedTokens={false}
                                                 />
-                                                {this.displayValidationErrors('principal')}
+                                                {principal && this.displayValidationErrors('principal')}
                                             </div>
                                             <div className="mt-20 create-loan-slider">
                                                 <label>LTV (Loan-to-Value Ratio)</label>
-                                                <InputRange
-                                                    lassName="mt-20"
-                                                    maxValue={60}
-                                                    formatLabel={value => `${value} %`}
-                                                    minValue={5}
-                                                    value={LTVRatioValue}
-                                                    onChange={value => this.handleLTVChange(value)} />
+                                                <div className="mb-20">
+                                                    <InputRange
+                                                        className="mt-20"
+                                                        maxValue={60}
+                                                        formatLabel={value => `${value} %`}
+                                                        minValue={5}
+                                                        value={LTVRatio}
+                                                        onChange={value => this.handleLTVChange(value)} />
+                                                </div>
+                                                {LTVRatio && this.displayValidationErrors('LTVRatioValue')}
+
                                             </div>
                                             <div className="mt-20">
                                                 <label>Collateral Amount<span className="red">*</span></label>
@@ -578,10 +559,12 @@ class CreateLoan extends Component {
                                                     dropdownFieldDefaultValue={collateralTokenSymbol}
                                                     dropdownOpen={collateralTokenSymbolDropdownOpen}
                                                     toggleDropDown={this.toggleDropDown}
-                                                    tokens={tokens}
+                                                    tokens={sortedTokens}
                                                     allowedTokens={true}
+                                                    disableValue={principalTokenSymbol}
                                                 />
-                                                {this.displayValidationErrors('collateral')}
+                                                {collateral && this.displayValidationErrors('collateral')}
+                                                {this.displayValidationErrors('collateralTokenSymbol')}
                                             </div>
                                             <div className="mt-20">
                                                 <label>Loan Term<span className="red">*</span></label>
@@ -594,7 +577,7 @@ class CreateLoan extends Component {
                                                     dropdownOpen={termUnitDropdownOpen}
                                                     toggleDropDown={this.toggleDropDown}
                                                 />
-                                                {this.displayValidationErrors('termLength')}
+                                                {termLength && this.displayValidationErrors('termLength')}
                                             </div>
                                             <div className="mt-20">
                                                 <label>Interest Rate (% Per Loan Term)<span className="red">*</span></label>
@@ -606,20 +589,8 @@ class CreateLoan extends Component {
                                                         value={interestRate} />
                                                     <InputGroupAddon addonType="append">%</InputGroupAddon>
                                                 </InputGroup>
-                                                {this.displayValidationErrors('interestRate')}
+                                                {interestRate && this.displayValidationErrors('interestRate')}
                                             </div>
-                                            {/*<div className="mt-20">
-                                            <label>Expiration</label>
-                                            <TimeUnitSelect
-                                                name="expirationLength"
-                                                onChange={this.handleInputChange}
-                                                defaultValue={expirationLength}
-                                                dropdownFieldName="expirationUnit"
-                                                dropdownFieldDefaultValue={expirationUnit}
-                                                dropdownOpen={expirationUnitDropdownOpen}
-                                                toggleDropDown={this.toggleDropDown}
-                                            />
-                                        </div>*/}
                                         </Form>
 
                                     </CardBody>
@@ -646,7 +617,7 @@ class CreateLoan extends Component {
                                                     />
                                                     <SummaryItem
                                                         labelName="LTV"
-                                                        labelValue={LTVRatioValue > 0 ? LTVRatioValue + "%" : 'N/A'}
+                                                        labelValue={LTVRatio > 0 ? LTVRatio + "%" : 'N/A'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Loan Term"
@@ -681,6 +652,7 @@ class CreateLoan extends Component {
                                                         <input type="checkbox" id="loanAgreement" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
                                                         <span className="checkmark"></span>
                                                     </label>
+                                                    {userLoanAgree && this.displayValidationErrors('userLoanAgree')}
                                                 </div>
 
                                             </div>
@@ -688,13 +660,15 @@ class CreateLoan extends Component {
                                         </div>
                                     </CardBody>
 
-                                    {msgDisplay === true &&
+                                    {!isBottomButtonLoading && msgDisplay === true &&
                                         <TransactionManager
                                             key={txHash}
                                             txHash={txHash}
                                             dharma={dharma}
                                             onSuccess={this.setHasSufficientAllowance}
-                                            tokenAuthorised={tokenAuthorised}
+                                            canAuthorize={
+                                                hasSufficientAllowance
+                                            }
                                         />
                                     }
 
@@ -708,20 +682,21 @@ class CreateLoan extends Component {
 
                                     <CardBody className="pl-4 pt-1 mtb-2 mt-10">
                                         <div>
-                                            <div className="create-loan-buttons-container">
-                                                <AuthorizableAction
-                                                    canTakeAction={hasSufficientAllowance}
-                                                    canAuthorize={
-                                                        hasSufficientAllowance !== null && !hasSufficientAllowance
-                                                    }
-                                                    onAction={this.createLoanRequest}
-                                                    onAuthorize={this.authorizeCollateralTransfer}
-                                                    tokenAuthorised={tokenAuthorised}
-                                                    disableSubmitBtn={disableSubmitBtn}
-                                                >
-                                                    <p>Unlock Tokens</p>
-                                                    <p>Submit Application</p>
-                                                </AuthorizableAction>
+                                            <div className="create-loan-buttons-container text-center">
+                                                {
+                                                    !isBottomButtonLoading &&
+                                                    <AuthorizableAction
+                                                        canTakeAction={hasSufficientAllowance && isFormValid}
+                                                        canAuthorize={hasSufficientAllowance}
+                                                        onAction={this.createLoanRequest}
+                                                        onAuthorize={this.authorizeCollateralTransfer}>
+                                                        <p>Unlock Tokens</p>
+                                                        <p>Submit Application</p>
+                                                    </AuthorizableAction>
+                                                }
+                                                {
+                                                    isBottomButtonLoading && <i className="btn btn-sm fa-spin fa fa-spinner"></i>
+                                                }
                                             </div>
                                         </div>
                                     </CardBody>

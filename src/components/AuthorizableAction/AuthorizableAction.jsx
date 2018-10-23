@@ -7,35 +7,24 @@ import "./AuthorizableAction.css";
 class AuthorizableAction extends Component {
     handleClick(event, callback) {
         event.preventDefault();
-
         callback();
     }
-
     render() {
-        const { canTakeAction, canAuthorize, onAction, onAuthorize,tokenAuthorised,disableSubmitBtn } = this.props;
-        let disableSubmitButton;
-        console.log(canTakeAction);
-        if(disableSubmitBtn === true || canTakeAction !== true)
-        {
-            disableSubmitButton = false;
-        }
-        else if(disableSubmitBtn === false && canTakeAction === true){
-            disableSubmitButton = true;
-        }
+        const { canTakeAction, canAuthorize, onAction, onAuthorize } = this.props;
         return (
             <div className="Actions">
             	<Button
                     onClick={(event) => this.handleClick(event, onAuthorize)}
-                    disabled={!canAuthorize}
+                    disabled={canAuthorize}
                     bsStyle="primary"
-                    className={`AuthorizableAction-Button unlock-tokens-button btn btn-success cognito ${tokenAuthorised ? 'd-none' : ''}`}
+                    className={`AuthorizableAction-Button unlock-tokens-button btn btn-success cognito ${canAuthorize ? 'd-none' : ''}`}
                     >
                     {this.props.children[0]}
                 </Button>
 
                 <Button
                     onClick={(event) => this.handleClick(event, onAction)}
-                    disabled={!disableSubmitButton}
+                    disabled={!canTakeAction}
                     bsStyle="primary"
                     className="AuthorizableAction-Button btn btn-primary cognito">
                     {this.props.children[1]}
