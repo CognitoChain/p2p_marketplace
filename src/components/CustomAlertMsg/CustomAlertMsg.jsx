@@ -7,19 +7,13 @@ class CustomAlertMsg extends Component {
     }
 
     render() {
-        const { bsStyle, className, title, txHash, description, extraClass } = this.props;
+        const { bsStyle, className, title, description, extraClass } = this.props;
         return (
             <Alert bsStyle={bsStyle} className={"custom-alert-msg " + (extraClass || "")}>
                 {className && <i className={className}></i>}
                 <h6 className="pl-2">
                     <small>
-                        {title}
-                        {
-                            txHash != '' && txHash != null && 
-                            <span className="transaction-detail-link">
-                                <a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a>
-                            </span> 
-                        }
+                        {title}                        
                     </small>
                 </h6>
 
