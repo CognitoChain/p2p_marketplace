@@ -11,7 +11,7 @@ class Privacy extends Component {
         <div className="page-title">
           <Row className="mt-4 mb-4">
               <Col>
-                  <h4 className="mb-0">Privacy Policy</h4>
+                  <h3 className="privacy-header">General Information Regarding GDPR Policies and Data Protection</h3>
               </Col>
           </Row>
         </div>  
@@ -20,9 +20,6 @@ class Privacy extends Component {
             <Col md={12}>
                 <Card className="card-statistics h-100 privacy-policy-container">
                     <CardBody>
-
-                        <h3 className="text-center privacy-header">General Information Regarding GDPR Policies and Data Protection</h3>
-
                         <p>
                             In relation to the GDPR provisions, the personal data is the personal information of our clients that we gather for the purpose of our lawful business activities and legitimate interests in connection to the operation of the platform and our relevant AML and KYC policies.
                         </p>

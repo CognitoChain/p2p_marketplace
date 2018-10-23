@@ -60,7 +60,7 @@ class Unsubscribe extends React.Component {
                   </h2>
                   <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
                   <ul className="list-unstyled  pos-bot pb-30">
-                    <li className="list-inline-item"><a className="text-white" href="#"> Terms of Use | </a> </li>
+                    <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use | </a> </li>
                     <li className="list-inline-item"><a className="text-white" href="privacy" target="_blank"> Privacy Policy</a></li>
                   </ul>
                 </div>

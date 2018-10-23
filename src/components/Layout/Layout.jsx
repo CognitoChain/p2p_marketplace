@@ -17,6 +17,7 @@ import Create from "../../containers/CreateLoan";
 import WalletContainer from "../../containers/Wallet";
 import Success from '../Success/Success';
 import Privacy from '../Privacy/Privacy';
+import TermsConditions from '../TermsConditions/TermsConditions';
 import {withRouter} from 'react-router-dom';
 
 import DashboardContainer from '../../containers/Dashboard';
@@ -118,6 +119,11 @@ class Layout extends Component {
                         <Route exact={true} path='/privacy' 
                             render={() => 
                               <Privacy {...this.props} authenticated={authenticated} token={token} />
+                            }
+                          />
+                        <Route exact={true} path='/terms' 
+                            render={() => 
+                              <TermsConditions {...this.props} authenticated={authenticated} token={token} />
                             }
                           />
                     </Switch>
