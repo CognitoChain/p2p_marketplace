@@ -1,7 +1,5 @@
 // External libraries
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
-import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 
 // Components
