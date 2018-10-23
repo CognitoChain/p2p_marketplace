@@ -12,7 +12,7 @@ class TokenSelect extends Component {
     }
 
     render() {
-        const { name, dropdownFieldName, dropdownFieldDefaultValue, onChange, defaultValue, tokens, dropdownOpen, toggleDropDown,allowedTokens } = this.props;
+        const { name, dropdownFieldName, dropdownFieldDefaultValue, onChange, defaultValue, tokens, dropdownOpen, toggleDropDown,allowedTokens,disableValue } = this.props;
         return (
             <InputGroup>
                 <InputGroupButtonDropdown addonType="prepend" isOpen={dropdownOpen} toggle={() => toggleDropDown(dropdownFieldName)}>
@@ -22,10 +22,11 @@ class TokenSelect extends Component {
                     <DropdownMenu>
                         {tokens.map((token) => {
                             if(allowedTokens === false || (allowedTokens === true && token.balance > 0)){
-                                return  <DropdownItem key={token.symbol} value={token.symbol} name={dropdownFieldName}          onClick={onChange}>
+                                return  <DropdownItem disabled={disableValue == token.symbol} key={token.symbol} value={token.symbol} name={dropdownFieldName}          onClick={onChange}>
                                             {`${token.symbol} (${token.name})`}
                                         </DropdownItem>;        
                             }
+                            return false;
                         })}
                     </DropdownMenu>
                 </InputGroupButtonDropdown>
