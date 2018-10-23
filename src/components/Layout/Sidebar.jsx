@@ -51,7 +51,7 @@ class Sidebar extends Component {
                   <a href="/privacy" target="_blank">Privacy Policy</a>
                 </li>
                 <li>
-                  <Link to="/terms-and-conditions">Terms and Conditions</Link>
+                  <a href="terms" target="_blank">Terms and Conditions</a>
                 </li>
               </ul>
             </div>
