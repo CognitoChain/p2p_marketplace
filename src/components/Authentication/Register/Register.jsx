@@ -174,7 +174,7 @@ class Register extends React.Component{
                               buttonText="Signup with Google"
                               onSuccess={responseGoogle}
                               onFailure={responseGoogle}
-                              className="google-login-btn"
+                              className="btn cognito btn-danger"
                         />
                         </div>
 

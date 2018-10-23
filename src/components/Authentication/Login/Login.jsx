@@ -263,7 +263,7 @@ class Login extends React.Component {
                     buttonText="Login with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}
-                    className="google-login-btn"
+                    className="btn cognito btn-danger "
                   />
 
                 </div>
