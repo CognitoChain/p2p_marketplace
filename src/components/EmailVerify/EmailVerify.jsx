@@ -199,7 +199,6 @@ class EmailVerify extends React.Component {
                   <div>
                     <a onClick={this.resendVerificationEmail} className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
                       <span className="text-white">Send veritfication link</span>
-                      <i className="fa fa-check text-white" />
                     </a>
                   </div>
                   <p className="mt-20 mb-0 remember-checkbox">After Verification  <Link to="login"> Login here</Link></p>

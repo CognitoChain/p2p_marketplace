@@ -165,7 +165,6 @@ class Register extends React.Component{
 
                         { <a onClick={this.register}  className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
                           <span className="text-white">Signup</span>
-                          <i className="fa fa-check text-white" />
                         </a>}
 
                         <span className="login-buttons-seperator">OR</span>

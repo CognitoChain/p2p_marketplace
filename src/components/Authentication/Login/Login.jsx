@@ -254,7 +254,6 @@ class Login extends React.Component {
                 <div>
                   <a onClick={this.login} className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
                     <span className="text-white">Log in</span>
-                    <i className="fa fa-check text-white" />
                   </a>
 
                   <span className="login-buttons-seperator">OR</span>
