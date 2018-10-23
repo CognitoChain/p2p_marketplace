@@ -1,9 +1,7 @@
 // External libraries
 import React, { Component } from "react";
-import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import "./MyActivities.css";
-import { amortizationUnitToFrequency } from "../../../utils/Util";
 import BootstrapTable from "react-bootstrap-table-next";
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
@@ -26,8 +24,11 @@ class MyActivities extends Component {
       investmentsActivities: [],
       loanRequestsActivities: [],
       myloanRequestsProcessCompleted: false,
-      myInvestmentsRequestsProcessCompleted: false,
-      metaMaskMsg:false
+      myFundedRequestsProcessCompleted: false,
+      metaMaskMsg:false,
+      myLoansIsMounted:true,
+      myInvestmensIsMounted:true,
+      displayNoRecordMsg:true
     };
   }
 
@@ -36,6 +37,7 @@ class MyActivities extends Component {
     let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
     let expectedRepaidAmount =
       expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
+    expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;  
     return expectedRepaidAmount;
   }
 
@@ -46,164 +48,159 @@ class MyActivities extends Component {
   }
 
   async componentWillReceiveProps(nextProps) {
-    //const { dharma } = this.props;
-    const { dharma, myloanRequests } = nextProps;
-    const { myloanRequestsProcessCompleted } = this.state;
+    const { dharma, myLoanRequests,myFundedRequests } = nextProps;
+    const { myloanRequestsProcessCompleted,myLoansIsMounted,myFundedRequestsProcessCompleted,myInvestmensIsMounted,displayNoRecordMsg } = this.state;
+    const myLoanRequestPropsLength = this.props.myLoanRequests.length;
+    const myLoanRequestLength = myLoanRequests.length;
+    const myFundedRequestPropsLength = this.props.myFundedRequests.length
+    const myFundedRequestLength = myFundedRequests.length; 
     const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-    if (myloanRequests == this.props.myloanRequests) {
+    /*if (myLoanRequests == this.props.myLoanRequests) {
       return;
-    }
+    }*/
     let repaymentSchedule;
     let expectedRepaidAmount;
     let loanRequestsActivities = [];
-    console.log("CurrentAccount");
-    console.log(CurrentAccount);
-    if (myloanRequestsProcessCompleted === false && typeof CurrentAccount != "undefined") {
-      await this.asyncForEach(myloanRequests, async ts => {
-        repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
-          ts.id
-        );
-        let current_timestamp = moment().unix();
-        let i = 1;
-        await this.asyncForEach(repaymentSchedule, async st => {
-          if (st > current_timestamp && i == 1) {
-            let date = new Date(st * 1000);
-            let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-              ts.id,
-              st
-            );
-            let expectedRepaymentAmountBignumber = expectedRepaidAmountBigNumber.toNumber();
-            let expectedRepaymentAmountDecimal =
-              "1E" + expectedRepaidAmountBigNumber.e;
-            expectedRepaidAmount =
-              expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
-            loanRequestsActivities.push({
-              icon: "minus",
-              loanText: "minus",
-              date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-              amount: expectedRepaidAmount,
-              type: "minus",
-              payBtn: "minus",
-              sybmol: ts.principalTokenSymbol,
-              agreementId: ts.id,
-              sortTimestamp: st
-            });
-            i++;
-          }
-        });
-      });
-      console.log(loanRequestsActivities)
-      this.setState({
-        loanRequestsActivities,
-        myloanRequestsProcessCompleted: true
-      });
-    }    
-  }
-  /**
-   * When the component mounts, use the API to get all of the load requests from the relayer
-   * database, and parse those into LoanRequest objects using Dharma.js. Then, set the state of
-   * the current component to include those loan requests so that they can be rendered as a table.
-   *
-   * This function assumes that there is a database with Loan Request data, and that we have
-   * access to Dharma.js, which is connected to a blockchain.
-   */
-  async componentDidMount() {
-    const { dharma, myloanRequests } = this.props;
-    let repaymentSchedule;
-    let expectedRepaidAmount;
     let investmentsActivities = [];
-    const { Investments } = Dharma.Types;
-    const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-    if (typeof CurrentAccount != "undefined") {
-      const investments = await Investments.getExpandedData(
-        dharma,
-        CurrentAccount
-      );
-      let investmentsMapped = investments.map(investment => {
-        return {
-          ...investment,
-          principal: `${investment.principalAmount} ${
-            investment.principalTokenSymbol
-            }`,
-          collateral: `${investment.collateralAmount} ${
-            investment.collateralTokenSymbol
-            }`,
-          term: `${investment.termDuration} ${investment.termUnit}`,
-          repaidAmount: `${investment.repaidAmount} ${
-            investment.principalTokenSymbol
-            }`,
-          totalExpectedRepaymentAmount: `${
-            investment.totalExpectedRepaymentAmount
-            } ${investment.principalTokenSymbol}`
-        };
-      });
 
-      if (typeof investmentsMapped != "undefined") {
-        await this.asyncForEach(investmentsMapped, async ts => {
+    if (myLoanRequestPropsLength != myLoanRequestLength && myloanRequestsProcessCompleted === false && !_.isUndefined(CurrentAccount)) {
+      if(displayNoRecordMsg)
+      {
+        this.setState({
+          displayNoRecordMsg: false
+        });  
+      }
+      
+      await this.asyncForEach(myLoanRequests, async ts => {
+        if(_.lowerCase(ts.loanStatus) == "filled")
+        {
+            repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
+              ts.id
+            );
+            let current_timestamp = moment().unix();
+            let i = 1;
+            if(!_.isUndefined(repaymentSchedule))
+            {
+                await this.asyncForEach(repaymentSchedule, async st => {
+                  if (st > current_timestamp && i == 1) {
+                    let date = new Date(st * 1000);
+                    let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+                      ts.id,
+                      st
+                    );
+                    expectedRepaidAmount = this.convert_big_number(
+                        expectedRepaidAmountBigNumber
+                    );
+                    loanRequestsActivities.push({
+                      id:_.random(999999999),
+                      icon: "minus",
+                      loanText: "minus",
+                      date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                      amount: expectedRepaidAmount,
+                      type: "minus",
+                      payBtn: "minus",
+                      sybmol: ts.principalTokenSymbol,
+                      agreementId: ts.id,
+                      sortTimestamp: st
+                    });
+                    i++;
+                  }
+                });  
+            }  
+        }
+      });
+      if(myLoansIsMounted)
+      {
+        this.setState({
+          loanRequestsActivities,
+          myloanRequestsProcessCompleted: true
+        });  
+      }      
+    }    
+    
+    if (myFundedRequestPropsLength != myFundedRequestLength && myFundedRequestsProcessCompleted === false && !_.isUndefined(myFundedRequests)) {
+        let expectedRepaidAmount;
+        let repaymentSchedule;
+        if(displayNoRecordMsg)
+        {
+          this.setState({
+            displayNoRecordMsg: false
+          });  
+        }
+        
+        await this.asyncForEach(myFundedRequests, async ts => {
           let current_timestamp = moment().unix();
           let i = 1;
           repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
             ts.id
           );
-          await this.asyncForEach(repaymentSchedule, async schedule_ts => {
-            if (schedule_ts > current_timestamp && i == 1) {
-              let date = new Date(schedule_ts * 1000);
-              let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-                ts.id,
-                schedule_ts
-              );
-              expectedRepaidAmount = this.convert_big_number(
-                expectedRepaidAmountBigNumber
-              );
-              investmentsActivities.push({
-                icon: "plus",
-                loanText: "plus",
-                date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                amount: expectedRepaidAmount,
-                type: "plus",
-                payBtn: "plus",
-                sybmol: ts.principalTokenSymbol,
-                agreementId: ts.id,
-                sortTimestamp: schedule_ts
-              });
-            }
-          });
+          if(!_.isUndefined(repaymentSchedule)){
+              await this.asyncForEach(repaymentSchedule, async schedule_ts => {
+                if (schedule_ts > current_timestamp && i == 1) {
+                  let date = new Date(schedule_ts * 1000);
+                  let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+                    ts.id,
+                    schedule_ts
+                  );
+                  expectedRepaidAmount = this.convert_big_number(
+                    expectedRepaidAmountBigNumber
+                  );
+                  investmentsActivities.push({
+                    id:_.random(999999999),
+                    icon: "plus",
+                    loanText: "plus",
+                    date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                    amount: expectedRepaidAmount,
+                    type: "plus",
+                    payBtn: "plus",
+                    sybmol: ts.principalTokenSymbol,
+                    agreementId: ts.id,
+                    sortTimestamp: schedule_ts
+                  });
+                }
+            });  
+          }
         });
-
-        this.setState({
-          investmentsActivities,
-          myInvestmentsRequestsProcessCompleted: true
-        });
-      }
-    }    
-  }
-
-  async componentWillMount() {
-    const { dharma, myloanRequests } = this.props;
-    const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-    if (typeof CurrentAccount == "undefined") {
-      this.setState({
-        myloanRequestsProcessCompleted: true,
-        myInvestmentsRequestsProcessCompleted:true,
-        metaMaskMsg:true,
-        myloanRequestsProcessCompleted:true
-      });
+        if(myInvestmensIsMounted)
+        {
+          this.setState({
+            investmentsActivities,
+            myFundedRequestsProcessCompleted: true
+          });  
+        }        
     }
   }
 
+  componentDidMount(){
+    const { myloanRequestsProcessCompleted,myFundedRequestsProcessCompleted,displayNoRecordMsg } = this.state;
+    if(!myloanRequestsProcessCompleted && !myFundedRequestsProcessCompleted && displayNoRecordMsg){
+      setTimeout(()=>{
+        this.setState({
+          myloanRequestsProcessCompleted:true,
+          myFundedRequestsProcessCompleted:true
+        });
+      },50000)
+    }
+  }
+  
+  componentWillUnmount(){
+    this.setState({
+      myLoansIsMounted: false,
+      myInvestmensIsMounted: false       
+    });
+  }
+
   render() {
-    const { loanRequestsActivities, investmentsActivities, myloanRequestsProcessCompleted, myInvestmentsRequestsProcessCompleted,metaMaskMsg } = this.state;
+    const { loanRequestsActivities, investmentsActivities, myloanRequestsProcessCompleted, myFundedRequestsProcessCompleted,metaMaskMsg } = this.state;
     let isLoading = true;
-    if (myloanRequestsProcessCompleted === true && myInvestmentsRequestsProcessCompleted === true) {
+    if (myloanRequestsProcessCompleted === true && myFundedRequestsProcessCompleted === true) {
       isLoading = false;
     }
     let activities = [];
     if (!isLoading) {
-      activities = [...loanRequestsActivities, ...investmentsActivities]
+      activities = [...loanRequestsActivities, ...investmentsActivities];
     }
-   
-
-    activities = _.sortBy(activities, function(o) { return new moment(o.date); }).reverse();
+    activities = _.sortBy(activities, function(o) { return new moment(o.date); });
     const columns = [
       {
         dataField: "icon",
@@ -223,7 +220,7 @@ class MyActivities extends Component {
               <div className="text-left">
                 <div className="d-inline-block">
                   <div className={classname}>
-                    <img src={img} height="20" className="mt-10" />
+                    <img src={img} height="20" className="mt-10" alt="Image" />
                   </div>
                 </div>
               </div>
@@ -312,7 +309,7 @@ class MyActivities extends Component {
           <CardBody>
             <CardTitle>My Activities</CardTitle>
             {isLoading && <Loading />}
-            {activities.length>0 && <MyActivitiesEmpty />}
+            {!isLoading && activities.length==0 && <MyActivitiesEmpty />}
             {
                 metaMaskMsg &&
                 <Row>

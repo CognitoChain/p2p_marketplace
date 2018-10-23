@@ -19,33 +19,67 @@ class Dashboard extends Component {
         this.state = {
             activeTab: '1',
             widths: 80,
-            myloanRequests: [],
-            highlightRow: null,
+            myLoanRequests: [],
+            myFundedRequests: [],
             myBorrowedLoading: true,
-            modal: false
+            myFundedLoading: true,
+            myLoanRequestsIsMounted:true,
+            myFundedRequestsIsMounted:true
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
     }
    
-    async componentDidMount() {
-        const { highlightRow } = this.props;
-        this.setState({
-            highlightRow,
-        });
+    componentDidMount() {
+        this.getBorrowedLoanRequests();
+        this.getFundedLoanRequests();
+    }
+
+    async getBorrowedLoanRequests(){
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
+        const { myLoanRequestsIsMounted } = this.state;
 
         api.setToken(this.props.token).get("user/loanRequests", { sort, order })
             .then(this.parseMyLoanRequests)
-            .then((myloanRequests) => this.setState({ myloanRequests, myBorrowedLoading: false }))
+            .then(myLoanRequests => {
+                if(myLoanRequestsIsMounted)    
+                {
+                    this.setState({ myLoanRequests, myBorrowedLoading: false });          
+                }
+            })
             .catch((error) => {
                 if(error.status && error.status === 403){
                     this.props.redirect(`/login/`);
                 }
         });
     }
+
+    async getFundedLoanRequests(){
+        const { dharma } = this.props;
+        const { myFundedRequestsIsMounted } = this.state;
+        const { Investments } = Dharma.Types;
+        const creditor = await dharma.blockchain.getCurrentAccount();
+        if(typeof creditor != "undefined")
+        {
+            const myFundedRequests = await Investments.getExpandedData(dharma, creditor);
+            if(myFundedRequestsIsMounted)
+            {
+                this.setState({
+                    myFundedRequests,
+                    myFundedLoading: false
+                });    
+            }
+        }
+        else
+        {
+            this.setState({
+                myFundedLoading: false
+            }); 
+        }
+    }
+
     tabsclick(tab) {
         if (this.state.activeTab !== tab) {
             this.setState({
@@ -54,10 +88,6 @@ class Dashboard extends Component {
         }
     }
     
-    componentWillMount() {
-
-    }
-
     parseMyLoanRequests(loanRequestData) {
         /*var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });*/
         return Promise.all(loanRequestData.map(this.parseLoanRequest));
@@ -67,40 +97,70 @@ class Dashboard extends Component {
         const { dharma } = this.props;
 
         const { LoanRequest } = Dharma.Types;
-
+        
         return new Promise((resolve) => {
             LoanRequest.load(dharma, datum).then((loanRequest) => {
                 resolve({
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
+                    loanStatus:datum.status
                 });
             });
         });
     }
 
-    getData() {
-        const { myloanRequests } = this.state;
-        if (!myloanRequests) {
+    getBorrowedData() {
+        const { myLoanRequests } = this.state;
+        if (!myLoanRequests) {
             return null;
         }
 
-        return myloanRequests.map((request) => {
+        return myLoanRequests.map((request) => {
             return {
                 ...request,
                 principal: `${request.principalAmount} ${request.principalTokenSymbol}`,
                 collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
                 term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
-                requestedDate: moment(request.requestedAt).calendar(),
-                authenticated:this.props.authenticated
+                requestedDate: moment(request.requestedAt).calendar()               
             };
         });
     }
 
+    getMyFundedData() {
+        const { myFundedRequests } = this.state;
+
+        if (!myFundedRequests) {
+            return null;
+        }
+
+        return myFundedRequests.map((investment) => {
+            return {
+                ...investment,
+                principal: `${investment.principalAmount} ${investment.principalTokenSymbol}`,
+                collateral: `${investment.collateralAmount} ${investment.collateralTokenSymbol}`,
+                term: `${investment.termDuration} ${investment.termUnit}`,
+                repaidAmount: `${investment.repaidAmount} ${investment.principalTokenSymbol}`,
+                totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${
+                    investment.principalTokenSymbol
+                    }`,
+            };
+        });
+    }
+
+    componentWillUnmount(){
+        this.setState({
+          myLoanRequestsIsMounted: false,
+          myFundedRequestsIsMounted:false                
+        });
+    }
+
     render() {
+        const myLoanRequests = this.getBorrowedData();
+        const myFundedRequests = this.getMyFundedData();
         const { token, dharma, redirect } = this.props;
-        const { myloanRequests,highlightRow,  myBorrowedLoading} = this.state;
+        const { highlightRow,  myBorrowedLoading, myFundedLoading} = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -120,13 +180,14 @@ class Dashboard extends Component {
                         dharma={this.props.dharma}
                         tokens={this.props.tokens}
                         token={this.props.token}
-                        myloanRequests={myloanRequests}
+                        myLoanRequests={myLoanRequests}
                     />
                     <MyActivities
                         authenticated={this.props.authenticated}
                         dharma={this.props.dharma}
                         token={this.props.token}
-                        myloanRequests={myloanRequests}
+                        myLoanRequests={myLoanRequests}
+                        myFundedRequests={myFundedRequests}
                     />
                 </Row>
 
@@ -167,7 +228,7 @@ class Dashboard extends Component {
                                                 dharma={dharma}
                                                 redirect={redirect}
                                                 myBorrowedLoading = {myBorrowedLoading}
-                                                myloanRequests={myloanRequests}
+                                                myLoanRequests={myLoanRequests}
                                                 highlightRow={highlightRow}
                                             />
 
@@ -179,6 +240,8 @@ class Dashboard extends Component {
                                                 token={token}
                                                 dharma={dharma}
                                                 redirect={redirect}
+                                                myFundedLoading={myFundedLoading}
+                                                myFundedRequests={myFundedRequests}
                                             />
 
                                         </TabPane>

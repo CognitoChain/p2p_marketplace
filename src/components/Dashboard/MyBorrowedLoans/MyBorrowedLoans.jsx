@@ -17,16 +17,9 @@ import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {amortizationUnitToFrequency} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
-/**
- * Here we define the columns that appear in the table that holds all of the
- * open Loan Requests.
- */
-
 class MyBorrowedLoans extends Component {
     constructor(props) {
-        super(props);
-        this.toggle = this.toggle.bind(this);
-        /*this.openlink = this.openlink.bind(this);*/
+        super(props);      
     }
     renderShowsTotal(start, to, total) {
         return (
@@ -35,14 +28,9 @@ class MyBorrowedLoans extends Component {
           </p>
         );
     }
-    toggle() {
-        this.setState({
-            modal: !this.state.modal
-        });
-    }
     render() {
         /*let _self=this;*/
-        const { myloanRequests,highlightRow,myBorrowedLoading } = this.props;
+        const { myLoanRequests,myBorrowedLoading } = this.props;
       
         if (myBorrowedLoading) {
             return <Loading/>;
@@ -50,18 +38,19 @@ class MyBorrowedLoans extends Component {
 
         const rowEvents = {
             onClick: (e, row, rowIndex) => {
-                this.props.redirect(`/detail/${row.id}`);
+                if(_.lowerCase(row.loanStatus) == "filled")
+                {
+                    this.props.redirect(`/detail/${row.id}`);    
+                }
+                else
+                {
+                    this.props.redirect(`/request/${row.id}`);       
+                }
             },
         };
 
         const rowClasses = (row, rowIndex) => {
-            const rowData = myloanRequests[rowIndex];
-
-            if (rowData.id === highlightRow) {
-                return "loan-request-row1 highlight cursor-pointer";
-            } else {
-                return "loan-request-row1 cursor-pointer";
-            }
+            return "loan-request-row1 cursor-pointer";            
         };
         const columns = [
             {
@@ -151,7 +140,7 @@ class MyBorrowedLoans extends Component {
                         </div>
                     )
                 }
-            }            
+            }
         ];
         
         const pagination = paginationFactory({
@@ -159,7 +148,7 @@ class MyBorrowedLoans extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns:true,            
         });
-        if(myloanRequests.length==0){
+        if(myLoanRequests.length==0){
             return <MyBorrowedLoansRequestsEmpty />
         }
         return (
@@ -169,7 +158,7 @@ class MyBorrowedLoans extends Component {
                     keyField="id"
                     classes = {"open-request"}
                     columns={columns}
-                    data={myloanRequests}
+                    data={myLoanRequests}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
