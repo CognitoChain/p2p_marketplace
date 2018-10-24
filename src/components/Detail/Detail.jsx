@@ -512,7 +512,7 @@ class Detail extends Component {
                 <BreadcrumbItem>
                   <a href="/dashboard" className="link-blue">
                     My Loans
-                  </a>
+</a>
                 </BreadcrumbItem>
                 <BreadcrumbItem active>Loan Detail</BreadcrumbItem>
               </Breadcrumb>
@@ -585,7 +585,7 @@ class Detail extends Component {
                               onClick={event => this.makeRepayment()}
                             >
                               Make Repayment
-                        </button>
+</button>
                           )}
 
                           {outstandingAmount == 0 &&
@@ -595,7 +595,7 @@ class Detail extends Component {
                                 onClick={event => this.unblockCollateral()}
                               >
                                 Get collateral back
-                          </button>
+</button>
                             )}
 
                           {collateralSeizeBtnDisplay === true && (
@@ -604,7 +604,7 @@ class Detail extends Component {
                               onClick={event => this.seizeCollateral()}
                             >
                               Seize Collateral
-                        </button>
+</button>
                           )}
                         </Col>
                       </Row>
@@ -723,11 +723,11 @@ class Detail extends Component {
                     </span>{" "}
                     in total, of which you've already repaid{" "}
                     <span className="text-bold">{totalRepaidAmount} {principalTokenSymbol}</span>.
-              </p>
+</p>
 
                   <p className="repayment-details mt-15 mb-15">
                     How large of a repayment would you like to make?
-              </p>
+</p>
 
                   <input
                     type="text"
@@ -744,13 +744,13 @@ class Detail extends Component {
                       onClick={this.processRepayment}
                     >
                       Make Repayment
-                </button>
+</button>
                     <button
                       className="btn cognito small icon mb-15 ml-10"
                       onClick={this.onCloseModal}
                     >
                       Cancel
-                </button>
+</button>
                   </div>
                 </Col>
               </Row>
