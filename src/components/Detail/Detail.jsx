@@ -119,21 +119,19 @@ class Detail extends Component {
 
         let totalRepaidAmount =
           parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
+        totalRepaidAmount = (totalRepaidAmount > 0) ? totalRepaidAmount.toFixed(2) : 0;
         let displayAgreementId = _(id).truncate(4);
 
         const all_token_price = api
           .setToken(this.props.token)
           .get(`priceFeed`)
           .then(async priceFeedData => {
-            let principalTokenCurrentPrice =
-              priceFeedData[get_terms.principalTokenSymbol].USD;
-            let principalCurrentAmount =
-              parseFloat(get_terms.principalAmount) *
-              principalTokenCurrentPrice;
-            let collateralCurrentAmount =
-              parseFloat(get_terms.collateralAmount) *
-              principalTokenCurrentPrice;
-            stateObj["collateralCurrentAmount"] = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
+            let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
+            let principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
+            let collateralTokenCurrentPrice = priceFeedData[get_terms.collateralTokenSymbol].USD;
+            let collateralCurrentAmount = parseFloat(get_terms.collateralAmount) * collateralTokenCurrentPrice;
+            collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
+            stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
 
             if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
               let LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
@@ -195,9 +193,9 @@ class Detail extends Component {
             agreementId,
             ts
           );
-          let expectedRepaymentAmountScheduleTime = expectedRepaidAmountBigNumber.toNumber();
-          let expectedScheduleTimeAmountDecimal = "1E" + expectedRepaidAmountBigNumber.e;
-          let expectedRepaidAmount = expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
+
+          let expectedRepaidAmount = this.convert_big_number(expectedRepaidAmountBigNumber);
+          expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;
           /*let temp = expectedRepaidAmount - valueRepaid + expectedRepaymentAmount;*/
           repaymentLoanstemp.push({
             id: i,
@@ -214,7 +212,11 @@ class Detail extends Component {
         });
         stateObj["repaymentLoans"] = repaymentLoanstemp;
         stateObj["isLoading"] = false;
-        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
+
+        let repaymentAmountDecimal = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
+        repaymentAmountDecimal = (repaymentAmountDecimal > 0) ? repaymentAmountDecimal.toFixed(2) : 0;
+
+        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = repaymentAmountDecimal;
         stateObj["currentEthAddress"] = currentAccount;
         if (
           typeof debtorEthAddress != "undefined" &&
@@ -246,7 +248,7 @@ class Detail extends Component {
   async processRepayment() {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { repaymentAmount, debtorEthAddress } = this.state;
+    const { repaymentAmount, debtorEthAddress, principalTokenSymbol } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     let collateralReturnable = false;
     let stateObj = {};
@@ -259,40 +261,45 @@ class Detail extends Component {
       if (typeof debt != "undefined") {
         const outstandingAmount = await debt.getOutstandingAmount();
         if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
-          const txHash = await debt.makeRepayment(repaymentAmount);
-          if (txHash != "") {
-            toast.success(
-              "Transaction submited successfully.We will notify you once it is completed.",
-              {
-                autoClose: 8000
+
+          try {
+            const txHash = await debt.makeRepayment(repaymentAmount);
+            if (txHash != "") {
+              toast.success(
+                "Transaction submited successfully.We will notify you once it is completed.",
+                {
+                  autoClose: 8000
+                }
+              );
+              const outstandingAmount = await debt.getOutstandingAmount();
+              stateObj["outstandingAmount"] = outstandingAmount;
+              stateObj["modalOpen"] = false;
+              stateObj["repaymentAmount"] = 0;
+              if (outstandingAmount == 0) {
+                const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+                  id
+                );
+                const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
+                  debtRegistryEntry.termsContract
+                );
+                let issuanceHash = id;
+                collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+                  issuanceHash
+                );
+                if (collateralReturnable === true) {
+                  stateObj["collateralBtnDisplay"] = true;
+                }
+                stateObj["repaymentBtnDisplay"] = false;
               }
-            );
-            const outstandingAmount = await debt.getOutstandingAmount();
-
-            console.log("Outstanding amount after repayment made");
-            console.log(outstandingAmount);
-
-            stateObj["outstandingAmount"] = outstandingAmount;
-            stateObj["modalOpen"] = false;
-            stateObj["repaymentAmount"] = 0;
-            if (outstandingAmount == 0) {
-              const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
-                id
-              );
-              const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
-                debtRegistryEntry.termsContract
-              );
-              let issuanceHash = id;
-              collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
-                issuanceHash
-              );
-              if (collateralReturnable === true) {
-                stateObj["collateralBtnDisplay"] = true;
-              }
-
-              stateObj["repaymentBtnDisplay"] = false;
+              this.setState(stateObj);
             }
-            this.setState(stateObj);
+          }
+          catch (e) {
+            console.log(e)
+            console.log(new Error(e))
+            toast.error(
+              "You have not granted the token a sufficient allowance in the specified token to execute this repayment or you does not have sufficient balance."
+            );
           }
         } else {
           toast.error(
@@ -510,7 +517,9 @@ class Detail extends Component {
             <Col>
               <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href="/dashboard" className="link-blue">My Loans</a>
+                  <a href="/dashboard" className="link-blue">
+                    My Loans
+                  </a>
                 </BreadcrumbItem>
                 <BreadcrumbItem active>Loan Detail</BreadcrumbItem>
               </Breadcrumb>
@@ -580,20 +589,29 @@ class Detail extends Component {
                           {repaymentBtnDisplay === true && (
                             <button
                               className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                              onClick={event => this.makeRepayment()}>Make Repayment</button>
+                              onClick={event => this.makeRepayment()}
+                            >
+                              Make Repayment
+                        </button>
                           )}
 
                           {outstandingAmount == 0 &&
                             collateralBtnDisplay === true && (
                               <button
                                 className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                                onClick={event => this.unblockCollateral()}>Get collateral back</button>
+                                onClick={event => this.unblockCollateral()}
+                              >
+                                Get collateral back
+                          </button>
                             )}
 
                           {collateralSeizeBtnDisplay === true && (
                             <button
                               className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                              onClick={event => this.seizeCollateral()}>Seize Collateral</button>
+                              onClick={event => this.seizeCollateral()}
+                            >
+                              Seize Collateral
+                        </button>
                           )}
                         </Col>
                       </Row>
