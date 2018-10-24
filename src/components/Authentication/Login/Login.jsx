@@ -28,12 +28,12 @@ class Login extends React.Component {
     this.displayValidationErrors = this.displayValidationErrors.bind(this);
     this.updateValidators = this.updateValidators.bind(this);
   }
-  componentDidMount(){
-    const {locationState} = this.state;
-    if(!_.isUndefined(locationState)){
+  componentDidMount() {
+    const { locationState } = this.state;
+    if (!_.isUndefined(locationState)) {
       this.props.history.push({
         pathname: '/login',
-        state: { }
+        state: {}
       });
     }
   }
@@ -136,8 +136,9 @@ class Login extends React.Component {
       if (json.ERROR == "USER_DISABLED") {
         this.props.history.push({
           pathname: '/email-verify',
-          state: { message: "USER_DISABLED",email }
-        });      }
+          state: { message: "USER_DISABLED", email }
+        });
+      }
       else {
         toast.error("Invalid email or password.");
       }
@@ -178,7 +179,7 @@ class Login extends React.Component {
         <div>
           <p>
             We have sent you an email with an activation link to <b>{email}</b>. It may take a minute to arrive.
-            <br />
+<br />
             <b>Still no email?</b>
             {!processing && <a onClick={this.resendVerificationEmail} className="btn btn-sm btn-link">Click here to Resend it</a>}
             {processing && <i className="btn btn-sm fa-spin fa fa-spinner"></i>}
@@ -192,7 +193,7 @@ class Login extends React.Component {
         <div>
           <p>
             Your account is successfully verified. You can login now.
-          </p>
+</p>
         </div>
       )
     }
