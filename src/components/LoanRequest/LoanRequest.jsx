@@ -11,10 +11,10 @@ import LoadingFull from "../LoadingFull/LoadingFull";
 import "./LoanRequest.css";
 import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
-import { toast } from 'react-toastify';
 import * as moment from "moment";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
+import _ from "lodash";
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -40,7 +40,7 @@ class LoanRequest extends Component {
             expirationUnit: "days",
             disabled: false,
             error: null,
-            hasSufficientAllowance: null,
+            hasSufficientAllowance: false,
             txHash: null,
             createdAt: null,
             interestAmount: 0,
@@ -52,7 +52,8 @@ class LoanRequest extends Component {
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
             disableSubmitBtn: true,
-            tokenAuthorised:false
+            isBottomButtonLoading: true
+
         };
 
         // handlers
@@ -77,24 +78,33 @@ class LoanRequest extends Component {
 
             const loanRequest = await LoanRequest.load(dharma, loanRequestData);
             let collateralCurrentAmount = 0;
-            this.setState({ loanRequest });
+            let principalCurrentAmount = 0;
+            this.setState({ loanRequest }, () => {
+                this.reloadState();
+            });
             var get_terms = loanRequest.getTerms();
 
             const all_token_price = await api.setToken(this.props.token).get(`priceFeed`)
                 .then(async priceFeedData => {
-                    let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
-                    let principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
-                    let collateralTokenCurrentPrice =
-                        priceFeedData[get_terms.collateralTokenSymbol].USD;
-                    collateralCurrentAmount =
-                        parseFloat(get_terms.collateralAmount) *
-                        collateralTokenCurrentPrice;
-                    collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
 
+                    if (!_.isUndefined(priceFeedData[get_terms.principalTokenSymbol])) {
+                        let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
+                        principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
+                        
+                    }
+                    if (!_.isUndefined(priceFeedData[get_terms.collateralTokenSymbol])) {
+                        let collateralTokenCurrentPrice =
+                            priceFeedData[get_terms.collateralTokenSymbol].USD;
+                        collateralCurrentAmount =
+                            parseFloat(get_terms.collateralAmount) *
+                            collateralTokenCurrentPrice;
+                    }
                     if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
                         LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
                         LTVRatioValue = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
                     }
+
+                    collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
 
                     let principal = get_terms.principalAmount;
                     let interest_rate = get_terms.interestRate;
@@ -116,7 +126,7 @@ class LoanRequest extends Component {
                         LTVRatioValue: LTVRatioValue
                     });
                 });
-            this.reloadState();
+
         });
     }
 
@@ -131,37 +141,43 @@ class LoanRequest extends Component {
         if (userLoanAgree === true) {
             try {
                 loanRequest
-                .fillAsCreditor()
-                .then((txHash) => {
-                    console.log("txHash");
-                    const { transactions } = this.state;
-                    transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
-                    console.log(transactions);
-                    this.setState({
-                        transactions,
-                        tokenAuthorised:true
+                    .fillAsCreditor()
+                    .then((txHash) => {
+
+                        const { transactions } = this.state;
+                        transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
+
+                        this.setState({
+                            transactions
+                        });
                     });
-                });
-            } 
+            }
             catch (e) {
-                console.log("In error it comes.");
-                let msg = (e.message.length > 3000 || e.length > 3000) ? 'Transaction cancelled successfully.' : e.message; 
+                console.log(e)
+                console.log(e.message)
+                let error = new Error(e);
                 this.setState({
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                    customAlertMsgTitle: 'Transaction cancelled.',
+                    customAlertMsgTitle: error.props.message,
                     disableSubmitBtn: false,
                 });
-            }   
+            }
         }
         else {
-            toast.error('Please accept loan agreement terms.');
+            this.setState({
+                customAlertMsgDisplay: true,
+                customAlertMsgStyle: 'danger',
+                customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                customAlertMsgTitle: 'Please accept loan agreement terms.',
+                disableSubmitBtn: true,
+            });
         }
     }
 
     async handleAuthorize() {
-        const { loanRequest, transactions } = this.state;
+        const { loanRequest, transactions, userLoanAgree } = this.state;
         const { dharma } = this.props;
         const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
@@ -171,9 +187,9 @@ class LoanRequest extends Component {
             const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
             if (txHash) {
                 transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
-
                 this.setState({
-                    transactions,
+                    customAlertMsgDisplay:false,
+                    transactions
                 });
             }
         }
@@ -187,16 +203,29 @@ class LoanRequest extends Component {
             .then(() => {
                 this.setState({
                     error: null,
+                    customAlertMsgDisplay: false,
                 });
             })
             .catch((error) => {
+                let title = "This loan request cannot be filled";
+                let description = error.message;
+                if(error.message == "Creditor allowance is insufficient"){
+                    title = "Steps Required" 
+                    description = 'Token transfer authorization required. Click "Unlock Token".'
+                }
                 this.setState({
                     error,
+                    customAlertMsgDisplay: true,
+                    customAlertMsgStyle: 'danger',
+                    customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                    customAlertMsgTitle: title,
+                    customAlertMsgDescription:description,
+                    disableSubmitBtn: false
                 });
             });
     }
 
-    async setHasSufficientAllowance() {
+    async setHasSufficientAllowance(tokenSymbol, status) {
         const { dharma } = this.props;
         const { loanRequest } = this.state;
 
@@ -205,20 +234,27 @@ class LoanRequest extends Component {
         const currentAccount = await dharma.blockchain.getCurrentAccount();
 
         const terms = loanRequest.getTerms();
+        const isCompleted = status && status == "success" ? true : false;
+
+        let stateObj = {};
 
         if (typeof currentAccount != "undefined") {
             const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
             const hasSufficientAllowance =
-                tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount;
-            this.setState({
-                hasSufficientAllowance,
-            });
+                tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount || isCompleted;
+                console.log("tokenData")
+
+                console.log(tokenData)
+            console.log("setHasSufficientAllowance--" + hasSufficientAllowance)
+
+            stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
+            stateObj["isBottomButtonLoading"] = false;
         }
         else {
-            this.setState({
-                hasSufficientAllowance: '',
-            });
+            stateObj["hasSufficientAllowance"] = false;
+            stateObj["isBottomButtonLoading"] = false;
         }
+        this.setState(stateObj);
     }
 
     handleAgreeChange(event) {
@@ -263,14 +299,16 @@ class LoanRequest extends Component {
             customAlertMsgStyle,
             customAlertMsgClassname,
             customAlertMsgTitle,
+            customAlertMsgDescription,
             disableSubmitBtn,
-            tokenAuthorised
+            isBottomButtonLoading
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
-
-
-
+        console.log("------------")
+        console.log("hasSufficientAllowance--" + hasSufficientAllowance)
+        console.log("disableSubmitBtn--" + disableSubmitBtn)
+        console.log("error--" + error)
         return (
             <div>
 
@@ -355,25 +393,37 @@ class LoanRequest extends Component {
                                         </div>
                                     </CardBody>
 
-                                    {transactions.map((transaction) => {
-                                            const { txHash, description } = transaction;
-                                            let onSuccess;
-                                            if (description === TRANSACTION_DESCRIPTIONS.fill) {
-                                                onSuccess = onFillComplete;
-                                            } else {
-                                                onSuccess = this.reloadState;
+                                    {!isBottomButtonLoading && transactions.map((transaction) => {
+                                        const { txHash, description } = transaction;
+                                        let onSuccess;
+                                        if (description === TRANSACTION_DESCRIPTIONS.fill) {
+                                            onSuccess = onFillComplete;
+                                        } else {
+                                            onSuccess = this.reloadState;
+                                        }
+                                        return (
+                                            <TransactionManager
+                                                key={txHash}
+                                                txHash={txHash}
+                                                dharma={dharma}
+                                                description={description}
+                                                onSuccess={onSuccess}
+                                                canAuthorize={
+                                                    hasSufficientAllowance
+                                                }
+                                            />
+                                        );
+                                    })
+                                    }
+                                    {
+                                        !isBottomButtonLoading && transactions.length == 0 && hasSufficientAllowance && <TransactionManager
+                                            key={txHash}
+                                            txHash={txHash}
+                                            dharma={dharma}
+                                            canAuthorize={
+                                                hasSufficientAllowance
                                             }
-                                            return (
-                                                <TransactionManager
-                                                    key={txHash}
-                                                    txHash={txHash}
-                                                    dharma={dharma}
-                                                    description={description}
-                                                    onSuccess={onSuccess}
-                                                    tokenAuthorised={tokenAuthorised}
-                                                />
-                                            );
-                                        })
+                                        />
                                     }
 
                                     {customAlertMsgDisplay === true &&
@@ -381,22 +431,28 @@ class LoanRequest extends Component {
                                             bsStyle={customAlertMsgStyle}
                                             className={customAlertMsgClassname}
                                             title={customAlertMsgTitle}
+                                            description = {customAlertMsgDescription}
                                         />
                                     }
 
-                                    <CardBody className="pl-4 pt-1 mtb-2 mt-10">
+                                    <CardBody className="pl-4 pt-1 mtb-2 mt-10 text-center">
                                         <div>
                                             <div className="create-loan-buttons-container">
-                                                <AuthorizableAction
-                                                    canTakeAction={!error && hasSufficientAllowance}
-                                                    canAuthorize={!hasSufficientAllowance}
-                                                    onAction={this.handleFill}
-                                                    onAuthorize={this.handleAuthorize}
-                                                    disableSubmitBtn={disableSubmitBtn}
-                                                >
-                                                    <p>Unlock Tokens</p>
-                                                    <p>Fund Loan</p>
-                                                </AuthorizableAction>
+                                                {
+                                                    !isBottomButtonLoading && <AuthorizableAction
+                                                        canTakeAction={!error && hasSufficientAllowance && !disableSubmitBtn}
+                                                        canAuthorize={hasSufficientAllowance}
+                                                        onAction={this.handleFill}
+                                                        onAuthorize={this.handleAuthorize}
+                                                    >
+                                                        <p>Unlock Tokens</p>
+                                                        <p>Fund Loan</p>
+                                                    </AuthorizableAction>
+                                                }
+                                                {
+                                                    isBottomButtonLoading && <i className="btn btn-sm fa-spin fa fa-spinner"></i>
+                                                }
+
                                             </div>
                                         </div>
                                     </CardBody>
