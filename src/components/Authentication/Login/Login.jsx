@@ -67,7 +67,6 @@ class Login extends React.Component {
     this.setState({
       [event.target.name]: event.target.value
     });
-    this.updateValidators([event.target.name], event.target.value);
   }
   updateValidators(fieldName, value) {
     this.validators[fieldName].errors = [];
@@ -89,11 +88,11 @@ class Login extends React.Component {
   }
   isFormValid() {
     let status = true;
-    Object.keys(this.validators).forEach((field) => {
-      if (field == 'email' || field == 'password') {
-        if (!this.validators[field].valid) {
-          status = false;
-        }
+    const validationFields = ["email", "password"];
+    validationFields.forEach((field) => {
+      this.updateValidators(field, this.state[field]);
+      if (!this.validators[field].valid) {
+        status = false;
       }
     });
     return status;
@@ -179,7 +178,7 @@ class Login extends React.Component {
         <div>
           <p>
             We have sent you an email with an activation link to <b>{email}</b>. It may take a minute to arrive.
-<br />
+            <br />
             <b>Still no email?</b>
             {!processing && <a onClick={this.resendVerificationEmail} className="btn btn-sm btn-link">Click here to Resend it</a>}
             {processing && <i className="btn btn-sm fa-spin fa fa-spinner"></i>}
@@ -193,7 +192,7 @@ class Login extends React.Component {
         <div>
           <p>
             Your account is successfully verified. You can login now.
-</p>
+          </p>
         </div>
       )
     }
@@ -206,6 +205,9 @@ class Login extends React.Component {
       console.log(response);
       this.signup(response, "google");
     };
+
+    const { email, password } = this.state;
+    const isFormValid = this.isFormValid();
 
     return (
       <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: 'url(assets/images/login-bg.png)' }}>
@@ -237,34 +239,27 @@ class Login extends React.Component {
                 <div className="section-field mb-20">
                   <label className="mb-10" htmlFor="name">Email </label>
                   <input id="email" className="web form-control" type="text" placeholder="Email" value={this.state.email} name="email" onChange={this.onchange} />
-                  {this.displayValidationErrors('email')}
+                  {email && this.displayValidationErrors('email')}
                 </div>
                 <div className="section-field mb-20">
                   <label className="mb-10" htmlFor="Password">Password* </label>
                   <input id="password" className="Password form-control" type="password" placeholder="Password" value={this.state.password} name="password" onChange={this.onchange} />
-                  {this.displayValidationErrors('password')}
-                </div>
-                <div className="section-field">
-                  <div className="remember-checkbox mb-30">
-                    <input type="checkbox" className="form-control" name="two" id="two" />
-                    <label htmlFor="two"> Remember me</label>
-
-                  </div>
+                  {password && this.displayValidationErrors('password')}
                 </div>
 
-                <div>
-                  <a onClick={this.login} className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
+                <div className="d-inline-block">
+                  <a onClick={this.login} className={`button pull-md-left ${isFormValid ? '' : 'disabled'}`}>
                     <span className="text-white">Log in</span>
                   </a>
 
-                  <span className="login-buttons-seperator">OR</span>
+                  <span className="login-buttons-seperator"></span>
 
                   <GoogleLogin
                     clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
                     buttonText="Login with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}
-                    className="btn cognito btn-danger "
+                    className="btn cognito btn-danger pull-md-right"
                   />
 
                 </div>
