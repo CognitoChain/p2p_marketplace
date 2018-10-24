@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {Card,CardBody,CardTitle,Row,Col} from 'reactstrap';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
-import LoanRequests from "../LoanRequests/LoanRequests";
-import FundedLoans from "../FundedLoans/FundedLoans";
+import LoanRequests from "./LoanRequests/LoanRequests";
+import FundedLoans from "./FundedLoans/FundedLoans";
 import { Link } from 'react-router-dom';
 import './Market.css';
 class Market extends Component {

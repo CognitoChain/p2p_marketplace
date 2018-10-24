@@ -5,17 +5,17 @@ import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 
 // Components
-import Loading from "../Loading/Loading";
+import Loading from "../../Loading/Loading";
 
 // Services
-import Api from "../../services/api";
+import Api from "../../../services/api";
 
 // Styling
 
 import "./FundedLoans.css";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
-import {amortizationUnitToFrequency} from "../../utils/Util";
+import { amortizationUnitToFrequency } from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 /**
  * Here we define the columns that appear in the table that holds all of the
@@ -25,7 +25,7 @@ const columns = [
     {
         dataField: "createdAt",
         text: "Created Date",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             var date = moment(row.requestedAt).format("DD/MM/YYYY");
             var time = moment(row.requestedAt).format("HH:mm:ss");
             return (
@@ -38,7 +38,7 @@ const columns = [
     {
         dataField: "principalAmount",
         text: "Amount",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div>
                     <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span> <br />{row.principalTokenSymbol}</div>
@@ -49,7 +49,7 @@ const columns = [
     {
         dataField: "termDuration",
         text: "Term",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div>
                     <span className="number-highlight">{cell}</span> {row.termUnit}
@@ -60,7 +60,7 @@ const columns = [
     {
         dataField: "interestRate",
         text: "Interest Rate",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div>
                     <span className="number-highlight">{cell}</span> %
@@ -71,7 +71,7 @@ const columns = [
     {
         dataField: "collateralAmount",
         text: "Collateral",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div>
                     <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralTokenSymbol}</div>
@@ -83,7 +83,7 @@ const columns = [
         dataField: "repaidAmount",
         isDummyField: true,
         text: "Total Repayment",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             let interest_amount = (row.principalAmount * row.interestRate) / 100;
             let repayment_amount = row.principalAmount + interest_amount;
             return (
@@ -97,14 +97,14 @@ const columns = [
         dataField: "repaymentFrequency",
         isDummyField: true,
         text: "Repayment Frequency",
-        formatter:function(cell,row,rowIndex,formatExtraData){
+        formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div>
                     {amortizationUnitToFrequency(row.termUnit)}
                 </div>
             )
         }
-    }    
+    }
 ];
 
 class FundedLoans extends Component {
@@ -114,6 +114,7 @@ class FundedLoans extends Component {
             fundedLoansLists: [],
             highlightRow: null,
             isLoading: true,
+            myFundedLoansIsMounted:true
         };
         this.fundedLoansRequests = this.fundedLoansRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -128,28 +129,26 @@ class FundedLoans extends Component {
      * access to Dharma.js, which is connected to a blockchain.
      */
     async componentDidMount() {
-        const { highlightRow,dharma } = this.props;
-        const currentAccount = await dharma.blockchain.getCurrentAccount();
-        // if(typeof currentAccount != "undefined")
-        // {
-            this.setState({
-                highlightRow,
+        const { highlightRow} = this.props;
+        const { myFundedLoansIsMounted } = this.state;
+        this.setState({
+            highlightRow,
+        });
+        const api = new Api();
+        const sort = "createdAt";
+        const order = "desc";
+        api.setToken(this.props.token).get("loanRequests", { sort, order })
+            .then(this.fundedLoansRequests)
+            .then(fundedLoansLists => {
+                if(myFundedLoansIsMounted)    
+                {
+                    this.setState({ fundedLoansLists, isLoading: false });           
+                }
+            }).catch((error) => {
+                if(error.status && error.status === 403){
+                    this.props.redirect(`/login/`);
+                }
             });
-
-            const api = new Api();
-
-            const sort = "createdAt";
-            const order = "desc";
-
-            api.setToken(this.props.token).get("loanRequests", { sort, order })
-                .then(this.fundedLoansRequests)
-                .then((fundedLoansLists) => this.setState({ fundedLoansLists, isLoading: false }))
-                .catch((error) => {
-                    if(error.status && error.status === 403){
-                        this.props.redirect(`/login/`);
-                    }
-            });
-        // }
     }
 
     fundedLoansRequests(FundedData) {
@@ -203,17 +202,24 @@ class FundedLoans extends Component {
                 repaidAmount: `${investment.repaidAmount} ${investment.principalTokenSymbol}`,
                 totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${
                     investment.principalTokenSymbol
-                }`
+                    }`
             };
         });
     }
+
+    componentWillUnmount(){
+        this.setState({
+          myFundedLoansIsMounted: false                
+        });
+    }
+
     render() {
         const { highlightRow, isLoading } = this.state;
 
         const data = this.getData();
 
         if (isLoading) {
-            return <Loading/>;
+            return <Loading />;
         }
 
         const rowEvents = {
@@ -231,13 +237,13 @@ class FundedLoans extends Component {
                 return "funded-loans-row1 cursor-pointer";
             }
         };
-        
+
         const pagination = paginationFactory({
             page: 1,
             /*showTotal:true,*/
-            alwaysShowAllBtns:true
+            alwaysShowAllBtns: true
         });
-        if(data.length==0){
+        if (data.length == 0) {
             return <FundedLoansEmpty />
         }
         return (
@@ -245,12 +251,12 @@ class FundedLoans extends Component {
                 <BootstrapTable
                     hover={false}
                     keyField="id"
-                    classes = {"open-request"}
+                    classes={"open-request"}
                     columns={columns}
                     data={data}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
-                    bordered={ false }
+                    bordered={false}
                     rowEvents={rowEvents}
                     pagination={pagination}
                 />

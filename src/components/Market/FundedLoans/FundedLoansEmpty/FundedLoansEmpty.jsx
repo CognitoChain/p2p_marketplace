@@ -3,7 +3,7 @@ import React from "react";
 
 // Styling
 import "./FundedLoansEmpty.css";
-import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
+import CustomAlertMsg from "../../../CustomAlertMsg/CustomAlertMsg";
 
 /**
  * Displays when the loan requests table are in the empty state.

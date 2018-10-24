@@ -6,10 +6,10 @@ import BootstrapTable from "react-bootstrap-table-next";
 /*import { Link } from 'react-router-dom';*/
 
 // Components
-import Loading from "../Loading/Loading";
+import Loading from "../../Loading/Loading";
 
 // Services
-import Api from "../../services/api";
+import Api from "../../../services/api";
 
 // Styling
 import "./LoanRequests.css";
@@ -18,7 +18,7 @@ import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency} from "../../utils/Util";
+import {amortizationUnitToFrequency} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 /**
