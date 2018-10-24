@@ -35,19 +35,20 @@ class MyPortfolio extends Component {
     }
     async componentWillReceiveProps(nextProps) {
         let userTokens = nextProps.tokens;
-        const { dharma } = this.props;
+        let myLoanRequests = nextProps.myLoanRequests;
+        const { dharma, tokens } = this.props;
         const { priceFeedData } = this.state;
-        const { myloanRequests } = this.props;
         let totalAssetAmount = 0;
         let totalLiablitiesAmount = 0;
         const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-        if (typeof priceFeedData != "undefined" && typeof CurrentAccount != "undefined") {
+        let stateObj = {};
+        if (!_.isUndefined(priceFeedData) && !_.isUndefined(CurrentAccount)) {
             if (typeof userTokens != 'undefined') {
                 userTokens.forEach(ts => {
                     if (ts.balance > 0) {
                         let tokenBalance = ts.balance;
                         let tokenSymbol = ts.symbol;
-                        if (typeof priceFeedData[tokenSymbol] != "undefined") {
+                        if (!_.isUndefined(priceFeedData[tokenSymbol])) {
                             let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
                             let tokenCurrentAmount = parseFloat(tokenBalance) * parseFloat(tokenCurrentPrice);
                             totalAssetAmount += tokenCurrentAmount;
@@ -55,57 +56,58 @@ class MyPortfolio extends Component {
                     }
                 });
             }
-
-            this.setState({ totalAssetAmount: totalAssetAmount });
-
-            if (typeof myloanRequests != 'undefined') {
-                myloanRequests.forEach(ml => {
-                    let principal = ml.principalAmount;
-                    let principalTokenSymbol = ml.principalTokenSymbol;
-                    if (typeof priceFeedData[principalTokenSymbol] != "undefined") {
-                        let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
-                        let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
-                        totalLiablitiesAmount += principalCurrentAmount;
-                    }
-                    this.setState({ totalLiablitiesAmount: totalLiablitiesAmount });
-                });
-            }
-
-
-
-            if (this.state.totalAssetAmount && this.state.totalLiablitiesAmount) {
-                let assetLiabilitiesPercentage = (totalAssetAmount / totalLiablitiesAmount) * 100;
-                const data = {
-                    labels: [
-                        'Assets',
-                        'Liabilities'
-                    ],
-                    datasets: [{
-                        data: [totalAssetAmount, totalLiablitiesAmount],
-                        backgroundColor: [
-                            '#00cc99',
-                            '#ffa31a'
-                        ],
-                        hoverBackgroundColor: [
-                            '#00cc99',
-                            '#ffa31a'
-                        ]
-                    }]
-                };
-
-                this.setState({
-                    assetLiabilitiesPercentage: assetLiabilitiesPercentage,
-                    doughnutData: data,
-                    isLoading: false
-                });
-            }
         }
-        else {
-            this.setState({
-                isLoading: false,
-                metaMaskMsg: true
+        totalAssetAmount = (totalAssetAmount > 0) ? totalAssetAmount.toFixed(2) : 0;
+        this.setState({ totalAssetAmount: totalAssetAmount }, () => {
+            this.calculateValues()
+        });
+        if (myLoanRequests.length > 0) {
+            myLoanRequests.forEach(ml => {
+                let principal = ml.principalAmount;
+                let principalTokenSymbol = ml.principalTokenSymbol;
+                if (!_.isUndefined(priceFeedData[principalTokenSymbol])) {
+                    let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
+                    let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
+                    totalLiablitiesAmount += principalCurrentAmount;
+                }
             });
         }
+        totalLiablitiesAmount = (totalLiablitiesAmount > 0) ? totalLiablitiesAmount.toFixed(2) : 0;
+        this.setState({ totalLiablitiesAmount: totalLiablitiesAmount }, () => {
+            this.calculateValues()
+        });
+    }
+    calculateValues() {
+        console.log("calculateValues")
+        const { totalAssetAmount, totalLiablitiesAmount } = this.state;
+        const { myBorrowedLoading, isTokenLoading } = this.props;
+        if (isTokenLoading || myBorrowedLoading) {
+            return;
+        }
+        let assetLiabilitiesPercentage = ((totalAssetAmount-totalLiablitiesAmount)/totalAssetAmount)*100;
+        assetLiabilitiesPercentage = (assetLiabilitiesPercentage < 100) ? assetLiabilitiesPercentage.toFixed(2) : 99.99;
+        const data = {
+            labels: [
+                'Assets',
+                'Liabilities'
+            ],
+            datasets: [{
+                data: [totalAssetAmount, totalLiablitiesAmount],
+                backgroundColor: [
+                    '#00cc99',
+                    '#ffa31a'
+                ],
+                hoverBackgroundColor: [
+                    '#00cc99',
+                    '#ffa31a'
+                ]
+            }]
+        };
+
+        this.setState({
+            assetLiabilitiesPercentage: assetLiabilitiesPercentage,
+            doughnutData: data
+        });
     }
     async componentWillMount() {
         const { dharma } = this.props;
@@ -126,8 +128,9 @@ class MyPortfolio extends Component {
     }
 
     render() {
-        const { isLoading, totalAssetAmount, totalLiablitiesAmount, assetLiabilitiesPercentage, doughnutData, metaMaskMsg } = this.state;
-
+        const { totalAssetAmount, totalLiablitiesAmount, assetLiabilitiesPercentage, doughnutData, metaMaskMsg } = this.state;
+        const { myBorrowedLoading, isTokenListLoading } = this.props;
+        let isLoading = myBorrowedLoading || isTokenListLoading;
         return (
             <Col lg={6} md={6} sm={6} xl={6}>
                 <Card className="h-100">
