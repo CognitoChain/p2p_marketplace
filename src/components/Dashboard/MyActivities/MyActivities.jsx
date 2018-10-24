@@ -299,8 +299,8 @@ class MyActivities extends Component {
       page: 1,
       /*showTotal:true,*/
       alwaysShowAllBtns: true,
-      sizePerPage: 5,
-      sizePerPageList: [{ text: "5", value: 5 }, { text: "10", value: 10 }]
+      sizePerPage: 4,
+      sizePerPageList: [{ text: "4", value: 4 }, { text: "10", value: 10 }]
     });
 
     return (
