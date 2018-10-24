@@ -54,6 +54,7 @@ class Login extends React.Component {
         const authorization = response.headers.get('Authorization');
         if (authorization && authorization != null) {
           localStorage.setItem('token', authorization);
+          localStorage.setItem('userEmail', response.email);
           this.props.history.push("/");
         }
         else {
@@ -128,6 +129,7 @@ class Login extends React.Component {
     console.log(authorization)
     if (authorization && authorization != null) {
       localStorage.setItem('token', authorization);
+      localStorage.setItem('userEmail', email);
       this.props.history.push("/");
     }
     else {

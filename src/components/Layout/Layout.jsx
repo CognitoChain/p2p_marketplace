@@ -68,6 +68,7 @@ class Layout extends Component {
     }
     render() {
         const token = localStorage.getItem('token');
+        const userEmail = localStorage.getItem('userEmail');
         const authenticated = ((token && token !== null) ? true : false)
         const urlString = this.props.location.pathname.substr(1);
         const urlStringArr = urlString.split("/");
@@ -91,7 +92,7 @@ class Layout extends Component {
         }
         else{
             return (
-                <Base logout={this.logout} authenticated={authenticated} token={token} location={location}>
+                <Base logout={this.logout} authenticated={authenticated} token={token} location={location} userEmail={userEmail}>
                     <Switch>
                         <Route exact={true} path='/' 
                             render={() => 

@@ -61,6 +61,7 @@ class Header extends Component {
     }
     render() {
         const {metamaskMsg} = this.state;
+        const {userEmail} = this.props;
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -96,6 +97,15 @@ class Header extends Component {
                             {
                                 this.props.authenticated ===true && (
                                     <div>
+                                        <div className="dropdown-header">
+                                            <div className="media">
+                                            <div className="media-body">
+                                                <h5 className="mt-0 mb-0">Welcome</h5>
+                                                <span>{userEmail}</span>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <div className="dropdown-divider"></div>
                                         <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                     </div>
                                 )

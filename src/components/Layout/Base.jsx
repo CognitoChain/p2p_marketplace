@@ -36,7 +36,8 @@ class Base extends Component {
                                 logout={this.props.logout}
                                 authenticated={this.props.authenticated}
                                 dharma={dharmaProps.dharma}
-                                token={this.props.token}                                
+                                token={this.props.token}
+                                userEmail={this.props.userEmail}                                
                             />
                         );
                     }}
