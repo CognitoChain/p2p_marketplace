@@ -510,9 +510,7 @@ class Detail extends Component {
             <Col>
               <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href="/dashboard" className="link-blue">
-                    My Loans
-</a>
+                  <a href="/dashboard" className="link-blue">My Loans</a>
                 </BreadcrumbItem>
                 <BreadcrumbItem active>Loan Detail</BreadcrumbItem>
               </Breadcrumb>
@@ -582,29 +580,20 @@ class Detail extends Component {
                           {repaymentBtnDisplay === true && (
                             <button
                               className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                              onClick={event => this.makeRepayment()}
-                            >
-                              Make Repayment
-</button>
+                              onClick={event => this.makeRepayment()}>Make Repayment</button>
                           )}
 
                           {outstandingAmount == 0 &&
                             collateralBtnDisplay === true && (
                               <button
                                 className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                                onClick={event => this.unblockCollateral()}
-                              >
-                                Get collateral back
-</button>
+                                onClick={event => this.unblockCollateral()}>Get collateral back</button>
                             )}
 
                           {collateralSeizeBtnDisplay === true && (
                             <button
                               className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                              onClick={event => this.seizeCollateral()}
-                            >
-                              Seize Collateral
-</button>
+                              onClick={event => this.seizeCollateral()}>Seize Collateral</button>
                           )}
                         </Col>
                       </Row>
@@ -723,11 +712,11 @@ class Detail extends Component {
                     </span>{" "}
                     in total, of which you've already repaid{" "}
                     <span className="text-bold">{totalRepaidAmount} {principalTokenSymbol}</span>.
-</p>
+                  </p>
 
                   <p className="repayment-details mt-15 mb-15">
                     How large of a repayment would you like to make?
-</p>
+                  </p>
 
                   <input
                     type="text"
@@ -741,16 +730,10 @@ class Detail extends Component {
                   <div className="mt-20 text-center">
                     <button
                       className="btn cognito orange small icon mb-15 make-repayment-btn"
-                      onClick={this.processRepayment}
-                    >
-                      Make Repayment
-</button>
+                      onClick={this.processRepayment}>Make Repayment</button>
                     <button
                       className="btn cognito small icon mb-15 ml-10"
-                      onClick={this.onCloseModal}
-                    >
-                      Cancel
-</button>
+                      onClick={this.onCloseModal}>Cancel</button>
                   </div>
                 </Col>
               </Row>
