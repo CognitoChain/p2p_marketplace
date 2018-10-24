@@ -10,8 +10,14 @@ var getProxyRules = new HttpProxyRules({
   rules: {
     '/api/ping': 'http://localhost:3000/ping',
     '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1',
-    '/api/user/loanRequests': 'http://localhost:3000/user/loanrequests',    
+    '/api/user/loanRequests': 'http://localhost:3000/user/loanRequestsAsDebtor',
+    '/api/user/loanRequestsAsCreditor': 'http://localhost:3000/user/loanRequestsAsCreditor',
     '/api/loanRequests/*': 'http://localhost:3000/loanrequest/all',
+
+    '/api/user/loans': 'http://localhost:3000/user/loans',
+    '/api/user/investments': 'http://localhost:3000/user/investments',
+    '/api/user/wallets': 'http://localhost:3000/user/wallets',
+  
     '/api/relayerFee': 'http://localhost:3000/config/relayerFee',
     '/api/relayerAddress': 'http://localhost:3000/config/relayerAddress',
     '/api/priceFeed': 'http://localhost:3000/prices/all',
@@ -33,7 +39,8 @@ var postProxyRules = new HttpProxyRules({
     '/api/goauthlogin': 'http://localhost:3000/goauthlogin',
     '/api/login': 'http://localhost:3000/login',
     '/api/sign-up': 'http://localhost:3000/sign-up',
-    '/api/email/([a-zA-Z0-9]+)': 'http://localhost:3000/email/$1'    
+    '/api/email/([a-zA-Z0-9]+)': 'http://localhost:3000/email/$1',
+    '/api/user/wallet' : 'http://localhost:3000/user/wallet'
   }
 });
 
