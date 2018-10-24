@@ -6,6 +6,7 @@ import validators from '../../../validators';
 import GoogleLogin from "react-google-login";
 import Api from "../../../services/api";
 import './Register.css';
+import _ from "lodash";
 
 
 class Register extends React.Component {
@@ -14,6 +15,7 @@ class Register extends React.Component {
     this.state = {
       email: '',
       password: '',
+      confirmPassword: '',
       error: null,
       apiError: ""
     };
@@ -47,9 +49,12 @@ class Register extends React.Component {
     this.setState({
       [event.target.name]: event.target.value
     });
-    this.updateValidators([event.target.name], event.target.value);
   }
   updateValidators(fieldName, value) {
+    const { password, confirmPassword } = this.state;
+    if (!this.validators[fieldName]) {
+      this.validators[fieldName] = {}
+    }
     this.validators[fieldName].errors = [];
     this.validators[fieldName].state = value;
     this.validators[fieldName].valid = true;
@@ -66,14 +71,19 @@ class Register extends React.Component {
         }
       }
     });
+    if ((fieldName == "confirmPassword" || fieldName == "password") && password != confirmPassword) {
+      this.validators["confirmPassword"].errors = [];
+      this.validators["confirmPassword"].errors.push("Password and confirm password should match.");
+      this.validators["confirmPassword"].valid = false;
+    }
   }
   isFormValid() {
     let status = true;
-    Object.keys(this.validators).forEach((field) => {
-      if (field == 'email' || field == 'password') {
-        if (!this.validators[field].valid) {
-          status = false;
-        }
+    const validationFields = ["email", "password", "confirmPassword"];
+    validationFields.forEach((field) => {
+      this.updateValidators(field, this.state[field]);
+      if (!this.validators[field].valid) {
+        status = false;
       }
     });
     return status;
@@ -115,7 +125,7 @@ class Register extends React.Component {
     }
     else {
       let error_msg = response.status;
-      if (typeof response.msg == 'undefined' && response.status == "ERROR_REGISTRATION_USER_EXISTS") {
+      if (_.isUndefined(response.msg) && response.status == "ERROR_REGISTRATION_USER_EXISTS") {
         error_msg = 'User already exist with this email id.';
       }
       toast.error(error_msg);
@@ -127,6 +137,8 @@ class Register extends React.Component {
       console.log(response);
       this.signup(response, "google");
     };
+    const { email, password, confirmPassword } = this.state;
+    const isFormValid = this.isFormValid();
     return (
       <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: 'url(assets/images/register-bg.png)' }}>
         <Container>
@@ -140,7 +152,7 @@ class Register extends React.Component {
                 </h2>
                 <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
                 <ul className="list-unstyled pos-bot pb-30">
-                  <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use</a> </li>
+                  <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use | </a> </li>
                   <li className="list-inline-item"><a className="text-white" href="privacy" target="_blank"> Privacy Policy</a></li>
                 </ul>
               </div>
@@ -150,30 +162,37 @@ class Register extends React.Component {
               <div className="login-fancy pb-40 clearfix">
                 <h3 className="mb-30">Signup</h3>
                 <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="email">Email* </label>
-                  <input type="email" value={this.state.email} placeholder="Email*" id="email" className="form-control" name="email" onChange={this.onchange} />
-                  {this.displayValidationErrors('email')}
+                  <label className="mb-10" htmlFor="email">Email<span className="red">*</span> </label>
+                  <input type="email" value={this.state.email} placeholder="Email" id="email" className="form-control" name="email" onChange={this.onchange} />
+                  {email && this.displayValidationErrors('email')}
                 </div>
                 <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="password">Password* </label>
+                  <label className="mb-10" htmlFor="password">Password<span className="red">*</span> </label>
                   <input className="Password form-control" value={this.state.password} id="password" type="password" placeholder="Password" name="password" onChange={this.onchange} />
-                  {this.displayValidationErrors('password')}
+                  {password && this.displayValidationErrors('password')}
+                </div>
+                <div className="section-field mb-20">
+                  <label className="mb-10" htmlFor="password">Confirm Password<span className="red">*</span> </label>
+                  <input className="Password form-control" value={this.state.confirmPassword} id="confirmPassword" type="password" placeholder="Confirm Password" name="confirmPassword" onChange={this.onchange} />
+                  {confirmPassword && this.displayValidationErrors('confirmPassword')}
                 </div>
 
-                <div>
+                <div className="d-inline-block">
 
-                  {<a onClick={this.register} className={`button   ${this.isFormValid() ? '' : 'disabled'}`}>
-                    <span className="text-white">Signup</span>
-                  </a>}
+                  {
+                    <a onClick={this.register} className={`button pull-md-left  ${isFormValid ? '' : 'disabled'}`}>
+                      <span className="text-white">Signup</span>
+                    </a>
+                  }
 
-                  <span className="login-buttons-seperator">OR</span>
+                  <span className="login-buttons-seperator"></span>
 
                   <GoogleLogin
                     clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
                     buttonText="Signup with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}
-                    className="btn cognito btn-danger"
+                    className="btn cognito btn-danger pull-md-right"
                   />
                 </div>
 

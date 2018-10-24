@@ -28,6 +28,23 @@ const validator = {
       valid: false,
       state: ''
     },
+    confirmPassword: {
+      rules: [
+        {
+          test: (value) => {
+            return value.length >= 6;
+          },
+          message: 'Password must not be shorter than 6 characters',
+        },
+        {
+            test: /^[a-z0-9A-Z_!@#$%&*]+$/,
+            message: 'Enter Valid Password',
+        },
+      ],
+      errors: [],
+      valid: false,
+      state: ''
+    },
     firstname: {
       rules: [
         {
