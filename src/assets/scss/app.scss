@@ -339,3 +339,13 @@ body{
   } 
 }
 
+
+@media (min-width: 768px) {
+  .pull-md-left {
+      float: left;
+  }
+  .pull-md-right {
+      float: right;
+  }
+}
+
