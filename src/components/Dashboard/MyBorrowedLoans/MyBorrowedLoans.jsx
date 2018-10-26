@@ -29,23 +29,13 @@ class MyBorrowedLoans extends Component {
         );
     }
     render() {
-        /*let _self=this;*/
-        const { myLoanRequests,myBorrowedLoading } = this.props;
-      
+        const { myBorrowedRequests,myBorrowedLoading,currentMetamaskAccount } = this.props;
         if (myBorrowedLoading) {
             return <Loading/>;
         }
-
         const rowEvents = {
             onClick: (e, row, rowIndex) => {
-                if(_.lowerCase(row.loanStatus) == "filled")
-                {
-                    this.props.redirect(`/detail/${row.id}`);    
-                }
-                else
-                {
-                    this.props.redirect(`/request/${row.id}`);       
-                }
+                this.props.redirect(`/detail/${row.id}`);
             },
         };
 
@@ -54,11 +44,19 @@ class MyBorrowedLoans extends Component {
         };
         const columns = [
             {
-                dataField: "createdAt",
+                dataField: "createdDate",
                 text: "Created Date",
                 formatter:function(cell,row,rowIndex,formatExtraData){
-                    var date = moment(row.requestedAt).format("DD/MM/YYYY");
-                    var time = moment(row.requestedAt).format("HH:mm:ss");
+                    if(!_.isUndefined(cell) && cell != null)
+                    {
+                        var date = moment(cell).format("DD/MM/YYYY");
+                        var time = moment(cell).format("HH:mm:ss");    
+                    }
+                    else
+                    {
+                        var date = 'N/A';
+                        var time = '';
+                    }
                     return (
                         <div>
                             <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
@@ -67,29 +65,29 @@ class MyBorrowedLoans extends Component {
                 }
             },
             {
-                dataField: "principalAmount",
+                dataField: "principal",
                 text: "Amount",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalSymbol}</div>
                         </div>
                     )
                 },
             },
             {
-                dataField: "termDuration",
+                dataField: "termLengthAmount",
                 text: "Term",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <span className="number-highlight">{cell}</span> {row.termUnit}
+                            <span className="number-highlight">{cell}</span> {row.termLengthUnit}
                         </div>
                     )
                 }
             },
             {
-                dataField: "interestRate",
+                dataField: "interestRatePercent",
                 text: "Interest Rate",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
@@ -100,31 +98,23 @@ class MyBorrowedLoans extends Component {
                 }
             },
             {
-                dataField: "collateralAmount",
+                dataField: "collateral",
                 text: "Collateral",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralSymbol}</div>
                         </div>
                     )
                 }
             },
             {
-                dataField: "repayment",
-                isDummyField: true,
+                dataField: "repaymentAmount",
                 text: "Total Repayment",
                 formatter:function(cell,row,rowIndex,formatExtraData){
-
-                    let principal = row.principalAmount;
-                    let interest_rate = row.interestRate;
-                    let interestAmount = (principal * interest_rate) / 100;
-                    let totalRepaymentAmount =
-                      parseFloat(principal) + parseFloat(interestAmount);
-
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{totalRepaymentAmount}</span><br />{row.principalTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalSymbol}</div>
                         </div>
                     )
                 }
@@ -136,7 +126,29 @@ class MyBorrowedLoans extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            {amortizationUnitToFrequency(row.termUnit)}
+                            {amortizationUnitToFrequency(row.termLengthUnit)}
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "actions",
+                isDummyField: true,
+                text: "Actions",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    let buttonText = '';
+                    if(row.debtorAddress == currentMetamaskAccount)
+                    {
+                        buttonText = (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false) ? 'Pay' : ((row.repaidAmount == row.repaymentAmount) ? 'Request Collateral' : '');
+                    }
+                    return (
+                        <div>
+                        {buttonText != '' && 
+                            <a href={`detail/${row.id}`} target="_blank" className="btn cognito x-small orange">{buttonText}</a>
+                        }
+                        {buttonText == '' && 
+                            <span>N/A</span>
+                        }
                         </div>
                     )
                 }
@@ -148,7 +160,7 @@ class MyBorrowedLoans extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns:true,            
         });
-        if(myLoanRequests.length==0){
+        if(myBorrowedRequests.length==0){
             return <MyBorrowedLoansRequestsEmpty />
         }
         return (
@@ -158,7 +170,7 @@ class MyBorrowedLoans extends Component {
                     keyField="id"
                     classes = {"open-request"}
                     columns={columns}
-                    data={myLoanRequests}
+                    data={myBorrowedRequests}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
