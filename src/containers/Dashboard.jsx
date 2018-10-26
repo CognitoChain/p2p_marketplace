@@ -19,7 +19,7 @@ class DashboardContainer extends Component {
         return (
             <DharmaConsumer>
                 {(dharmaProps) => {
-                    return <Dashboard token = {this.props.token} isTokenLoading= {dharmaProps.isTokenLoading}  tokens={dharmaProps.tokens} dharma={dharmaProps.dharma} redirect={this.redirect}/>;
+                    return <Dashboard token = {this.props.token} isTokenLoading= {dharmaProps.isTokenLoading}  tokens={dharmaProps.tokens} dharma={dharmaProps.dharma} redirect={this.redirect} currentMetamaskAccount={this.props.currentMetamaskAccount} />;
                 }}
             </DharmaConsumer>
         );

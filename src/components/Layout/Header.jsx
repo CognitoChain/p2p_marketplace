@@ -6,7 +6,7 @@ import {
   Alert
 } from "reactstrap";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-
+import Api from "../../services/api";
 class Header extends Component {
 
     constructor(props) {
@@ -25,14 +25,25 @@ class Header extends Component {
     
     async componentWillMount() {
         const { dharma } = this.props;
+        const api = new Api();
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        localStorage.setItem('currentMetamaskAccount', currentAccount);
+        let currentMetamaskAccountLocal = localStorage.getItem('currentMetamaskAccount');
+        
         if(typeof currentAccount === "undefined")
         {
             this.setState({
                 metamaskMsg:true,
             });
         }
+
+        if(!_.isUndefined(currentAccount) && currentMetamaskAccountLocal != currentAccount)
+        {
+            const walletResponse = api.setToken(this.props.token).create("user/wallet", {
+                address: currentAccount
+            });
+        }
+
+        localStorage.setItem('currentMetamaskAccount', currentAccount);
         
         this.interval = setInterval(
         () => {
@@ -55,7 +66,7 @@ class Header extends Component {
 
         if (currentMetamaskAccount != String(currentAccount) && (typeof currentMetamaskAccount != "undefined" || typeof String(currentAccount) != "undefined")) 
         {
-            localStorage.setItem('currentMetamaskAccount', currentAccount);
+            /*localStorage.setItem('currentMetamaskAccount', currentAccount);*/
             window.location.reload();
         }
     }

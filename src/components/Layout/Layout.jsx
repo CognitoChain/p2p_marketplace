@@ -57,6 +57,7 @@ class Layout extends Component {
     }
     logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('currentMetamaskAccount');
         localStorage.removeItem('userEmail');
         this.props.history.push("/login");
     }
@@ -70,6 +71,7 @@ class Layout extends Component {
     render() {
         const token = localStorage.getItem('token');
         const userEmail = localStorage.getItem('userEmail');
+        const currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         const authenticated = ((token && token !== null) ? true : false)
         const urlString = this.props.location.pathname.substr(1);
         const urlStringArr = urlString.split("/");
@@ -107,7 +109,7 @@ class Layout extends Component {
                             }
                           />  
 
-                        <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={DashboardContainer}/>
+                        <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={DashboardContainer} currentMetamaskAccount={currentMetamaskAccount} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={WalletContainer} /> 
                         <PrivateRoute authenticated={authenticated} token={token} path="/loanrequests" component={LoanRequestsContainer} />
                         <PrivateRoute path="/createold"  authenticated={authenticated} token={token}  component={CreateLoanRequestContainer} />
