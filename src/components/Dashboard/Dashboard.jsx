@@ -9,8 +9,9 @@ import MyBorrowedLoans from "./MyBorrowedLoans/MyBorrowedLoans";
 import MyFundedLoans from "./MyFundedLoans/MyFundedLoans";
 import MyPortfolio from "./MyPortfolio/MyPortfolio";
 import MyActivities from "./MyActivities/MyActivities";
+import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
-
+import _ from 'lodash';
 class Dashboard extends Component {
 
     constructor(props) {
@@ -19,34 +20,43 @@ class Dashboard extends Component {
         this.state = {
             activeTab: '1',
             widths: 80,
-            myLoanRequests: [],
+            myBorrowedRequests: [],
             myFundedRequests: [],
+            myLoanRequests: [],
             myBorrowedLoading: true,
             myFundedLoading: true,
+            myLoansLoading:true,
+            myBorrowedRequestsIsMounted:true,
+            myFundedRequestsIsMounted:true,
             myLoanRequestsIsMounted:true,
-            myFundedRequestsIsMounted:true
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
+    }
+
+    convertBigNumber(number,decimal) {
+        let divider = "1E"+decimal;
+        let formatedAmount = number / divider;
+        return formatedAmount;
     }
    
     componentDidMount() {
         this.getBorrowedLoanRequests();
         this.getFundedLoanRequests();
+        this.getMyLoanRequests();
     }
 
     async getBorrowedLoanRequests(){
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myLoanRequestsIsMounted } = this.state;
+        const { myBorrowedRequestsIsMounted } = this.state;
 
-        api.setToken(this.props.token).get("user/loanRequests", { sort, order })
-            .then(this.parseMyLoanRequests)
-            .then(myLoanRequests => {
-                if(myLoanRequestsIsMounted)    
+        api.setToken(this.props.token).get("user/loans", { sort, order })
+            .then(myBorrowedRequests => {
+                if(myBorrowedRequestsIsMounted)    
                 {
-                    this.setState({ myLoanRequests, myBorrowedLoading: false });          
+                    this.setState({ myBorrowedRequests, myBorrowedLoading: false });          
                 }
             })
             .catch((error) => {
@@ -57,47 +67,52 @@ class Dashboard extends Component {
     }
 
     async getFundedLoanRequests(){
-        const { dharma } = this.props;
+        const api = new Api();
+        const sort = "createdAt";
+        const order = "desc";
         const { myFundedRequestsIsMounted } = this.state;
-        const { Investments } = Dharma.Types;
-        const creditor = await dharma.blockchain.getCurrentAccount();
-        if(typeof creditor != "undefined")
-        {
-            const myFundedRequests = await Investments.getExpandedData(dharma, creditor);
-            if(myFundedRequestsIsMounted)
-            {
-                this.setState({
-                    myFundedRequests,
-                    myFundedLoading: false
-                });    
-            }
-        }
-        else
-        {
-            this.setState({
-                myFundedLoading: false
-            }); 
-        }
+        api.setToken(this.props.token).get("user/investments", { sort, order })
+            .then(myFundedRequests => {
+                if(myFundedRequestsIsMounted)    
+                {
+                    this.setState({ myFundedRequests, myFundedLoading: false });          
+                }
+            })
+            .catch((error) => {
+                if(error.status && error.status === 403){
+                    this.props.redirect(`/login/`);
+                }
+        });
     }
 
-    tabsclick(tab) {
-        if (this.state.activeTab !== tab) {
-            this.setState({
-                activeTab: tab
-            });
-        }
-    }
-    
+    async getMyLoanRequests(){
+        const api = new Api();
+        const sort = "createdAt";
+        const order = "desc";
+        const { myLoanRequestsIsMounted } = this.state;
+        api.setToken(this.props.token).get("user/loanRequests", { sort, order })
+            .then(this.parseMyLoanRequests)
+            .then(myLoanRequests => {
+                if(myLoanRequestsIsMounted)    
+                {
+                    this.setState({ myLoanRequests, myLoansLoading: false });          
+                }
+            })
+            .catch((error) => {
+                if(error.status && error.status === 403){
+                    this.props.redirect(`/login/`);
+                }
+        });
+    }    
+
     parseMyLoanRequests(loanRequestData) {
-        /*var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });*/
-        return Promise.all(loanRequestData.map(this.parseLoanRequest));
+        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
+        return Promise.all(filteredRequestData.map(this.parseLoanRequest));
     }
 
     parseLoanRequest(datum) {
         const { dharma } = this.props;
-
         const { LoanRequest } = Dharma.Types;
-        
         return new Promise((resolve) => {
             LoanRequest.load(dharma, datum).then((loanRequest) => {
                 resolve({
@@ -110,20 +125,32 @@ class Dashboard extends Component {
         });
     }
 
+    tabsclick(tab) {
+        if (this.state.activeTab !== tab) {
+            this.setState({
+                activeTab: tab
+            });
+        }
+    }
+    
     getBorrowedData() {
-        const { myLoanRequests } = this.state;
-        if (!myLoanRequests) {
+        const { myBorrowedRequests } = this.state;
+        if (!myBorrowedRequests) {
             return null;
         }
 
-        return myLoanRequests.map((request) => {
+        return myBorrowedRequests.map((request) => {
+            let princiaplAmount = this.convertBigNumber(request.principalAmount,request.principalNumDecimals);
+            let collateralAmount = this.convertBigNumber(request.collateralAmount,request.collateralNumDecimals);
+            let repaymentAmount = this.convertBigNumber(request.totalExpectedRepayment,request.principalNumDecimals);
+            let repaidAmount = this.convertBigNumber(request.repaidAmount,request.principalNumDecimals);
             return {
                 ...request,
-                principal: `${request.principalAmount} ${request.principalTokenSymbol}`,
-                collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
-                term: `${request.termDuration} ${request.termUnit}`,
-                expiration: moment.unix(request.expiresAt).fromNow(),
-                requestedDate: moment(request.requestedAt).calendar()               
+                principal: `${princiaplAmount}`,
+                collateral: `${collateralAmount}`,
+                requestedDate: moment(request.createdDate).calendar(),
+                repaymentAmount:`${repaymentAmount}`,
+                repaidAmount:`${repaidAmount}`            
             };
         });
     }
@@ -136,31 +163,57 @@ class Dashboard extends Component {
         }
 
         return myFundedRequests.map((investment) => {
+            let princiaplAmount = this.convertBigNumber(investment.principalAmount,investment.principalNumDecimals);
+            let collateralAmount = this.convertBigNumber(investment.collateralAmount,investment.collateralNumDecimals);
+            let repaymentAmount = this.convertBigNumber(investment.totalExpectedRepayment,investment.principalNumDecimals);
+            let repaidAmount = this.convertBigNumber(investment.repaidAmount,investment.principalNumDecimals);
+
             return {
                 ...investment,
-                principal: `${investment.principalAmount} ${investment.principalTokenSymbol}`,
-                collateral: `${investment.collateralAmount} ${investment.collateralTokenSymbol}`,
-                term: `${investment.termDuration} ${investment.termUnit}`,
-                repaidAmount: `${investment.repaidAmount} ${investment.principalTokenSymbol}`,
-                totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${
-                    investment.principalTokenSymbol
+                principal: `${princiaplAmount}`,
+                collateral: `${collateralAmount}`,
+                term: `${investment.termLengthAmount}`,
+                repaidAmount: `${repaidAmount} ${investment.principalSymbol}`,
+                totalExpectedRepaymentAmount: `${repaymentAmount} ${
+                    investment.principalSymbol
                     }`,
             };
         });
     }
 
-    componentWillUnmount(){
-        this.setState({
-          myLoanRequestsIsMounted: false,
-          myFundedRequestsIsMounted:false                
+    getMyLoansData() {
+        const { myLoanRequests } = this.state;
+
+        if (!myLoanRequests) {
+            return null;
+        }
+        return myLoanRequests.map((request) => {
+            return {
+                ...request,
+                principal: `${request.principalAmount} ${request.principalTokenSymbol}`,
+                collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
+                term: `${request.termDuration} ${request.termUnit}`,
+                expiration: moment.unix(request.expiresAt).fromNow(),
+                requestedDate: moment(request.requestedAt).calendar()               
+            };
         });
     }
 
+
+    componentWillUnmount(){
+        this.setState({
+          myBorrowedRequestsIsMounted:false,
+          myLoanRequestsIsMounted: false,
+          myFundedRequestsIsMounted:false                
+        });            
+    }
+
     render() {
-        const myLoanRequests = this.getBorrowedData();
+        const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
-        const { token, dharma, redirect } = this.props;
-        const { highlightRow,  myBorrowedLoading, myFundedLoading} = this.state;
+        const myLoanRequests = this.getMyLoansData();
+        const { token, dharma, redirect, currentMetamaskAccount } = this.props;
+        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading} = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -182,14 +235,16 @@ class Dashboard extends Component {
                         isTokenLoading = {this.props.isTokenLoading}
                         myBorrowedLoading={myBorrowedLoading}
                         token={this.props.token}
-                        myLoanRequests={myLoanRequests}
+                        myBorrowedRequests={myBorrowedRequests}
+                        currentMetamaskAccount={currentMetamaskAccount}
                     />
                     <MyActivities
                         authenticated={this.props.authenticated}
                         dharma={this.props.dharma}
                         token={this.props.token}
-                        myLoanRequests={myLoanRequests}
+                        myBorrowedRequests={myBorrowedRequests}
                         myFundedRequests={myFundedRequests}
+                        currentMetamaskAccount={currentMetamaskAccount}
                     />
                 </Row>
 
@@ -219,6 +274,13 @@ class Dashboard extends Component {
                                                         Funded Loans
                                                     </NavLink>
                                                 </NavItem>
+                                                <NavItem>
+                                                    <NavLink className={classnames({ active: this.state.activeTab === '3' })}
+                                                        onClick={() => { this.tabsclick('3'); }}
+                                                    >
+                                                        My Loan Requests
+                                                    </NavLink>
+                                                </NavItem>
                                             </Nav>
                                         </div>
                                     </div>
@@ -229,9 +291,10 @@ class Dashboard extends Component {
                                                 token={token}
                                                 dharma={dharma}
                                                 redirect={redirect}
-                                                myBorrowedLoading = {myBorrowedLoading}
-                                                myLoanRequests={myLoanRequests}
+                                                myBorrowedLoading ={myBorrowedLoading}
+                                                myBorrowedRequests={myBorrowedRequests}
                                                 highlightRow={highlightRow}
+                                                currentMetamaskAccount={currentMetamaskAccount}
                                             />
 
                                         </TabPane>
@@ -244,9 +307,24 @@ class Dashboard extends Component {
                                                 redirect={redirect}
                                                 myFundedLoading={myFundedLoading}
                                                 myFundedRequests={myFundedRequests}
+                                                currentMetamaskAccount={currentMetamaskAccount}
                                             />
 
                                         </TabPane>
+
+                                        <TabPane tabId="3" title="My loan requests">
+
+                                            <MyLoanRequests
+                                                token={token}
+                                                dharma={dharma}
+                                                redirect={redirect}
+                                                myLoansLoading={myLoansLoading}
+                                                myLoanRequests={myLoanRequests}
+                                            />
+
+                                        </TabPane>
+
+
                                     </TabContent>
                                 </div>
                             </CardBody>
