@@ -162,7 +162,7 @@ class EmailVerify extends React.Component {
           <Container>
             <Row className="justify-content-center no-gutters vertical-align row">
               <Col lg={4} md={6} className="login-fancy-bg bg" style={{ backgroundImage: `url(${login_innner_bg})` }}>
-                <div className="login-fancy">
+                <div className="login-fancy login-left">
                   <h2 className="text-white mb-20 text-center">
                     <a href="/"><img src={logo_full} alt="Cognito Chain" width="200" /></a>
                   </h2>
