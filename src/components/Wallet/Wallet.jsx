@@ -214,11 +214,11 @@ class Wallet extends Component {
         <Row className="mb-30 mt-30">
           <Col lg={12} md={12} sm={12} xl={12}>
             <div className="tab nav-border" style={{ position: "relative" }}>
-
+              {!isTokenLoading && tokenlist.length == 0 && (
               <Alert color="warning" className="mb-30">
                 Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link">https://wallet.dharma.io/</a>.
                   </Alert>
-
+              )}    
               <div className="mb-30">
                 <div>Ethereum Address</div>
                 <div className="eth-address">{ethAddress}</div>
