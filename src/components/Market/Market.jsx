@@ -98,11 +98,6 @@ class Market extends Component {
                                     <div className="d-block w-100">
                                         <CardTitle>Open Requests</CardTitle>
                                     </div>
-                                    <div className="d-block d-md-flex" style={{ position: 'absolute', right: 0, top: 0 }}>
-                                        <div className="btn-group">
-                                            <a className="btn btn-outline-info cognito x-small mb-15 filter-disabled" href="javascript:void(0);">Filter</a>
-                                        </div>
-                                    </div>
                                 </div>
                                 <DharmaConsumer>
                                     {(dharmaProps) => (
