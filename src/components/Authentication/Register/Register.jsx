@@ -73,7 +73,7 @@ class Register extends React.Component {
     });
     if ((fieldName == "confirmPassword" || fieldName == "password") && password != confirmPassword) {
       this.validators["confirmPassword"].errors = [];
-      this.validators["confirmPassword"].errors.push("Password and confirm password should match.");
+      this.validators["confirmPassword"].errors.push("Password and Confirm Password should match.");
       this.validators["confirmPassword"].valid = false;
     }
   }
@@ -97,8 +97,12 @@ class Register extends React.Component {
       });
 
       return (
-        <div className="col s12 row">
-          {errors}
+        <div className="row">
+          <div className="col">
+            <div className="s12 ">
+              {errors}
+            </div>
+          </div>
         </div>
       );
     }
@@ -126,7 +130,7 @@ class Register extends React.Component {
     else {
       let error_msg = response.status;
       if (_.isUndefined(response.msg) && response.status == "ERROR_REGISTRATION_USER_EXISTS") {
-        error_msg = 'User already exist with this email id.';
+        error_msg = 'User already exist with this Email Address.';
       }
       toast.error(error_msg);
     }
@@ -144,7 +148,7 @@ class Register extends React.Component {
         <Container>
           <Row className="justify-content-center no-gutters vertical-align row">
             <Col lg={4} md={6} className="login-fancy-bg bg parallax" style={{ backgroundImage: 'url(assets/images/register-inner-bg.png)' }}>
-              <div className="login-fancy">
+              <div className="login-fancy login-left">
                 <h2 className="text-white mb-20 text-center">
                   <a href="/">
                     <img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" />
@@ -180,7 +184,7 @@ class Register extends React.Component {
                 <div className="d-inline-block">
 
                   {
-                    <a onClick={this.register} className={`button pull-md-left  ${isFormValid ? '' : 'disabled'}`}>
+                    <a onClick={this.register} className={`btn cognito btn-theme pull-md-left  ${isFormValid ? '' : 'disabled'}`}>
                       <span className="text-white">Signup</span>
                     </a>
                   }
