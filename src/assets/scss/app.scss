@@ -3,16 +3,26 @@ body{
   background-color:#fafafa !important;
 }
 .btn.cognito{
-	text-transform: capitalize;
-	padding: 10px 30px; 
+	text-transform: uppercase;
+  padding: 10px 20px;
+}
+.btn.cognito.disabled, .btn.cognito:disabled{
+  opacity: .90;
+  cursor: not-allowed;
 }
 .btn.cognito.orange { 
   background: $orange;
   color: $white; 
-  border: none; 
   &:hover { 
     color: $orange;
     background: $white; 
+   }
+}
+.btn.cognito.btn-theme { 
+  background: $theme-color;
+  color: $white; 
+  &:hover { 
+    background: $theme-hover-color; 
    }
 }
 .btn.cognito.x-small { 
@@ -349,3 +359,19 @@ body{
   }
 }
 
+.lock-switch-label,.unlock-switch-label,.token-loading{
+  vertical-align: top;
+}
+.login-fancy.login-left{
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+.login-fancy.login-left p{
+  min-height: 200px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
