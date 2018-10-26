@@ -11,13 +11,15 @@ import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoa
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {amortizationUnitToFrequency} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import * as moment from "moment";
+import _ from 'lodash';
 class MyFundedLoans extends Component {
     constructor(props) {
         super(props);        
     }
 
     render() {
-        const { myFundedRequests,myFundedLoading } = this.props;
+        const { myFundedRequests,myFundedLoading,currentMetamaskAccount } = this.props;
         if (myFundedLoading) {
             return <Loading />;
         }
@@ -29,33 +31,55 @@ class MyFundedLoans extends Component {
         };
 
         const rowClasses = (row, rowIndex) => {
-            return "loan-request-row1";
+            return "loan-request-row1 cursor-pointer";
         };
         const columns = [
             {
-                dataField: "principalAmount",
-                text: "Amount",
-                formatter: function (cell, row, rowIndex, formatExtraData) {
+                dataField: "createdDate",
+                text: "Created Date",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    if(!_.isUndefined(cell) && cell != null)
+                    {
+                        var date = moment(cell).format("DD/MM/YYYY");
+                        var time = moment(cell).format("HH:mm:ss");    
+                    }
+                    else
+                    {
+                        var date = 'N/A';
+                        var time = '';
+                    }
+                    
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalTokenSymbol}</div>
-                        </div>
-                    )
-                },
-            },
-            {
-                dataField: "termDuration",
-                text: "Term",
-                formatter: function (cell, row, rowIndex, formatExtraData) {
-                    return (
-                        <div>
-                            <span className="number-highlight">{cell}</span> {row.termUnit}
+                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
                         </div>
                     )
                 }
             },
             {
-                dataField: "interestRate",
+                dataField: "principal",
+                text: "Amount",
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    return (
+                        <div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalSymbol}</div>
+                        </div>
+                    )
+                },
+            },
+            {
+                dataField: "term",
+                text: "Term",
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    return (
+                        <div>
+                            <span className="number-highlight">{cell}</span> {row.termLengthUnit}
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "interestRatePercent",
                 text: "Interest Rate",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
@@ -66,12 +90,12 @@ class MyFundedLoans extends Component {
                 }
             },
             {
-                dataField: "collateralAmount",
+                dataField: "collateral",
                 text: "Collateral",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralSymbol}</div>
                         </div>
                     )
                 }
@@ -90,12 +114,11 @@ class MyFundedLoans extends Component {
             },
             {
                 dataField: "repaidAmount",
-                isDummyField: true,
                 text: "Total Earned",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.repaidAmount}</span></div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span></div>
                         </div>
                     )
                 }
@@ -107,7 +130,29 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            {amortizationUnitToFrequency(row.termUnit)}
+                            {amortizationUnitToFrequency(row.termLengthUnit)}
+                        </div>
+                    )
+                }
+            },
+            {
+                dataField: "actions",
+                isDummyField: true,
+                text: "Actions",
+                formatter:function(cell,row,rowIndex,formatExtraData){
+                    let buttonText = '';
+                    if(row.creditorAddress == currentMetamaskAccount)
+                    {
+                        buttonText = (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isCollateralSeizable == true) ? 'Seize Collateral' : '';
+                    }
+                    return (
+                        <div>
+                        {buttonText != '' && 
+                            <a href={`detail/${row.id}`} target="_blank" className="btn cognito x-small orange">{buttonText}</a>
+                        }
+                        {buttonText == '' && 
+                            <span>N/A</span>
+                        }
                         </div>
                     )
                 }
