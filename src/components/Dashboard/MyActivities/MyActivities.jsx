@@ -100,7 +100,7 @@ class MyActivities extends Component {
                       date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                       amount: expectedRepaidAmount,
                       type: "minus",
-                      sybmol: ts.principalTokenSymbol,
+                      sybmol: ts.principalSymbol,
                       agreementId: ts.id,
                       sortTimestamp: st,
                       buttonText:buttonText
@@ -157,7 +157,7 @@ class MyActivities extends Component {
                     date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                     amount: expectedRepaidAmount,
                     type: "plus",
-                    sybmol: ts.principalTokenSymbol,
+                    sybmol: ts.principalSymbol,
                     agreementId: ts.id,
                     sortTimestamp: schedule_ts,
                     buttonText:buttonText
