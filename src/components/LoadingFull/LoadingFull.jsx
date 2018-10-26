@@ -7,8 +7,8 @@ import "./LoadingFull.css";
 class LoadingFull extends React.Component {
   render() {
     return <section className="loading">
-      Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-         <span className="loading__author"> - Lorem Ipsum</span>
+      We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings. 
+        
 
       <div className="indicator">
         <svg width="16px" height="12px">
