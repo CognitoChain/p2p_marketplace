@@ -53,7 +53,7 @@ class TransactionManager extends Component {
 
     awaitTransactionMined() {
         const { dharma, txHash, onSuccess } = this.props;
-
+        
         dharma.blockchain
             .awaitTransactionMinedAsync(txHash)
             .then(() => {

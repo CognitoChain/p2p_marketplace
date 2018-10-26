@@ -90,7 +90,7 @@ class LoanRequest extends Component {
                     if (!_.isUndefined(priceFeedData[get_terms.principalTokenSymbol])) {
                         let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
                         principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
-                        
+
                     }
                     if (!_.isUndefined(priceFeedData[get_terms.collateralTokenSymbol])) {
                         let collateralTokenCurrentPrice =
@@ -130,8 +130,8 @@ class LoanRequest extends Component {
         });
     }
 
-    reloadState() {
-        this.setHasSufficientAllowance();
+    reloadState(tokenSymbol,status) {
+        this.setHasSufficientAllowance(status);
         this.assertFillable();
     }
 
@@ -188,7 +188,7 @@ class LoanRequest extends Component {
             if (txHash) {
                 transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
                 this.setState({
-                    customAlertMsgDisplay:false,
+                    customAlertMsgDisplay: false,
                     transactions
                 });
             }
@@ -209,8 +209,8 @@ class LoanRequest extends Component {
             .catch((error) => {
                 let title = "This loan request cannot be filled";
                 let description = error.message;
-                if(error.message == "Creditor allowance is insufficient"){
-                    title = "Steps Required" 
+                if (error.message == "Creditor allowance is insufficient") {
+                    title = "Steps Required"
                     description = 'Token transfer authorization required. Click "Unlock Token".'
                 }
                 this.setState({
@@ -219,13 +219,13 @@ class LoanRequest extends Component {
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: title,
-                    customAlertMsgDescription:description,
+                    customAlertMsgDescription: description,
                     disableSubmitBtn: false
                 });
             });
     }
 
-    async setHasSufficientAllowance(tokenSymbol, status) {
+    async setHasSufficientAllowance(status) {
         const { dharma } = this.props;
         const { loanRequest } = this.state;
 
@@ -235,16 +235,16 @@ class LoanRequest extends Component {
 
         const terms = loanRequest.getTerms();
         const isCompleted = status && status == "success" ? true : false;
-
+        console.log(status + "status")
         let stateObj = {};
 
         if (typeof currentAccount != "undefined") {
             const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
             const hasSufficientAllowance =
                 tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount || isCompleted;
-                console.log("tokenData")
+            console.log("tokenData")
 
-                console.log(tokenData)
+            console.log(tokenData)
             console.log("setHasSufficientAllowance--" + hasSufficientAllowance)
 
             stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
@@ -309,6 +309,7 @@ class LoanRequest extends Component {
         console.log("hasSufficientAllowance--" + hasSufficientAllowance)
         console.log("disableSubmitBtn--" + disableSubmitBtn)
         console.log("error--" + error)
+        console.log(transactions)
         return (
             <div>
 
@@ -431,7 +432,7 @@ class LoanRequest extends Component {
                                             bsStyle={customAlertMsgStyle}
                                             className={customAlertMsgClassname}
                                             title={customAlertMsgTitle}
-                                            description = {customAlertMsgDescription}
+                                            description={customAlertMsgDescription}
                                         />
                                     }
 
