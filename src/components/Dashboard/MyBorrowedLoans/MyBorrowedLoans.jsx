@@ -54,7 +54,7 @@ class MyBorrowedLoans extends Component {
                     }
                     else
                     {
-                        var date = 'N/A';
+                        var date = '-';
                         var time = '';
                     }
                     return (
