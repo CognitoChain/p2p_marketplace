@@ -21,31 +21,33 @@ import _ from "lodash";
 import Loading from "../Loading/Loading";
 import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-let timer ;
+import { BLOCKCHAIN_API } from "../../common/constants";
+import Switch from "react-switch";
+let timer;
 class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
       ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
-      isWalletMounted:true
+      isWalletMounted: true
     };
   }
 
   componentWillMount() {
     this.getETH();
   }
-  componentWillReceiveProps(nextProps){
-    if(nextProps.tokens!=this.props.tokenlist){
-      this.setState({tokenlist:nextProps.tokens})
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.tokens != this.props.tokenlist) {
+      this.setState({ tokenlist: nextProps.tokens })
     }
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.setState({
-      isWalletMounted: false    
+      isWalletMounted: false
     });
   }
-  async getETH(){
+  async getETH() {
     const { dharma } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     if (typeof currentAccount != "undefined") {
@@ -57,51 +59,77 @@ class Wallet extends Component {
       });
     }
   }
+  handleLoading(token, isLoading) {
+    const { tokenlist } = this.state;
+    let symbol = token.symbol;
+    var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
+    tokenlist[tokenKey].isLoading = isLoading;
+    this.setState({
+      tokenlist
+    });
+  }
+  async updateProxyAllowanceAsync(token) {
 
-  async updateProxyAllowanceAsync(symbol) {
     const { dharma } = this.props;
     const { Token } = Dharma.Types;
     const { tokenlist } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
+    let symbol = token.symbol;
+    let tokenAddress = token.address;
+    if (token.isLoading == true) {
+      return true;
+    }
+    this.handleLoading(token, true);
+    let status = !token.hasUnlimitedAllowance;
     if (typeof currentAccount != "undefined") {
-      const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
-        dharma,
-        symbol,
-        currentAccount
-      );
+      try {
+        let txHash;
+        if (status == true) {
+          txHash = await Token.makeAllowanceUnlimitedIfNecessary(
+            dharma,
+            symbol,
+            currentAccount
+          );
+        }
+        else {
+         
+          txHash = await Token.revokeAllowance(
+            dharma,
+            symbol,
+            currentAccount
+          );
+        }
 
-      if (typeof txHash != "undefined") {
-        var TokenKey = _.findKey(tokenlist, ["symbol", symbol]);
-        tokenlist[TokenKey].hasUnlimitedAllowance = true;
-        this.setState({
-          tokenlist
-        });
+
+        if (typeof txHash != "undefined") {
+          await dharma.blockchain.awaitTransactionMinedAsync(
+            txHash,
+            BLOCKCHAIN_API.POLLING_INTERVAL,
+            BLOCKCHAIN_API.TIMEOUT,
+          );
+
+          // const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
+          // console.log("tokenData")
+
+          //console.log(tokenData)
+          var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
+          tokenlist[tokenKey].hasUnlimitedAllowance = status;
+          this.setState({
+            tokenlist
+          });
+
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
-  }
+    this.handleLoading(token, false)
 
-  async RevokeAllowanceAsync(symbol) {
-    const { dharma } = this.props;
-    const { Token } = Dharma.Types;
-    const { tokenlist } = this.state;
-    const currentAccount = await dharma.blockchain.getCurrentAccount();
-    if (typeof currentAccount != "undefined") {
-      const txHash = await Token.revokeAllowance(
-        dharma,
-        symbol,
-        currentAccount
-      );
-      var revokedTokenKey = _.findKey(tokenlist, ["symbol", symbol]);
-      tokenlist[revokedTokenKey].hasUnlimitedAllowance = false;
-      this.setState({
-        tokenlist
-      });
-    }
   }
   renderTokenBalances() {
-    
+
     const { tokenlist } = this.state;
-    const {isTokenLoading} = this.props;
+    const { isTokenLoading } = this.props;
     console.log(this.props)
     console.log(this.state)
     if (isTokenLoading) {
@@ -111,7 +139,7 @@ class Wallet extends Component {
       return <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={"Could not find tokens in your wallet."} />
     }
     else {
-      const tokensSorted =  _.orderBy(tokenlist, ['symbol'], ['asc']);
+      const tokensSorted = _.orderBy(tokenlist, ['symbol'], ['asc']);
       return (
         <Row>
 
@@ -120,7 +148,7 @@ class Wallet extends Component {
               return (
                 <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
                   <Card className="card card-statistics h-100">
-                    <CardBody>
+                    <CardBody className="pb-0">
                       <div className="clearfix mb-10">
                         <div className="float-left icon-box rounded-circle">
                           <span className="text-white">
@@ -145,34 +173,23 @@ class Wallet extends Component {
                           </div>
                         </div>
                       </div>
-                      <div className="mt-3 text-right">
-                        {token.hasUnlimitedAllowance === true && (
-                          <a
-                            className="btn btn-outline-success btn-success cognito x-small lock-button"
-                            href="javascript:void(0);"
-                            onClick={() =>
-                              this.RevokeAllowanceAsync(
-                                token.symbol
-                              )
-                            }
-                          >
-                            Lock
-                          </a>
-                        )}
+                      <div className="mt-3 pull-left text-left d-inline-block">
+                      {
+                        token.hasUnlimitedAllowance 
+                        ? <label className="badge badge-success">Unlocked</label>
+                        : <label className="badge badge-warning">Locked</label>
 
-                        {token.hasUnlimitedAllowance === false && (
-                          <a
-                            className="btn cognito x-small btn-success unlock-button"
-                            href="javascript:void(0);"
-                            onClick={() =>
+                      }
+                      </div>
+                      <div className="mt-3 pull-right text-right d-inline-block">
+                        {
+                          token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
+                        }
+                        <Switch height={20} width={40} uncheckedIcon={false} disabled = {token.isLoading} checkedIcon={false} checked={token.hasUnlimitedAllowance} onChange={() =>
                               this.updateProxyAllowanceAsync(
-                                token.symbol
+                                token
                               )
-                            }
-                          >
-                            Unlock
-                            </a>
-                        )}
+                            } className="react-switch" id="normal-switch" />                       
                       </div>
                     </CardBody>
                   </Card>
@@ -189,7 +206,7 @@ class Wallet extends Component {
   render() {
     let _self = this;
     const { ethAddress, tokenlist } = this.state;
-
+    const { isTokenLoading } = this.props;
 
     return (
       <div className="wallet-page">
