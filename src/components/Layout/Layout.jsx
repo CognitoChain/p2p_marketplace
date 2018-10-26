@@ -57,6 +57,7 @@ class Layout extends Component {
     }
     logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('userEmail');
         this.props.history.push("/login");
     }
     componentDidUpdate() {
