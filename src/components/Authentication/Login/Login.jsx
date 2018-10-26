@@ -106,8 +106,12 @@ class Login extends React.Component {
         return <span className="error" key={index}>* {info}<br /></span>
       });
       return (
-        <div className="col s12 row">
-          {errors}
+        <div className="row">
+          <div className="col">
+            <div className="s12 ">
+              {errors}
+            </div>
+          </div>
         </div>
       );
     }
@@ -216,7 +220,7 @@ class Login extends React.Component {
         <Container>
           <Row className="justify-content-center no-gutters vertical-align row">
             <Col lg={4} md={6} className="login-fancy-bg bg" style={{ backgroundImage: 'url(assets/images/login-inner-bg.png)' }}>
-              <div className="login-fancy">
+              <div className="login-fancy login-left">
                 <h2 className="text-white mb-20 text-center">
                   <a href="/"><img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" /></a>
                 </h2>
@@ -250,7 +254,7 @@ class Login extends React.Component {
                 </div>
 
                 <div className="d-inline-block">
-                  <a onClick={this.login} className={`button pull-md-left ${isFormValid ? '' : 'disabled'}`}>
+                  <a onClick={this.login} className={`btn cognito btn-theme pull-md-left ${isFormValid ? '' : 'disabled'}`}>
                     <span className="text-white">Log in</span>
                   </a>
 
