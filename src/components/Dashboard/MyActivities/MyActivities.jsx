@@ -48,10 +48,11 @@ class MyActivities extends Component {
   }
 
   async componentWillReceiveProps(nextProps) {
-    const { dharma, myLoanRequests,myFundedRequests } = nextProps;
+    const { dharma, myBorrowedRequests,myFundedRequests } = nextProps;
+    const { currentMetamaskAccount } = this.props;
     const { myloanRequestsProcessCompleted,myLoansIsMounted,myFundedRequestsProcessCompleted,myInvestmensIsMounted,displayNoRecordMsg } = this.state;
-    const myLoanRequestPropsLength = this.props.myLoanRequests.length;
-    const myLoanRequestLength = myLoanRequests.length;
+    const myLoanRequestPropsLength = this.props.myBorrowedRequests.length;
+    const myLoanRequestLength = myBorrowedRequests.length;
     const myFundedRequestPropsLength = this.props.myFundedRequests.length
     const myFundedRequestLength = myFundedRequests.length; 
     const CurrentAccount = await dharma.blockchain.getCurrentAccount();
@@ -70,20 +71,16 @@ class MyActivities extends Component {
           displayNoRecordMsg: false
         });  
       }
-      
-      await this.asyncForEach(myLoanRequests, async ts => {
-        if(_.lowerCase(ts.loanStatus) == "filled")
-        {
-            repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
-              ts.id
-            );
+
+      await this.asyncForEach(myBorrowedRequests, async ts => {
+            repaymentSchedule = ts.repaymentSchedule;
             let current_timestamp = moment().unix();
             let i = 1;
             if(!_.isUndefined(repaymentSchedule))
             {
                 await this.asyncForEach(repaymentSchedule, async st => {
                   if (st > current_timestamp && i == 1) {
-                    let date = new Date(st * 1000);
+                    let date = new Date(st);
                     let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
                       ts.id,
                       st
@@ -91,23 +88,28 @@ class MyActivities extends Component {
                     expectedRepaidAmount = this.convert_big_number(
                         expectedRepaidAmountBigNumber
                     );
+
+                    let buttonText = '';
+                    if(ts.debtorAddress == currentMetamaskAccount)
+                    {
+                        buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) ? 'Pay' : ((ts.repaidAmount == ts.repaymentAmount) ? 'Request Collateral' : '');
+                    }
+
                     loanRequestsActivities.push({
                       id:_.random(999999999),
-                      icon: "minus",
-                      loanText: "minus",
                       date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                       amount: expectedRepaidAmount,
                       type: "minus",
-                      payBtn: "minus",
                       sybmol: ts.principalTokenSymbol,
                       agreementId: ts.id,
-                      sortTimestamp: st
+                      sortTimestamp: st,
+                      buttonText:buttonText
                     });
                     i++;
                   }
                 });  
             }  
-        }
+        
       });
       if(myLoansIsMounted)
       {
@@ -131,13 +133,11 @@ class MyActivities extends Component {
         await this.asyncForEach(myFundedRequests, async ts => {
           let current_timestamp = moment().unix();
           let i = 1;
-          repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
-            ts.id
-          );
+          repaymentSchedule = ts.repaymentSchedule;
           if(!_.isUndefined(repaymentSchedule)){
               await this.asyncForEach(repaymentSchedule, async schedule_ts => {
                 if (schedule_ts > current_timestamp && i == 1) {
-                  let date = new Date(schedule_ts * 1000);
+                  let date = new Date(schedule_ts);
                   let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
                     ts.id,
                     schedule_ts
@@ -145,18 +145,24 @@ class MyActivities extends Component {
                   expectedRepaidAmount = this.convert_big_number(
                     expectedRepaidAmountBigNumber
                   );
+
+                  let buttonText = '';
+                  if(ts.creditorAddress == currentMetamaskAccount)
+                  {
+                      buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isCollateralSeizable == true) ? 'Seize Collateral' : '';
+                  }
+
                   investmentsActivities.push({
                     id:_.random(999999999),
-                    icon: "plus",
-                    loanText: "plus",
                     date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                     amount: expectedRepaidAmount,
                     type: "plus",
-                    payBtn: "plus",
                     sybmol: ts.principalTokenSymbol,
                     agreementId: ts.id,
-                    sortTimestamp: schedule_ts
+                    sortTimestamp: schedule_ts,
+                    buttonText:buttonText
                   });
+                  i++;
                 }
             });  
           }
@@ -205,10 +211,11 @@ class MyActivities extends Component {
       {
         dataField: "icon",
         text: "Icon",
+        isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let img;
           let classname;
-          if (cell == "minus") {
+          if (row.type == "minus") {
             img = fundLoanImg;
             classname = "rounded-circle bg-orange icon-box";
           } else {
@@ -231,12 +238,13 @@ class MyActivities extends Component {
       {
         dataField: "loanText",
         text: "Loan Text",
+        isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let text = "";
-          if (row.loanText == "minus") {
-            text = "Loan repayment due";
-          } else if (row.loanText == "plus") {
-            text = "Loan settlement";
+          if (row.type == "minus") {
+            text = "Repayment due";
+          } else if (row.type == "plus") {
+            text = "Earning";
           }
           return (
             <div>
@@ -262,11 +270,19 @@ class MyActivities extends Component {
       {
         dataField: "payBtn",
         text: "Pay Button",
+        isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
-          if (cell == "minus") {
+          if (row.type == "minus" && row.buttonText != '') {
             return (
               <div>
-                <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small orange">Pay</a>
+                <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small orange">{row.buttonText}</a>
+              </div>
+            );
+          }
+          else if(row.type == "plus" && row.buttonText != ''){
+            return (
+              <div>
+                <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small green">{row.buttonText}</a>
               </div>
             );
           }
@@ -275,16 +291,17 @@ class MyActivities extends Component {
       {
         dataField: "amount",
         text: "Amount",
+        isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let label_color = "";
-          if (row.loanText == "minus") {
-            label_color = "color-orange";
-          } else if (row.loanText == "plus") {
-            label_color = "color-green";
+          if (row.type == "minus") {
+            label_color = "number-highlight color-orange";
+          } else if (row.type == "plus") {
+            label_color = "number-highlight color-green";
           }
           return (
             <div>
-              <span className="number-highlight color-orange">
+              <span className={label_color}>
                 {row.amount}
               </span>
               <br />
