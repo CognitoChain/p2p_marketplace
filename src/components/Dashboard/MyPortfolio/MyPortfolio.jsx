@@ -35,7 +35,7 @@ class MyPortfolio extends Component {
     }
     async componentWillReceiveProps(nextProps) {
         let userTokens = nextProps.tokens;
-        let myLoanRequests = nextProps.myLoanRequests;
+        let myBorrowedRequests = nextProps.myBorrowedRequests;
         const { dharma, tokens } = this.props;
         const { priceFeedData } = this.state;
         let totalAssetAmount = 0;
@@ -61,8 +61,8 @@ class MyPortfolio extends Component {
         this.setState({ totalAssetAmount: totalAssetAmount }, () => {
             this.calculateValues()
         });
-        if (myLoanRequests.length > 0) {
-            myLoanRequests.forEach(ml => {
+        if (myBorrowedRequests.length > 0) {
+            myBorrowedRequests.forEach(ml => {
                 let principal = ml.principalAmount;
                 let principalTokenSymbol = ml.principalTokenSymbol;
                 if (!_.isUndefined(priceFeedData[principalTokenSymbol])) {
