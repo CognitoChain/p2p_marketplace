@@ -23,190 +23,163 @@ class MyActivities extends Component {
       activities: [],
       investmentsActivities: [],
       loanRequestsActivities: [],
-      myloanRequestsProcessCompleted: false,
-      myFundedRequestsProcessCompleted: false,
-      metaMaskMsg:false,
-      myLoansIsMounted:true,
-      myInvestmensIsMounted:true,
-      displayNoRecordMsg:true
+      isLoading:true,
+      myBorrowedRequestsLoading:true,
+      myFundedRequestsLoading:true,
+      metaMaskMsg: false,
+      myLoansIsMounted: true,
+      myInvestmensIsMounted: true
     };
   }
 
-  convert_big_number(obj) {
-    let expectedRepaymentAmountScheduleTime = obj.toNumber();
-    let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
-    let expectedRepaidAmount =
-      expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
-    expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;  
-    return expectedRepaidAmount;
+
+
+
+
+  async componentWillReceiveProps(nextProps) {
+    const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests,myBorrowedLoading,myFundedLoading } = nextProps;
+    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
+    const { myLoansIsMounted, myInvestmensIsMounted, displayNoRecordMsg } = this.state;
+
+    let repaymentSchedule;
+    let expectedRepaidAmount;
+    let loanRequestsActivities = [];
+    let investmentsActivities = [];
+    let myBorrowedRequestsLoading = true;
+    let myFundedRequestsLoading = true;
+    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount)) {
+      if (nextBorrowedRequests.length > 0) {
+        await this.asyncForEach(nextBorrowedRequests, async ts => {
+          repaymentSchedule = ts.repaymentSchedule;
+          let current_timestamp = moment().unix();
+          let i = 1;
+          if (!_.isUndefined(repaymentSchedule)) {
+            await this.asyncForEach(repaymentSchedule, async st => {
+              if (st > current_timestamp && i == 1) {
+                let date = new Date(st);
+                let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+                  ts.id,
+                  st
+                );
+                expectedRepaidAmount = this.convert_big_number(
+                  expectedRepaidAmountBigNumber
+                );
+
+                let buttonText = '';
+                if (ts.debtorAddress == currentMetamaskAccount) {
+                  buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) ? 'Pay' : ((ts.repaidAmount == ts.repaymentAmount) ? 'Request Collateral' : '');
+                }
+
+                loanRequestsActivities.push({
+                  id: "l_"+_.random(999999999),
+                  date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                  amount: expectedRepaidAmount,
+                  type: "minus",
+                  sybmol: ts.principalSymbol,
+                  agreementId: ts.id,
+                  sortTimestamp: st,
+                  buttonText: buttonText
+                });
+                i++;
+              }
+            });
+          }
+
+        });
+        
+      }
+      myBorrowedRequestsLoading = false
+      if (myLoansIsMounted) {
+        this.setState({
+          loanRequestsActivities,
+          myBorrowedRequestsLoading
+        });
+      }
+    }
+
+    if (nextFundedRequests != myFundedRequests && myFundedLoading === false) {
+      let expectedRepaidAmount;
+      let repaymentSchedule;
+      if (nextFundedRequests.length > 0) {
+        await this.asyncForEach(nextFundedRequests, async ts => {
+          let current_timestamp = moment().unix();
+          let i = 1;
+          repaymentSchedule = ts.repaymentSchedule;
+          if (!_.isUndefined(repaymentSchedule)) {
+            await this.asyncForEach(repaymentSchedule, async schedule_ts => {
+              if (schedule_ts > current_timestamp && i == 1) {
+                let date = new Date(schedule_ts);
+                let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+                  ts.id,
+                  schedule_ts
+                );
+                expectedRepaidAmount = this.convert_big_number(
+                  expectedRepaidAmountBigNumber
+                );
+
+                let buttonText = '';
+                if (ts.creditorAddress == currentMetamaskAccount) {
+                  buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isCollateralSeizable == true) ? 'Seize Collateral' : '';
+                }
+
+                investmentsActivities.push({
+                  id: "i_"+_.random(999999999),
+                  date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                  amount: expectedRepaidAmount,
+                  type: "plus",
+                  sybmol: ts.principalSymbol,
+                  agreementId: ts.id,
+                  sortTimestamp: schedule_ts,
+                  buttonText: buttonText
+                });
+                i++;
+              }
+            });
+          }
+        });
+      }
+      myFundedRequestsLoading = false;
+      if (myInvestmensIsMounted) {
+        this.setState({
+          investmentsActivities,
+          myFundedRequestsLoading
+        });
+      }
+    }
   }
 
+  componentDidMount() {
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      myLoansIsMounted: false,
+      myInvestmensIsMounted: false
+    });
+  }
   async asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
     }
   }
-
-  async componentWillReceiveProps(nextProps) {
-    const { dharma, myBorrowedRequests,myFundedRequests } = nextProps;
-    const { currentMetamaskAccount } = this.props;
-    const { myloanRequestsProcessCompleted,myLoansIsMounted,myFundedRequestsProcessCompleted,myInvestmensIsMounted,displayNoRecordMsg } = this.state;
-    const myLoanRequestPropsLength = this.props.myBorrowedRequests.length;
-    const myLoanRequestLength = myBorrowedRequests.length;
-    const myFundedRequestPropsLength = this.props.myFundedRequests.length
-    const myFundedRequestLength = myFundedRequests.length; 
-    const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-    /*if (myLoanRequests == this.props.myLoanRequests) {
-      return;
-    }*/
-    let repaymentSchedule;
-    let expectedRepaidAmount;
-    let loanRequestsActivities = [];
-    let investmentsActivities = [];
-
-    if (myLoanRequestPropsLength != myLoanRequestLength && myloanRequestsProcessCompleted === false && !_.isUndefined(CurrentAccount)) {
-      if(displayNoRecordMsg)
-      {
-        this.setState({
-          displayNoRecordMsg: false
-        });  
-      }
-
-      await this.asyncForEach(myBorrowedRequests, async ts => {
-            repaymentSchedule = ts.repaymentSchedule;
-            let current_timestamp = moment().unix();
-            let i = 1;
-            if(!_.isUndefined(repaymentSchedule))
-            {
-                await this.asyncForEach(repaymentSchedule, async st => {
-                  if (st > current_timestamp && i == 1) {
-                    let date = new Date(st);
-                    let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-                      ts.id,
-                      st
-                    );
-                    expectedRepaidAmount = this.convert_big_number(
-                        expectedRepaidAmountBigNumber
-                    );
-
-                    let buttonText = '';
-                    if(ts.debtorAddress == currentMetamaskAccount)
-                    {
-                        buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) ? 'Pay' : ((ts.repaidAmount == ts.repaymentAmount) ? 'Request Collateral' : '');
-                    }
-
-                    loanRequestsActivities.push({
-                      id:_.random(999999999),
-                      date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                      amount: expectedRepaidAmount,
-                      type: "minus",
-                      sybmol: ts.principalSymbol,
-                      agreementId: ts.id,
-                      sortTimestamp: st,
-                      buttonText:buttonText
-                    });
-                    i++;
-                  }
-                });  
-            }  
-        
-      });
-      if(myLoansIsMounted)
-      {
-        this.setState({
-          loanRequestsActivities,
-          myloanRequestsProcessCompleted: true
-        });  
-      }      
-    }    
-    
-    if (myFundedRequestPropsLength != myFundedRequestLength && myFundedRequestsProcessCompleted === false && !_.isUndefined(myFundedRequests)) {
-        let expectedRepaidAmount;
-        let repaymentSchedule;
-        if(displayNoRecordMsg)
-        {
-          this.setState({
-            displayNoRecordMsg: false
-          });  
-        }
-        
-        await this.asyncForEach(myFundedRequests, async ts => {
-          let current_timestamp = moment().unix();
-          let i = 1;
-          repaymentSchedule = ts.repaymentSchedule;
-          if(!_.isUndefined(repaymentSchedule)){
-              await this.asyncForEach(repaymentSchedule, async schedule_ts => {
-                if (schedule_ts > current_timestamp && i == 1) {
-                  let date = new Date(schedule_ts);
-                  let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-                    ts.id,
-                    schedule_ts
-                  );
-                  expectedRepaidAmount = this.convert_big_number(
-                    expectedRepaidAmountBigNumber
-                  );
-
-                  let buttonText = '';
-                  if(ts.creditorAddress == currentMetamaskAccount)
-                  {
-                      buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isCollateralSeizable == true) ? 'Seize Collateral' : '';
-                  }
-
-                  investmentsActivities.push({
-                    id:_.random(999999999),
-                    date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                    amount: expectedRepaidAmount,
-                    type: "plus",
-                    sybmol: ts.principalSymbol,
-                    agreementId: ts.id,
-                    sortTimestamp: schedule_ts,
-                    buttonText:buttonText
-                  });
-                  i++;
-                }
-            });  
-          }
-        });
-        if(myInvestmensIsMounted)
-        {
-          this.setState({
-            investmentsActivities,
-            myFundedRequestsProcessCompleted: true
-          });  
-        }        
-    }
+  convert_big_number(obj) {
+    let expectedRepaymentAmountScheduleTime = obj.toNumber();
+    let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
+    let expectedRepaidAmount =
+      expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
+    expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;
+    return expectedRepaidAmount;
   }
-
-  componentDidMount(){
-    const { myloanRequestsProcessCompleted,myFundedRequestsProcessCompleted,displayNoRecordMsg } = this.state;
-    if(!myloanRequestsProcessCompleted && !myFundedRequestsProcessCompleted && displayNoRecordMsg){
-      setTimeout(()=>{
-        this.setState({
-          myloanRequestsProcessCompleted:true,
-          myFundedRequestsProcessCompleted:true
-        });
-      },50000)
-    }
-  }
-  
-  componentWillUnmount(){
-    this.setState({
-      myLoansIsMounted: false,
-      myInvestmensIsMounted: false       
-    });
-  }
-
   render() {
-    const { loanRequestsActivities, investmentsActivities, myloanRequestsProcessCompleted, myFundedRequestsProcessCompleted,metaMaskMsg } = this.state;
-    let isLoading = true;
-    if (myloanRequestsProcessCompleted === true && myFundedRequestsProcessCompleted === true) {
-      isLoading = false;
-    }
+    const { loanRequestsActivities, investmentsActivities, metaMaskMsg ,myFundedRequestsLoading, myBorrowedRequestsLoading} = this.state;
+    const { myFundedLoading, myBorrowedLoading } = this.props;
+    let isLoading = myBorrowedRequestsLoading || myFundedRequestsLoading || myBorrowedLoading || myFundedLoading;
+  
     let activities = [];
     if (!isLoading) {
       activities = [...loanRequestsActivities, ...investmentsActivities];
     }
-    activities = _.sortBy(activities, function(o) { return new moment(o.date); });
+    activities = _.sortBy(activities, function (o) { return new moment(o.date); });
     const columns = [
       {
         dataField: "icon",
@@ -216,10 +189,10 @@ class MyActivities extends Component {
           let img;
           let classname;
           if (row.type == "minus") {
-            img = fundLoanImg;
+            img = borrowLoanImg;
             classname = "rounded-circle bg-orange icon-box";
           } else {
-            img = borrowLoanImg;
+            img = fundLoanImg;
             classname = "rounded-circle bg-green icon-box";
           }
           return (
@@ -242,7 +215,7 @@ class MyActivities extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let text = "";
           if (row.type == "minus") {
-            text = "Repayment due";
+            text = "Repayment due in ";
           } else if (row.type == "plus") {
             text = "Earning";
           }
@@ -279,7 +252,7 @@ class MyActivities extends Component {
               </div>
             );
           }
-          else if(row.type == "plus" && row.buttonText != ''){
+          else if (row.type == "plus" && row.buttonText != '') {
             return (
               <div>
                 <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small green">{row.buttonText}</a>
@@ -295,9 +268,9 @@ class MyActivities extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let label_color = "";
           if (row.type == "minus") {
-            label_color = "number-highlight color-orange";
+            label_color = "number-highlight color-orange number-bold";
           } else if (row.type == "plus") {
-            label_color = "number-highlight color-green";
+            label_color = "number-highlight color-green number-bold";
           }
           return (
             <div>
@@ -326,19 +299,20 @@ class MyActivities extends Component {
           <CardBody>
             <CardTitle>My Activities</CardTitle>
             {isLoading && <Loading />}
-            {!isLoading && activities.length==0 && <MyActivitiesEmpty />}
+            {!isLoading && activities.length == 0 && <MyActivitiesEmpty />}
             {
-                metaMaskMsg &&
-                <Row>
-                    <Col md={12}>
-                        <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={["Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured."]} />
-                    </Col>
-                </Row>
+              metaMaskMsg &&
+              <Row>
+                <Col md={12}>
+                  <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={["Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured."]} />
+                </Col>
+              </Row>
             }
-            {!isLoading && activities.length>0 && (
+            {!isLoading && activities.length > 0 && (
               <div className="LoanRequests">
                 <BootstrapTable
                   hover={false}
+                  hideSizePerPage={true}
                   keyField="id"
                   classes={"open-request"}
                   columns={columns}

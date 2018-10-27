@@ -15,10 +15,10 @@
 	height: 6px !important;
 }
 .color-orange{
-	color:#FFA31A;
+	color:#FFA31A!important;
 }
 .color-green{
-	color: #00CC99;
+	color: #00CC99!important;
 }
 .currency-text{
 	font-size:10px;
