@@ -375,3 +375,10 @@ body{
   justify-content: center;
   text-align: center;
 }
+.header-links{
+  font-size:18px;
+  color:#f29c1f !important;
+}
+.side-menu-fixed .side-menu li a:hover,.side-menu-fixed .side-menu li.active > a{
+  font-weight:bolder !important;
+}
