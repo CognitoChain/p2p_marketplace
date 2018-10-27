@@ -103,9 +103,9 @@ class Header extends Component {
                             {
                                 this.props.authenticated === true && (
                                     <div>
-                                        <a className="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                        <div className="nav-link nav-pill user-avatar btn btn-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                             <Avatar name={userEmail} size="30px" round={true} />
-                                        </a>
+                                        </div>
                                         <div className="dropdown-menu dropdown-menu-right">
                                             <div>
                                                 <div className="dropdown-header">
