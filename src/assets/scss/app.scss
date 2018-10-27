@@ -18,6 +18,13 @@ body{
     background: $white; 
    }
 }
+.btn.cognito.btn-link { 
+  text-transform: capitalize;
+  color: $dark-blue ;
+  padding: 0;
+  line-height: 25px;
+  border-radius: 0;
+}
 .btn.cognito.btn-theme { 
   background: $theme-color;
   color: $white; 
@@ -330,9 +337,6 @@ body{
   padding: .375rem .75rem!important;
   line-height: 1.5;
   font-size: 1rem;
-}
-.header-right-block{
-  margin-top:0.7rem;
 }
 @-webkit-keyframes animate {
   50% {

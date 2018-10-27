@@ -7,6 +7,7 @@ import {
 } from "reactstrap";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Api from "../../services/api";
+import Avatar from 'react-avatar';
 class Header extends Component {
 
     constructor(props) {
@@ -90,7 +91,7 @@ class Header extends Component {
                         metamaskMsg === true && (
                             <CustomAlertMsg
                                 bsStyle='danger'
-                                extraClass="d-inline-block header-notice"
+                                extraClass="d-inline-block header-notice mb-0"
                                 title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page."
                             />
                         )
@@ -98,36 +99,43 @@ class Header extends Component {
 
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
-                            <a className="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                <i className="fa fa-user-circle"></i>
-                            </a>
-                            <div className="dropdown-menu dropdown-menu-right">
-                                {
-                                    this.props.authenticated === true && (
-                                        <div>
-                                            <div className="dropdown-header">
-                                                <div className="media">
-                                                    <div className="media-body">
-                                                        <h5 className="mt-0 mb-0">Welcome</h5>
-                                                        <span>{userEmail}</span>
+
+                            {
+                                this.props.authenticated === true && (
+                                    <div>
+                                        <a className="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                            <Avatar name={userEmail} size="30px" round={true} />
+                                        </a>
+                                        <div className="dropdown-menu dropdown-menu-right">
+                                            <div>
+                                                <div className="dropdown-header">
+                                                    <div className="media">
+                                                        <div className="media-body">
+                                                            <h5 className="mt-0 mb-0">Welcome</h5>
+                                                            <span>{userEmail}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="dropdown-divider"></div>
+                                                <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
-                                            <div className="dropdown-divider"></div>
-                                            <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                         </div>
-                                    )
-                                }
-                                {
-                                    this.props.authenticated === false && (
-                                        <div>
-                                            <a className="dropdown-item" href="/login"><i className="text-info fa fa-sign-in"></i>Login</a>
-                                            <a className="dropdown-item" href="/register"><i className="text-info ti-user"></i>Register</a>
-                                        </div>
-                                    )
-                                }
+                                    </div>
+                                )
+                            }
 
-                            </div>
+
+
+                            {
+                                this.props.authenticated === false && (
+                                    <div className="header-links">
+                                        <a className="btn btn-link cognito" href="/login">Login / Register</a>
+                                    </div>
+
+                                )
+                            }
+
+
                         </li>
                     </ul>
                 </div>
