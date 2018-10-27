@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import {ListGroupItem} from 'reactstrap';
 class SummaryItem extends Component {
     render() {
-        const { labelName, labelValue } = this.props;
+        const { labelName, labelValue,labelValue2 } = this.props;
         return (
-            <ListGroupItem className="p-0 mt-20" style={{ border: 'none' }}>
+            <ListGroupItem className="p-0 mt-1" style={{ border: 'none' }}>
                 <div>
                     <label className="pull-left" htmlFor="one">{labelName}</label>
-                    <label className="pull-right"><b>{labelValue}</b></label>
+                    <label className="pull-right text-right"><b>{labelValue}</b> <br /><span className="detail-sumary-second-label">{labelValue2}</span></label>
+
                 </div>
             </ListGroupItem>
         );
