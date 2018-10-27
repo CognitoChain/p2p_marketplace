@@ -1,6 +1,8 @@
 //Bootstrap 4.0.0
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import "./assets/mont-font/style.css";
+
 //Font Awesome 
 import 'font-awesome/css/font-awesome.min.css';
 
