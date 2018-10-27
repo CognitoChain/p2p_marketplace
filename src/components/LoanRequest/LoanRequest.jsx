@@ -42,7 +42,8 @@ class LoanRequest extends Component {
             error: null,
             hasSufficientAllowance: false,
             txHash: null,
-            createdAt: null,
+            createdDate:null,
+            createdTime:null,
             interestAmount: 0,
             totalRepaymentAmount: 0,
             collateralCurrentAmount: 0,
@@ -120,6 +121,8 @@ class LoanRequest extends Component {
                         termLength: get_terms.termDuration,
                         termUnit: get_terms.termUnit,
                         createdAt: moment(loanRequest.data.createdAt).format("DD/MM/YYYY HH:mm:ss"),
+                        createdDate:moment(loanRequest.data.createdAt).format( "DD/MM/YYYY"),
+                        createdTime:moment(loanRequest.data.createdAt).format("HH:mm:ss"),
                         interestAmount: interest_amount,
                         totalRepaymentAmount: total_reapayment_amount,
                         collateralCurrentAmount: collateralCurrentAmount,
@@ -291,7 +294,8 @@ class LoanRequest extends Component {
             LTVRatioValue,
             loanRequest,
             transactions,
-            createdAt,
+            createdDate,
+            createdTime,
             interestAmount,
             totalRepaymentAmount,
             collateralCurrentAmount,
@@ -345,39 +349,53 @@ class LoanRequest extends Component {
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"
-                                                        labelValue={principal > 0 ? principal + ' ' + principalTokenSymbol : ' - '}
+                                                        labelValue={principal > 0 ? principal : ' - '}
+                                                        labelValue2={principal > 0 ? principalTokenSymbol : ''}
+
                                                     />
                                                     <SummaryItem
                                                         labelName="Created Date"
-                                                        labelValue={createdAt != '' ? createdAt : ' - '}
+                                                        labelValue={createdDate != "" ? createdDate : ' - '}
+                                                        labelValue2={createdTime != "" ? createdTime : ''}
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Amount"
-                                                        labelValue={collateral > 0 ? collateral + ' ' + collateralTokenSymbol : ' - '}
+                                                        labelValue={collateral > 0 ? collateral  : ' - '}
+                                                        labelValue2={collateral > 0 ? collateralTokenSymbol : ''}
+
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Value"
-                                                        labelValue={collateralCurrentAmount > 0 ? collateralCurrentAmount + '$' : ' - '}
+                                                        labelValue={collateralCurrentAmount > 0 ? collateralCurrentAmount : ' - '}
+                                                        labelValue2={collateralCurrentAmount > 0 ? '$' : ''}
                                                     />
                                                     <SummaryItem
                                                         labelName="LTV"
-                                                        labelValue={LTVRatioValue > 0 ? LTVRatioValue + "%" : ' - '}
+                                                        labelValue={LTVRatioValue > 0 ? LTVRatioValue : ' - '}
+                                                        labelValue2={LTVRatioValue > 0 ? '%' : ''}
+
                                                     />
                                                     <SummaryItem
                                                         labelName="Loan Term"
-                                                        labelValue={termLength > 0 ? termLength + " " + termUnit : ' - '}
+                                                        labelValue={termLength > 0 ? termLength : ' - '}
+                                                        labelValue2={termLength > 0 ? termUnit : ''}
+
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Rate(Per Loan Term)"
-                                                        labelValue={interestRate + "%"}
+                                                        labelValue={interestRate>0 ? interestRate : ' - '}
+                                                        labelValue2={interestRate>0 ? '%' :''}
+
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Amount"
-                                                        labelValue={interestAmount > 0 ? interestAmount + ' ' + principalTokenSymbol : ' - '}
+                                                        labelValue={interestAmount > 0 ? interestAmount : ' - '}
+                                                        labelValue2={interestAmount > 0 ? principalTokenSymbol : ''}
                                                     />
                                                     <SummaryItem
                                                         labelName="Total Repayment Amount"
-                                                        labelValue={totalRepaymentAmount > 0 ? totalRepaymentAmount + ' ' + principalTokenSymbol : ' - '}
+                                                        labelValue={totalRepaymentAmount > 0 ? totalRepaymentAmount : ' - '}
+                                                        labelValue2={totalRepaymentAmount > 0 ? principalTokenSymbol : ''}
                                                     />
                                                 </ListGroup>
 
