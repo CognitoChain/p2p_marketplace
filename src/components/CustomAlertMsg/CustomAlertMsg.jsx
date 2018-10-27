@@ -16,11 +16,14 @@ class CustomAlertMsg extends Component {
                         {title}                        
                     </small>
                 </h6>
+                {
+                    description && 
+                    <div className="mt-2">
+                            <p>{description}</p>
 
-                <div>
-                    <p>{description}</p>
-
-                </div>
+                    </div>
+                }
+                
             </Alert>
         );
     }
