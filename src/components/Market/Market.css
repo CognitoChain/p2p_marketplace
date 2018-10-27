@@ -49,11 +49,7 @@
 .open-request td{
 	text-align: center !important;
 }
-.number-highlight{
-	font-weight: 600 !important;
-	font-size: 14px !important; 
-	color:#0f3b56;
-}
+
 .open-request-table{
 	margin-bottom: 30px !important;
 }

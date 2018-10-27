@@ -255,7 +255,7 @@ class LoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            {amortizationUnitToFrequency(row.termUnit)}
+                            <span className="number-highlight">{amortizationUnitToFrequency(row.termUnit)}</span>
                         </div>
                     )
                 }
