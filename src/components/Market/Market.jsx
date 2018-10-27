@@ -47,12 +47,12 @@ class Market extends Component {
                             <div className="bg-overlay"></div>
                             <div className="market-bg-content">
                                 <h1>EASY LOAN</h1>
-                                <div className="row justify-content-center mt-10">
+                                <div className="row justify-content-center mt-20">
                                     <div className="col-md-2"><p className="market-bg-feature">Secured</p></div>
                                     <div className="col-md-2"><p className="market-bg-feature">Asset Backed</p></div>
                                     <div className="col-md-2"><p className="market-bg-feature">Flexible Terms</p></div>
                                 </div>
-                                <div className="row mt-20 how-it-works">
+                                <div className="row mt-30 how-it-works">
                                     <div className="col-md-3">
                                         <h5 className="text-muted">Step 1</h5>
                                         <p>Login to Cognitochain Marketplace</p>
