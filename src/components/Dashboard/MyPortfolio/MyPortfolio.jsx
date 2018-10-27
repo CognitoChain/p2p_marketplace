@@ -28,23 +28,22 @@ class MyPortfolio extends Component {
             totalAssetAmount: 0,
             totalLiablitiesAmount: 0,
             assetLiabilitiesPercentage: 0,
-            priceFeedData: [],
+            priceFeedData: this.props.priceFeedData,
             doughnutData: [],
             metaMaskMsg: false
         };
     }
     async componentWillReceiveProps(nextProps) {
-        let userTokens = nextProps.tokens;
-        let myBorrowedRequests = nextProps.myBorrowedRequests;
-        const { dharma, tokens } = this.props;
-        const { priceFeedData } = this.state;
+        console.log("componentWillReceiveProps")
+        console.log(nextProps)
+        const { dharma,currentMetamaskAccount } = this.props;
+        const { priceFeedData,myBorrowedRequests,tokens } = nextProps;
         let totalAssetAmount = 0;
         let totalLiablitiesAmount = 0;
-        const CurrentAccount = await dharma.blockchain.getCurrentAccount();
         let stateObj = {};
-        if (!_.isUndefined(priceFeedData) && !_.isUndefined(CurrentAccount)) {
-            if (typeof userTokens != 'undefined') {
-                userTokens.forEach(ts => {
+        if (!_.isUndefined(priceFeedData) && !_.isUndefined(currentMetamaskAccount)) {
+            if (tokens.length>0) {
+                tokens.forEach(ts => {
                     if (ts.balance > 0) {
                         let tokenBalance = ts.balance;
                         let tokenSymbol = ts.symbol;
@@ -58,9 +57,7 @@ class MyPortfolio extends Component {
             }
         }
         totalAssetAmount = (totalAssetAmount > 0) ? totalAssetAmount.toFixed(2) : 0;
-        this.setState({ totalAssetAmount: totalAssetAmount }, () => {
-            this.calculateValues()
-        });
+     
         if (myBorrowedRequests.length > 0) {
             myBorrowedRequests.forEach(ml => {
                 let principal = ml.principalAmount;
@@ -73,14 +70,17 @@ class MyPortfolio extends Component {
             });
         }
         totalLiablitiesAmount = (totalLiablitiesAmount > 0) ? totalLiablitiesAmount.toFixed(2) : 0;
-        this.setState({ totalLiablitiesAmount: totalLiablitiesAmount }, () => {
+        this.setState({ totalAssetAmount: totalAssetAmount,totalLiablitiesAmount: totalLiablitiesAmount }, () => {
             this.calculateValues()
         });
     }
     calculateValues() {
         console.log("calculateValues")
+      
         const { totalAssetAmount, totalLiablitiesAmount } = this.state;
         const { myBorrowedLoading, isTokenLoading } = this.props;
+        console.log("isTokenLoading"+isTokenLoading)
+        console.log("myBorrowedLoading"+myBorrowedLoading)
         if (isTokenLoading || myBorrowedLoading) {
             return;
         }
@@ -110,39 +110,30 @@ class MyPortfolio extends Component {
         });
     }
     async componentWillMount() {
-        const { dharma } = this.props;
-        const { totalLiablitiesAmount } = this.state;
-        const { Debt, Investments, LoanRequest, Loan, Debts } = Dharma.Types;
-        const CurrentAccount = await dharma.blockchain.getCurrentAccount();
-        let priceFeedData = [];
-        let totalLiablitiesAmountCount = 0;
-        if (typeof CurrentAccount != "undefined") {
-            const api = new Api();
-            const all_token_price = api
-                .setToken(this.props.token)
-                .get(`priceFeed`)
-                .then(async priceFeedData => {
-                    this.setState({ priceFeedData: priceFeedData });
-                });
-        }
+      
     }
 
     render() {
         const { totalAssetAmount, totalLiablitiesAmount, assetLiabilitiesPercentage, doughnutData, metaMaskMsg } = this.state;
-        const { myBorrowedLoading, isTokenListLoading } = this.props;
-        let isLoading = myBorrowedLoading || isTokenListLoading;
+        const { myBorrowedLoading, isTokenLoading } = this.props;
+        let isLoading = myBorrowedLoading || isTokenLoading;
         return (
             <Col lg={6} md={6} sm={6} xl={6}>
                 <Card className="h-100">
                     <CardBody>
                         <CardTitle>My Portfolio</CardTitle>
                         {
-                            isLoading && <Loading />
+                            isLoading &&  
+                                <Row className="align-items-center h-100 position-absolute portfolio-row justify-content-center w-100">
+                                    <Col md={12}>
+                                        <Loading />
+                                    </Col>
+                                </Row>
                         }
                         {
                             !isLoading && !metaMaskMsg &&
 
-                            <Row>
+                            <Row className="align-items-center h-100 position-absolute portfolio-row w-100">
                                 <Col md={6}>
                                     <div className="chart-wrapper" style={{ height: 200 }}>
                                         <Doughnut data={doughnutData} options={{ maintainAspectRatio: false, legend: { display: false, labels: { fontFamily: "Poppins" } } }} width={this.state.widths} />
