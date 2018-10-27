@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import logoImg from "../../assets/images/logo.svg";
 import {
-  Alert
+    Alert
 } from "reactstrap";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Api from "../../services/api";
@@ -15,64 +15,61 @@ class Header extends Component {
         this.state = {
             toggleactive: false,
             defaultValue: 1,
-            metamaskMsg:false
+            metamaskMsg: false
         };
         this.togglebutton = this.togglebutton.bind(this);
     }
     togglebutton(toggleactive) {
         this.props.updateParent();
     };
-    
+
     async componentWillMount() {
         const { dharma } = this.props;
         const api = new Api();
         const currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccountLocal = localStorage.getItem('currentMetamaskAccount');
-        
-        if(typeof currentAccount === "undefined")
-        {
+
+        if (typeof currentAccount === "undefined") {
             this.setState({
-                metamaskMsg:true,
+                metamaskMsg: true,
             });
         }
 
-        if(!_.isUndefined(currentAccount) && currentMetamaskAccountLocal != currentAccount)
-        {
+        if (!_.isUndefined(currentAccount) && currentMetamaskAccountLocal != currentAccount) {
             const walletResponse = api.setToken(this.props.token).create("user/wallet", {
                 address: currentAccount
             });
         }
 
         localStorage.setItem('currentMetamaskAccount', currentAccount);
-        
+
         this.interval = setInterval(
-        () => {
-            this.checkAccount()
-        },2500);
+            () => {
+                this.checkAccount()
+            }, 2500);
     }
 
     // async componentDidMount() {
-        
+
     // }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         console.log("Clear")
         clearInterval(this.interval);
     }
-    async checkAccount(){
+    async checkAccount() {
         const { dharma } = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
 
-        if (currentMetamaskAccount != String(currentAccount) && (typeof currentMetamaskAccount != "undefined" || typeof String(currentAccount) != "undefined")) 
-        {
+        if (currentMetamaskAccount != String(currentAccount) && (typeof currentMetamaskAccount != "undefined" || typeof String(currentAccount) != "undefined")) {
             /*localStorage.setItem('currentMetamaskAccount', currentAccount);*/
             window.location.reload();
         }
     }
     render() {
-        const {metamaskMsg} = this.state;
-        const {userEmail} = this.props;
+        const { metamaskMsg } = this.state;
+        const { userEmail } = this.props;
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -89,50 +86,50 @@ class Header extends Component {
 
                 {/* <!-- top bar right --> */}
                 <div className="ml-auto header-right-block">
-                {
-                    metamaskMsg ===true && (
-                        <CustomAlertMsg 
-                            bsStyle='danger'
-                            extraClass="d-inline-block header-notice"
-                            title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page."
-                        />
-                    )
-                }
+                    {
+                        metamaskMsg === true && (
+                            <CustomAlertMsg
+                                bsStyle='danger'
+                                extraClass="d-inline-block header-notice"
+                                title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page."
+                            />
+                        )
+                    }
 
-                <ul className="nav navbar-nav d-inline-block">
-                    <li className="nav-item dropdown mr-30">
-                        <a className="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                            <i className="fa fa-user-circle"></i>
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-right">
-                            {
-                                this.props.authenticated ===true && (
-                                    <div>
-                                        <div className="dropdown-header">
-                                            <div className="media">
-                                            <div className="media-body">
-                                                <h5 className="mt-0 mb-0">Welcome</h5>
-                                                <span>{userEmail}</span>
+                    <ul className="nav navbar-nav d-inline-block">
+                        <li className="nav-item dropdown mr-30">
+                            <a className="nav-link nav-pill user-avatar" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i className="fa fa-user-circle"></i>
+                            </a>
+                            <div className="dropdown-menu dropdown-menu-right">
+                                {
+                                    this.props.authenticated === true && (
+                                        <div>
+                                            <div className="dropdown-header">
+                                                <div className="media">
+                                                    <div className="media-body">
+                                                        <h5 className="mt-0 mb-0">Welcome</h5>
+                                                        <span>{userEmail}</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            </div>
+                                            <div className="dropdown-divider"></div>
+                                            <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                         </div>
-                                        <div className="dropdown-divider"></div>
-                                        <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
-                                    </div>
-                                )
-                            }
-                            {
-                                this.props.authenticated ===false && (
-                                    <div>
-                                        <a className="dropdown-item"  href="/login"><i className="text-info fa fa-sign-in"></i>Login</a>
-                                        <a className="dropdown-item"  href="/register"><i className="text-info ti-user"></i>Register</a>
-                                    </div>
-                                )
-                            }
+                                    )
+                                }
+                                {
+                                    this.props.authenticated === false && (
+                                        <div>
+                                            <a className="dropdown-item" href="/login"><i className="text-info fa fa-sign-in"></i>Login</a>
+                                            <a className="dropdown-item" href="/register"><i className="text-info ti-user"></i>Register</a>
+                                        </div>
+                                    )
+                                }
 
-                        </div>
-                    </li>
-                </ul>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </nav>
             //   End Header
