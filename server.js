@@ -35,10 +35,12 @@ var getProxyRules = new HttpProxyRules({
 
 var postProxyRules = new HttpProxyRules({
   rules: {
+    '/api/sign-up': 'http://localhost:3000/sign-up',
+    '/api/login': 'http://localhost:3000/login',
+    '/api/password-reset-request': 'http://localhost:3000/password-reset-request',    
+    '/api/password-reset': 'http://localhost:3000/password-reset',
     '/api/loanRequests': 'http://localhost:3000/loanrequest/save',
     '/api/goauthlogin': 'http://localhost:3000/goauthlogin',
-    '/api/login': 'http://localhost:3000/login',
-    '/api/sign-up': 'http://localhost:3000/sign-up',
     '/api/email/([a-zA-Z0-9]+)': 'http://localhost:3000/email/$1',
     '/api/user/wallet' : 'http://localhost:3000/user/wallet'
   }
