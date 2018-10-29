@@ -116,7 +116,7 @@ const validator = {
       rules: [
         {
           test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
-          message: 'Interest rate must be greater then zero',
+          message: 'Enter valid interest rate.',
         },
         {
             test: /^[0-9.]+$/,
