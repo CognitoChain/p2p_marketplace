@@ -248,14 +248,14 @@ class MyActivities extends Component {
           if (row.type == "minus" && row.buttonText != '') {
             return (
               <div>
-                <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small orange">{row.buttonText}</a>
+                <a href={`detail/${row.agreementId}`} className="btn cognito x-small orange">{row.buttonText}</a>
               </div>
             );
           }
           else if (row.type == "plus" && row.buttonText != '') {
             return (
               <div>
-                <a href={`detail/${row.agreementId}`} target="_blank" className="btn cognito x-small green">{row.buttonText}</a>
+                <a href={`detail/${row.agreementId}`} className="btn cognito x-small green">{row.buttonText}</a>
               </div>
             );
           }

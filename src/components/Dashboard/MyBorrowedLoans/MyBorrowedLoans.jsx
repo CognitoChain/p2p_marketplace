@@ -144,7 +144,7 @@ class MyBorrowedLoans extends Component {
                     return (
                         <div>
                         {buttonText != '' && 
-                            <a href={`detail/${row.id}`} target="_blank" className="btn cognito x-small orange">{buttonText}</a>
+                            <a href="javascript:void(0)" className="btn cognito x-small orange">{buttonText}</a>
                         }
                         {buttonText == '' && 
                             <span>N/A</span>
