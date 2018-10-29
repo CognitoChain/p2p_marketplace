@@ -10,7 +10,7 @@
 .card-title-custom{
 	font-weight: 500 !important;
 }
-.create-loan-form .btn-info,.create-loan-form .input-range__slider,.input-range__track--active{
+.create-loan-form .btn-info,.input-range__track--active{
 	background-color: #2A80B9 !important;
 }
 .create-loan-form .input-group-text{
@@ -55,8 +55,48 @@
 }
 .create-loan-container .form-control{
     background: #F6F7F9 !important;
-    border: 1px solid #F6F7F9 !important;
+    border: 1px solid #F4F5F7 !important;
+    padding: 10px 10px 10px 20px !important;
 }
 .red{
     color: red;
+}
+.create-loan-container .btn,.create-loan-container .input-group>.input-group-prepend>.btn,.input-group>.input-group-append>.input-group-text,.create-loan-container .input-group>.form-control {
+    border-radius: 0 !important;
+}
+.create-loan-container .round-icon.round-icon-lg{
+    height: 30px !important;
+    width: 30px !important;
+    line-height: 30px !important;
+}
+.input-range__track {
+  height: 0.5rem !important;
+}
+.input-range__track--active{
+    /*background:#FFF !important;*/    
+}
+.input-group-prepend .btn{
+    padding: .375rem 1rem !important;
+}
+.create-summary-label-bold{
+    font-weight: 510 !important;
+}
+.input-range__slider{
+    height: 1.3rem !important;
+    width: 1.3rem !important;
+    margin-top: -0.8rem !important;
+    background-color: white !important;
+    border:1px solid #F9FCF9 !important;
+    box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.3) !important;
+}
+.create-loan-container .dropdown-toggle::after{
+    border-top:none !important;
+    margin-left: 0 !important;
+}
+.create-loan-container i.fa-angle-down{
+    margin-left: 0.3rem !important;
+    font-size: 18px !important;
+}
+.create-loan-container button p{
+    margin-bottom:0 !important;
 }

@@ -17,7 +17,7 @@ class TokenSelect extends Component {
             <InputGroup>
                 <InputGroupButtonDropdown addonType="prepend" isOpen={dropdownOpen} toggle={() => toggleDropDown(dropdownFieldName)}>
                     <DropdownToggle color="info" caret>
-                        {dropdownFieldDefaultValue}
+                        {dropdownFieldDefaultValue} <i className="fa fa-angle-down"></i>
                     </DropdownToggle>
                     <DropdownMenu>
                         {tokens.map((token) => {

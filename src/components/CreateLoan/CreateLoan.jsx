@@ -37,7 +37,7 @@ class CreateLoan extends Component {
             collateralTokenSymbol: "REP",
             interestRate: '',
             termLength: '',
-            termUnit: "weeks",
+            termUnit: "days",
             expirationLength: 30,
             expirationUnit: "days",
             disabled: false,
@@ -267,7 +267,7 @@ class CreateLoan extends Component {
         if (interestRate > 0) {
             interestAmount = (principal * interestRate) / 100;
             totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
-            stateObj["interestAmount"] = interestAmount;
+            stateObj["interestAmount"] = (interestAmount > 0) ? interestAmount.toFixed(2) : 0;
             stateObj["totalReapaymentAmount"] = totalReapaymentAmount.toFixed(2);
         }
         this.setState(stateObj);
@@ -344,7 +344,7 @@ class CreateLoan extends Component {
             });
         }
         if (fieldName == "collateral" && hasSufficientAllowance && value > collateralCurrentBalance && collateralCurrentBalance > 0) {
-            this.validators[fieldName].errors.push("You does not have sufficient collateral balance in wallet.'");
+            this.validators[fieldName].errors.push("You do not have sufficient collateral balance in wallet.'");
             this.validators[fieldName].valid = false;
         }
         if (fieldName == "collateralTokenSymbol" && principalTokenSymbol == collateralTokenSymbol) {
@@ -515,12 +515,12 @@ class CreateLoan extends Component {
                     <div>
                         <Row className="row-eq-height">
                             <Col lg={4} md={4} sm={6} xl={4}>
-                                <Card className="card-statistics mb-30 h-100 p-4">
+                                <Card className="card-statistics mb-30 h-100 p-2">
                                     <CardBody>
                                         <CardTitle className="card-title-custom">Create New Loan Request </CardTitle>
 
                                         <Form disabled={disabled} onSubmit={this.createLoanRequest} className="create-loan-form">
-                                            <div className="mt-20">
+                                            <div className="mt-30">
                                                 <label>Loan Amount<span className="red">*</span></label>
                                                 <TokenSelect
                                                     name="principal"
@@ -535,7 +535,7 @@ class CreateLoan extends Component {
                                                 />
                                                 {principal && this.displayValidationErrors('principal')}
                                             </div>
-                                            <div className="mt-20 create-loan-slider">
+                                            <div className="mt-30 create-loan-slider">
                                                 <label>LTV (Loan-to-Value Ratio)</label>
                                                 <div className="mb-20">
                                                     <InputRange
@@ -549,7 +549,7 @@ class CreateLoan extends Component {
                                                 {LTVRatio && this.displayValidationErrors('LTVRatioValue')}
 
                                             </div>
-                                            <div className="mt-20">
+                                            <div className="mt-30">
                                                 <label>Collateral Amount<span className="red">*</span></label>
                                                 <TokenSelect
                                                     name="collateral"
@@ -566,7 +566,7 @@ class CreateLoan extends Component {
                                                 {collateral && this.displayValidationErrors('collateral')}
                                                 {this.displayValidationErrors('collateralTokenSymbol')}
                                             </div>
-                                            <div className="mt-20">
+                                            <div className="mt-30">
                                                 <label>Loan Term<span className="red">*</span></label>
                                                 <TimeUnitSelect
                                                     name="termLength"
@@ -579,7 +579,7 @@ class CreateLoan extends Component {
                                                 />
                                                 {termLength && this.displayValidationErrors('termLength')}
                                             </div>
-                                            <div className="mt-20">
+                                            <div className="mt-30">
                                                 <label>Interest Rate (% Per Loan Term)<span className="red">*</span></label>
                                                 <InputGroup>
                                                     <Input onChange={this.handleInputChange}
@@ -597,12 +597,12 @@ class CreateLoan extends Component {
                                 </Card>
                             </Col>
 
-                            <Col lg={4} md={4} sm={6} xl={4}>
+                            <Col lg={4} md={4} sm={6} xl={4} className="pl-4">
 
                                 <Card className="card-statistics mb-30 h-100">
                                     <CardBody className="pb-0">
 
-                                        <div className="p-4 pb-0">
+                                        <div className="p-2 pb-0">
 
                                             <CardTitle className="card-title-custom">Summary </CardTitle>
                                             <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>

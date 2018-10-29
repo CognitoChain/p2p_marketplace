@@ -3,23 +3,23 @@ import { DropdownToggle, DropdownMenu, DropdownItem, InputGroup, Input, InputGro
 
 const TIME_UNITS = [
     {
-        label: "Hour",
+        label: "Hours",
         value: "hours",
     },
     {
-        label: "Day",
+        label: "Days",
         value: "days",
     },
     {
-        label: "Week",
+        label: "Weeks",
         value: "weeks",
     },
     {
-        label: "Month",
+        label: "Months",
         value: "months",
     },
     {
-        label: "Year",
+        label: "Years",
         value: "years",
     },
 ];
@@ -32,7 +32,7 @@ class TimeUnitSelect extends Component {
             <InputGroup>
                 <InputGroupButtonDropdown addonType="prepend" isOpen={dropdownOpen} toggle={() => toggleDropDown(dropdownFieldName)}>
                     <DropdownToggle color="info" caret>
-                        {dropdownFieldDefaultValue.replace(/^./, dropdownFieldDefaultValue[0].toUpperCase())}
+                        {dropdownFieldDefaultValue.replace(/^./, dropdownFieldDefaultValue[0].toUpperCase())} <i className="fa fa-angle-down"></i>
                     </DropdownToggle>
                     <DropdownMenu>
                         {TIME_UNITS.map((unit) => (
