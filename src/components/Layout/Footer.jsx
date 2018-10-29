@@ -16,7 +16,6 @@ class Footer extends Component{
                     <Col md={6}>
                       <ul className="text-center text-md-right">
                         <li className="list-inline-item"><a href="terms" target="_blank">Terms &amp; Conditions | </a> </li>
-                        <li className="list-inline-item"><a href="#">API Use Policy | </a> </li>
                         <li className="list-inline-item"><a href="privacy" target="_blank">Privacy Policy </a> </li>
                       </ul>
                     </Col>
