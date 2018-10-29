@@ -50,7 +50,8 @@ var putProxyRules = new HttpProxyRules({
   rules: {
     '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1',
     '/api/email/subscribe': 'http://localhost:3000/email/subscribe',
-    '/api/email/unsubscribe': 'http://localhost:3000/email/unsubscribe'
+    '/api/email/unsubscribe': 'http://localhost:3000/email/unsubscribe',
+    '/api/user/password' : 'http://localhost:3000/user/password'
   }
 });
 
