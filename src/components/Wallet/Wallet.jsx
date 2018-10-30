@@ -132,6 +132,7 @@ class Wallet extends Component {
     const { isTokenLoading } = this.props;
     console.log(this.props)
     console.log(this.state)
+    let i = 0;
     if (isTokenLoading) {
       return <Loading />
     }
@@ -145,6 +146,7 @@ class Wallet extends Component {
 
           {tokensSorted.map(token => {
             if (token.balance > 0) {
+              i++;
               return (
                 <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
                   <Card className="card card-statistics h-100">
@@ -198,6 +200,13 @@ class Wallet extends Component {
             }
           })}
 
+          {!isTokenLoading && i == 0 &&
+            <Col xl={12} md={12} lg={12} xs={12} sm={12} className="mb-30">
+              <Alert color="warning" className="mb-30">
+                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link">https://wallet.dharma.io/</a>.
+              </Alert>
+            </Col>
+          }
         </Row>
       )
     }
@@ -231,11 +240,6 @@ class Wallet extends Component {
         <Row className="mb-30 mt-30">
           <Col lg={12} md={12} sm={12} xl={12}>
             <div className="tab nav-border" style={{ position: "relative" }}>
-              {!isTokenLoading && tokenlist.length == 0 && (
-              <Alert color="warning" className="mb-30">
-                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link">https://wallet.dharma.io/</a>.
-                  </Alert>
-              )}    
               <div className="mb-30">
                 <div>Ethereum Address</div>
                 <div className="eth-address">{ethAddress}</div>
