@@ -20,9 +20,11 @@ class Dashboard extends Component {
         this.state = {
             activeTab: '1',
             widths: 80,
+            priceFeedData: [],
             myBorrowedRequests: [],
             myFundedRequests: [],
             myLoanRequests: [],
+            tokenlist: this.props.tokens,
             myBorrowedLoading: true,
             myFundedLoading: true,
             myLoansLoading: true,
@@ -41,11 +43,25 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
+        this.setPriceFeedData();
         this.getBorrowedLoanRequests();
         this.getFundedLoanRequests();
         this.getMyLoanRequests();
     }
-
+    componentWillUnmount() {
+        this.setState({
+            myBorrowedRequestsIsMounted: false,
+            myLoanRequestsIsMounted: false,
+            myFundedRequestsIsMounted: false
+        });
+    }
+    componentWillReceiveProps(nextProps) {
+        console.log("nextProps")
+        console.log(nextProps)
+        if (nextProps.tokens != this.state.tokenlist) {
+            this.setState({ tokenlist: nextProps.tokens })
+        }
+    }
     async getBorrowedLoanRequests() {
         const api = new Api();
         const sort = "createdAt";
@@ -141,6 +157,7 @@ class Dashboard extends Component {
             let collateralAmount = this.convertBigNumber(request.collateralAmount, request.collateralNumDecimals);
             let repaymentAmount = this.convertBigNumber(request.totalExpectedRepayment, request.principalNumDecimals);
             let repaidAmount = this.convertBigNumber(request.repaidAmount, request.principalNumDecimals);
+
             return {
                 ...request,
                 principal: `${princiaplAmount}`,
@@ -197,20 +214,29 @@ class Dashboard extends Component {
     }
 
 
-    componentWillUnmount() {
-        this.setState({
-            myBorrowedRequestsIsMounted: false,
-            myLoanRequestsIsMounted: false,
-            myFundedRequestsIsMounted: false
-        });
+
+    setPriceFeedData() {
+        const { dharma, currentMetamaskAccount, token } = this.props;
+        const { Debt, Investments, LoanRequest, Loan, Debts } = Dharma.Types;
+        let priceFeedData = [];
+        let totalLiablitiesAmountCount = 0;
+        if (typeof currentMetamaskAccount != "undefined") {
+            const api = new Api();
+            const all_token_price = api
+                .setToken(token)
+                .get(`priceFeed`)
+                .then(async priceFeedData => {
+                    this.setState({ priceFeedData: priceFeedData });
+                });
+        }
     }
 
     render() {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { token, dharma, redirect, currentMetamaskAccount } = this.props;
-        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading } = this.state;
+        const { token, dharma, tokens, redirect, currentMetamaskAccount, isTokenLoading, authenticated } = this.props;
+        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist } = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -226,21 +252,24 @@ class Dashboard extends Component {
 
                 <Row className="mb-30">
                     <MyPortfolio
-                        authenticated={this.props.authenticated}
-                        dharma={this.props.dharma}
-                        tokens={this.props.tokens}
-                        isTokenLoading={this.props.isTokenLoading}
+                        authenticated={authenticated}
+                        dharma={dharma}
+                        tokens={tokenlist}
+                        isTokenLoading={isTokenLoading}
                         myBorrowedLoading={myBorrowedLoading}
-                        token={this.props.token}
+                        token={token}
                         myBorrowedRequests={myBorrowedRequests}
                         currentMetamaskAccount={currentMetamaskAccount}
+                        priceFeedData={priceFeedData}
                     />
                     <MyActivities
-                        authenticated={this.props.authenticated}
-                        dharma={this.props.dharma}
-                        token={this.props.token}
+                        authenticated={authenticated}
+                        dharma={dharma}
+                        token={token}
                         myBorrowedRequests={myBorrowedRequests}
                         myFundedRequests={myFundedRequests}
+                        myBorrowedLoading={myBorrowedLoading}
+                        myFundedLoading={myFundedLoading}
                         currentMetamaskAccount={currentMetamaskAccount}
                     />
                 </Row>
