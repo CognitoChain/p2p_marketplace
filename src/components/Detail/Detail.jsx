@@ -20,6 +20,7 @@ import Loading from "../Loading/Loading";
 import { toast } from "react-toastify";
 import Modal from "react-responsive-modal";
 import _ from "lodash";
+import { BigNumber } from "bignumber.js";
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -51,18 +52,15 @@ class Detail extends Component {
       currentEthAddress: "",
       collateralCurrentAmount: 0,
       LTVRatioValue: 0,
-      loanScheduleDisplay: false
+      loanScheduleDisplay: false,
+      nextRepaymentDate:''      
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
   }
-  convert_big_number(obj) {
-    let expectedRepaymentAmountScheduleTime = obj.toNumber();
-    let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
-    let expectedRepaidAmount = expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
-    return expectedRepaidAmount;
+  convert_big_number(obj,power) {
+    return obj.div(new BigNumber(10).pow(power.toNumber()));
   }
-
   async asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
@@ -78,16 +76,15 @@ class Detail extends Component {
     let collateralReturnable = false;
     let stateObj = {};
     const api = new Api();
-
     api
       .setToken(this.props.token)
       .get(`loanRequests/${id}`)
       .then(async loanRequestData => {
         const loanRequest = await LoanRequest.load(dharma, loanRequestData);
-
+        var get_terms = loanRequest.getTerms();
         let creditorEthAddress = loanRequest.data.creditor;
         let debtorEthAddress = loanRequest.data.debtor;
-
+        const principalTokenDecimals = await dharma.token.getNumDecimals(get_terms.principalTokenSymbol);
         const debt = await Debt.fetch(dharma, id);
         const outstandingAmount = await debt.getOutstandingAmount();
 
@@ -108,9 +105,6 @@ class Detail extends Component {
         const isRepaid = await investment.isRepaid();
         const isCollateralSeizable = await investment.isCollateralSeizable();
 
-        /*this.setState({ loanRequest });*/
-        var get_terms = loanRequest.getTerms();
-
         let principal = get_terms.principalAmount;
         let interest_rate = get_terms.interestRate;
         let interestAmount = (principal * interest_rate) / 100;
@@ -119,9 +113,10 @@ class Detail extends Component {
 
         let totalRepaidAmount =
           parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
-        totalRepaidAmount = (totalRepaidAmount > 0) ? totalRepaidAmount.toFixed(2) : 0;
+        totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
         let displayAgreementId = _(id).truncate(4);
-
+        let nextRepaymentAmount = 0;
+        let nextRepaymentDate = '';
         const all_token_price = api
           .setToken(this.props.token)
           .get(`priceFeed`)
@@ -130,6 +125,7 @@ class Detail extends Component {
             let principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
             let collateralTokenCurrentPrice = priceFeedData[get_terms.collateralTokenSymbol].USD;
             let collateralCurrentAmount = parseFloat(get_terms.collateralAmount) * collateralTokenCurrentPrice;
+            
             collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
             stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
 
@@ -157,7 +153,7 @@ class Detail extends Component {
         stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
         stateObj["outstandingAmount"] = outstandingAmount;
         stateObj["agreementId"] = displayAgreementId;
-        stateObj["nextRepaymentAmount"] = "";
+        stateObj["nextRepaymentAmount"] = nextRepaymentAmount;
         stateObj["nextRepaymentDate"] = "";
         stateObj["totalRepaidAmount"] = totalRepaidAmount;
         stateObj["creditorEthAddress"] = creditorEthAddress;
@@ -167,24 +163,17 @@ class Detail extends Component {
         const repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
           agreementId
         );
-
-        const expectedRepaymentAmountAr = await dharma.servicing.getExpectedAmountPerRepayment(
-          agreementId
-        );
-
         const valueRepaidAr = await dharma.servicing.getValueRepaid(
           agreementId
         );
-
-        const expectedRepaymentAmount = this.convert_big_number(expectedRepaymentAmountAr);
-        const valueRepaid = this.convert_big_number(valueRepaidAr);
-
-        const expectedRepaymentAmountBignumber = expectedRepaymentAmountAr.toNumber();
-        const expectedRepaymentAmountDecimal = "1E" + expectedRepaymentAmountAr.e;
+        const valueRepaid = this.convert_big_number(valueRepaidAr,principalTokenDecimals);
         const repaymentLoanstemp = [];
         let i = 1;
+        let j = 1;
         let userTimezone = moment.tz.guess();
-        console.log(userTimezone);
+        let current_timestamp = moment().unix();
+        
+        let lastExpectedRepaidAmount = 0;
         await this.asyncForEach(repaymentSchedule, async ts => {
 
           let date = new Date(ts * 1000);
@@ -194,8 +183,34 @@ class Detail extends Component {
             ts
           );
 
-          let expectedRepaidAmount = this.convert_big_number(expectedRepaidAmountBigNumber);
-          expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;
+          let expectedRepaidAmount = this.convert_big_number(expectedRepaidAmountBigNumber,principalTokenDecimals);
+          expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
+
+          nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
+          nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
+
+          if (ts > current_timestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
+            nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+            j++;
+          }
+          
+          let paidStatus = '';
+          if(totalRepaidAmount > expectedRepaidAmount)
+          {
+            paidStatus = 'paid';   
+          }
+          else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
+            paidStatus = 'partial_paid';   
+          }
+          else{
+            paidStatus = 'due';
+          }
+
+          if(lastExpectedRepaidAmount != expectedRepaidAmount)
+          {
+            lastExpectedRepaidAmount = expectedRepaidAmount;  
+          }
+
           /*let temp = expectedRepaidAmount - valueRepaid + expectedRepaymentAmount;*/
           repaymentLoanstemp.push({
             id: i,
@@ -206,17 +221,14 @@ class Detail extends Component {
             principalTokenSymbol: get_terms.principalTokenSymbol,
             interestAmount: 0,
             totalRepaymentAmount: expectedRepaidAmount,
-            status: ""
+            status: paidStatus
           });
           i++;
         });
         stateObj["repaymentLoans"] = repaymentLoanstemp;
         stateObj["isLoading"] = false;
-
-        let repaymentAmountDecimal = expectedRepaymentAmountBignumber / expectedRepaymentAmountDecimal;
-        repaymentAmountDecimal = (repaymentAmountDecimal > 0) ? repaymentAmountDecimal.toFixed(2) : 0;
-
-        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = repaymentAmountDecimal;
+        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
+        stateObj["nextRepaymentDate"] = nextRepaymentDate;
         stateObj["currentEthAddress"] = currentAccount;
         if (
           typeof debtorEthAddress != "undefined" &&
@@ -460,17 +472,18 @@ class Detail extends Component {
         text: "Status",
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let label = "Due";
-          let icon = "fa-check-circle";
-          if (row.status == "missed") {
-            label = "Failed";
-            icon = "fa-trash";
-          } else if (row.status == "paid") {
-            label = "Success";
-            icon = "fa-check-circle";
+          let className = "payment-due";
+          if (row.status == 'paid') {
+            label = "Paid";
+            className = "payment-success";
+          }
+          else if(row.status == "partial_paid"){
+            label = "Partial Paid";
+            className = "payment-partial-paid";   
           }
           return (
-            <div className="payment-due">
-              <i className="fa fa-check-circle" />
+            <div className={className}>
+              <i className="fa fa-check-circle payment-check-circle" />
               <br />
               {label}
             </div>
@@ -507,7 +520,8 @@ class Detail extends Component {
       creditorEthAddress,
       collateralCurrentAmount,
       LTVRatioValue,
-      loanScheduleDisplay
+      loanScheduleDisplay,
+      nextRepaymentDate
     } = this.state;
 
     return (
@@ -581,6 +595,8 @@ class Detail extends Component {
                                     : "N/A"}
                                 </span>{" "}
                                 {outstandingAmount > 0 ? principalTokenSymbol : ""}
+                                <br />
+                                <span>{nextRepaymentDate}</span>
                               </div>
                             </Col>
                           )}
@@ -588,7 +604,7 @@ class Detail extends Component {
                         <Col lg={6} md={6} sm={6} xl={6}>
                           {repaymentBtnDisplay === true && (
                             <button
-                              className="btn cognito repayment-button icon mb-15 btn-make-repayment"
+                              className="btn cognito repayment-button icon mb-15 btn-make-repayment btn-sm"
                               onClick={event => this.makeRepayment()}
                             >
                               Make Repayment
@@ -631,59 +647,43 @@ class Detail extends Component {
                         <ListGroup className="list-unstyled to-do">
                           <SummaryItem
                             labelName="Created Date"
-                            labelValue={createdDate != "" ? createdDate : "N/A"}
-                            labelValue2={createdTime != "" ? createdTime : "N/A"}
+                            labelValue={createdDate != "" ? createdDate : ' - '}
+                            labelValue2={createdTime != "" ? createdTime : ''}
                           />
                           <SummaryItem
                             labelName="Collateral Amount"
-                            labelValue={
-                              collateralAmount > 0 ? collateralAmount : "N/A"
-                            }
-                            labelValue2={collateralTokenSymbol}
+                            labelValue={collateralAmount > 0 ? collateralAmount : ' - '}
+                            labelValue2={collateralAmount > 0 ? collateralTokenSymbol : ''}
                           />
                           <SummaryItem
                             labelName="Collateral Value"
-                            labelValue={
-                              collateralCurrentAmount > 0
-                                ? collateralCurrentAmount
-                                : "N/A"
-                            }
-                            labelValue2="$"
+                            labelValue={collateralCurrentAmount > 0 ? collateralCurrentAmount : ' - '}
+                            labelValue2={collateralCurrentAmount > 0 ? '$' : ''}
                           />
                           <SummaryItem
                             labelName="LTV"
-                            labelValue={LTVRatioValue > 0 ? LTVRatioValue : "N/A"}
-                            labelValue2="%"
+                            labelValue={LTVRatioValue > 0 ? LTVRatioValue : ' - '}
+                            labelValue2={LTVRatioValue > 0 ? '%' : ''}
                           />
                           <SummaryItem
                             labelName="Loan Term"
-                            labelValue={termLength > 0 ? termLength : "N/A"}
-                            labelValue2={termUnit}
+                            labelValue={termLength > 0 ? termLength : ' - '}
+                            labelValue2={termLength > 0 ? termUnit : ''}
                           />
                           <SummaryItem
                             labelName="Interest Rate(Per Loan Term)"
-                            labelValue={interestRate > 0 ? interestRate : "N/A"}
-                            labelValue2="%"
+                            labelValue={interestRate > 0 ? interestRate : ' - '}
+                            labelValue2={interestRate > 0 ? '%' : ''}
                           />
                           <SummaryItem
                             labelName="Interest Amount"
-                            labelValue={interestAmount > 0 ? interestAmount : "N/A"}
-                            labelValue2={
-                              interestAmount > 0 ? principalTokenSymbol : "N/A"
-                            }
+                            labelValue={interestAmount > 0 ? interestAmount : ' - '}
+                            labelValue2={interestAmount > 0 ? principalTokenSymbol : ' - '}
                           />
                           <SummaryItem
                             labelName="Total Repayment Amount"
-                            labelValue={
-                              totalRepaymentAmount > 0
-                                ? totalRepaymentAmount
-                                : "N/A"
-                            }
-                            labelValue2={
-                              totalRepaymentAmount > 0
-                                ? principalTokenSymbol
-                                : "N/A"
-                            }
+                            labelValue={totalRepaymentAmount > 0 ? totalRepaymentAmount : ' - '}
+                            labelValue2={totalRepaymentAmount > 0 ? principalTokenSymbol : ' - '}
                           />
                         </ListGroup>
                       </div>

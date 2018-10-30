@@ -34,3 +34,13 @@
 	-webkit-box-shadow:none !important;
 	box-shadow:none !important;
 }
+.payment-success{
+	color:green !important;
+}
+.payment-check-circle{
+	font-size: 15px !important;
+}
+.payment-partial-paid{
+	opacity: 0.7 !important;
+	color:#fd7e14 !important;	
+}
