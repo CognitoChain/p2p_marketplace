@@ -108,8 +108,9 @@ class Api {
      */
     put(resource, id, data) {
         console.log("PUT ", this.apiUrl, "/", resource, "/", id)
+        let url = (id != null) ? this.apiUrl+'/'+resource+'/'+id : this.apiUrl+'/'+resource; 
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${resource}/${id}`, { 
+            fetch(url, { 
                     method: "PUT",
                     cache: "no-cache",
                     headers: {
