@@ -192,13 +192,20 @@ class Login extends React.Component {
         </div>
       )
     }
-    else if (locationState.message == "EMAIL_VERIFICATION_SUCCESS") {
-
+    else if (locationState.message == "EMAIL_VERIFICATION_SUCCESS" || locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") {
+      let flag = (locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") ? true : false; 
       return (
         <div>
+          {locationState.message == "EMAIL_VERIFICATION_SUCCESS" &&
           <p>
             Your account is successfully verified. You can login now.
           </p>
+          }
+          {flag === true &&
+          <p>
+             Password changed successfully.Please login using new passowrd.
+          </p>
+          }
         </div>
       )
     }
@@ -253,6 +260,8 @@ class Login extends React.Component {
                   {password && this.displayValidationErrors('password')}
                 </div>
 
+                <p className="mb-3 remember-checkbox text-right"><Link to="/forgot" > Forgot Password? </Link></p>
+
                 <div className="d-inline-block">
                   <a onClick={this.login} className={`btn cognito btn-theme pull-md-left ${isFormValid ? '' : 'disabled'}`}>
                     <span className="text-white">Log in</span>
@@ -271,6 +280,9 @@ class Login extends React.Component {
                 </div>
 
                 <p className="mt-20 mb-0 remember-checkbox">Don't have an account? <Link to="/register" > Create one here </Link></p>
+
+                
+
               </div>
             </Col>
           </Row>
