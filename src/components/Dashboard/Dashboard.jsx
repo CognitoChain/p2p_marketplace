@@ -25,28 +25,28 @@ class Dashboard extends Component {
             myLoanRequests: [],
             myBorrowedLoading: true,
             myFundedLoading: true,
-            myLoansLoading:true,
-            myBorrowedRequestsIsMounted:true,
-            myFundedRequestsIsMounted:true,
-            myLoanRequestsIsMounted:true,
+            myLoansLoading: true,
+            myBorrowedRequestsIsMounted: true,
+            myFundedRequestsIsMounted: true,
+            myLoanRequestsIsMounted: true,
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
     }
 
-    convertBigNumber(number,decimal) {
-        let divider = "1E"+decimal;
+    convertBigNumber(number, decimal) {
+        let divider = "1E" + decimal;
         let formatedAmount = number / divider;
         return formatedAmount;
     }
-   
+
     componentDidMount() {
         this.getBorrowedLoanRequests();
         this.getFundedLoanRequests();
         this.getMyLoanRequests();
     }
 
-    async getBorrowedLoanRequests(){
+    async getBorrowedLoanRequests() {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
@@ -54,38 +54,36 @@ class Dashboard extends Component {
 
         api.setToken(this.props.token).get("user/loans", { sort, order })
             .then(myBorrowedRequests => {
-                if(myBorrowedRequestsIsMounted)    
-                {
-                    this.setState({ myBorrowedRequests, myBorrowedLoading: false });          
+                if (myBorrowedRequestsIsMounted) {
+                    this.setState({ myBorrowedRequests, myBorrowedLoading: false });
                 }
             })
             .catch((error) => {
-                if(error.status && error.status === 403){
+                if (error.status && error.status === 403) {
                     this.props.redirect(`/login/`);
                 }
-        });
+            });
     }
 
-    async getFundedLoanRequests(){
+    async getFundedLoanRequests() {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
         const { myFundedRequestsIsMounted } = this.state;
         api.setToken(this.props.token).get("user/investments", { sort, order })
             .then(myFundedRequests => {
-                if(myFundedRequestsIsMounted)    
-                {
-                    this.setState({ myFundedRequests, myFundedLoading: false });          
+                if (myFundedRequestsIsMounted) {
+                    this.setState({ myFundedRequests, myFundedLoading: false });
                 }
             })
             .catch((error) => {
-                if(error.status && error.status === 403){
+                if (error.status && error.status === 403) {
                     this.props.redirect(`/login/`);
                 }
-        });
+            });
     }
 
-    async getMyLoanRequests(){
+    async getMyLoanRequests() {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
@@ -93,17 +91,16 @@ class Dashboard extends Component {
         api.setToken(this.props.token).get("user/loanRequests", { sort, order })
             .then(this.parseMyLoanRequests)
             .then(myLoanRequests => {
-                if(myLoanRequestsIsMounted)    
-                {
-                    this.setState({ myLoanRequests, myLoansLoading: false });          
+                if (myLoanRequestsIsMounted) {
+                    this.setState({ myLoanRequests, myLoansLoading: false });
                 }
             })
             .catch((error) => {
-                if(error.status && error.status === 403){
+                if (error.status && error.status === 403) {
                     this.props.redirect(`/login/`);
                 }
-        });
-    }    
+            });
+    }
 
     parseMyLoanRequests(loanRequestData) {
         var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
@@ -119,7 +116,7 @@ class Dashboard extends Component {
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
-                    loanStatus:datum.status
+                    loanStatus: datum.status
                 });
             });
         });
@@ -132,7 +129,7 @@ class Dashboard extends Component {
             });
         }
     }
-    
+
     getBorrowedData() {
         const { myBorrowedRequests } = this.state;
         if (!myBorrowedRequests) {
@@ -140,17 +137,17 @@ class Dashboard extends Component {
         }
 
         return myBorrowedRequests.map((request) => {
-            let princiaplAmount = this.convertBigNumber(request.principalAmount,request.principalNumDecimals);
-            let collateralAmount = this.convertBigNumber(request.collateralAmount,request.collateralNumDecimals);
-            let repaymentAmount = this.convertBigNumber(request.totalExpectedRepayment,request.principalNumDecimals);
-            let repaidAmount = this.convertBigNumber(request.repaidAmount,request.principalNumDecimals);
+            let princiaplAmount = this.convertBigNumber(request.principalAmount, request.principalNumDecimals);
+            let collateralAmount = this.convertBigNumber(request.collateralAmount, request.collateralNumDecimals);
+            let repaymentAmount = this.convertBigNumber(request.totalExpectedRepayment, request.principalNumDecimals);
+            let repaidAmount = this.convertBigNumber(request.repaidAmount, request.principalNumDecimals);
             return {
                 ...request,
                 principal: `${princiaplAmount}`,
                 collateral: `${collateralAmount}`,
                 requestedDate: moment(request.createdDate).calendar(),
-                repaymentAmount:`${repaymentAmount}`,
-                repaidAmount:`${repaidAmount}`            
+                repaymentAmount: `${repaymentAmount}`,
+                repaidAmount: `${repaidAmount}`
             };
         });
     }
@@ -163,10 +160,10 @@ class Dashboard extends Component {
         }
 
         return myFundedRequests.map((investment) => {
-            let princiaplAmount = this.convertBigNumber(investment.principalAmount,investment.principalNumDecimals);
-            let collateralAmount = this.convertBigNumber(investment.collateralAmount,investment.collateralNumDecimals);
-            let repaymentAmount = this.convertBigNumber(investment.totalExpectedRepayment,investment.principalNumDecimals);
-            let repaidAmount = this.convertBigNumber(investment.repaidAmount,investment.principalNumDecimals);
+            let princiaplAmount = this.convertBigNumber(investment.principalAmount, investment.principalNumDecimals);
+            let collateralAmount = this.convertBigNumber(investment.collateralAmount, investment.collateralNumDecimals);
+            let repaymentAmount = this.convertBigNumber(investment.totalExpectedRepayment, investment.principalNumDecimals);
+            let repaidAmount = this.convertBigNumber(investment.repaidAmount, investment.principalNumDecimals);
 
             return {
                 ...investment,
@@ -194,18 +191,18 @@ class Dashboard extends Component {
                 collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
                 term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
-                requestedDate: moment(request.requestedAt).calendar()               
+                requestedDate: moment(request.requestedAt).calendar()
             };
         });
     }
 
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.setState({
-          myBorrowedRequestsIsMounted:false,
-          myLoanRequestsIsMounted: false,
-          myFundedRequestsIsMounted:false                
-        });            
+            myBorrowedRequestsIsMounted: false,
+            myLoanRequestsIsMounted: false,
+            myFundedRequestsIsMounted: false
+        });
     }
 
     render() {
@@ -213,7 +210,7 @@ class Dashboard extends Component {
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
         const { token, dharma, redirect, currentMetamaskAccount } = this.props;
-        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading} = this.state;
+        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading } = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -232,7 +229,7 @@ class Dashboard extends Component {
                         authenticated={this.props.authenticated}
                         dharma={this.props.dharma}
                         tokens={this.props.tokens}
-                        isTokenLoading = {this.props.isTokenLoading}
+                        isTokenLoading={this.props.isTokenLoading}
                         myBorrowedLoading={myBorrowedLoading}
                         token={this.props.token}
                         myBorrowedRequests={myBorrowedRequests}
@@ -291,7 +288,7 @@ class Dashboard extends Component {
                                                 token={token}
                                                 dharma={dharma}
                                                 redirect={redirect}
-                                                myBorrowedLoading ={myBorrowedLoading}
+                                                myBorrowedLoading={myBorrowedLoading}
                                                 myBorrowedRequests={myBorrowedRequests}
                                                 highlightRow={highlightRow}
                                                 currentMetamaskAccount={currentMetamaskAccount}
