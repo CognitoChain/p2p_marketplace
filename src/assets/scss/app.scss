@@ -399,3 +399,7 @@ body{
 .number-bold{
 	font-weight: 800;
 }
+.side-menu li a{
+  display: flex !important;
+  align-items:center !important;
+}
