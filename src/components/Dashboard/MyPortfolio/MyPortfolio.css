@@ -29,3 +29,6 @@
 .portfolio-row{
     margin-top:-52px;
 }
+.my-portfolio-container{
+    min-height: 390px !important;
+}

@@ -119,7 +119,7 @@ class MyPortfolio extends Component {
         let isLoading = myBorrowedLoading || isTokenLoading;
         return (
             <Col lg={6} md={6} sm={6} xl={6}>
-                <Card className="h-100">
+                <Card className="h-100 my-portfolio-container">
                     <CardBody>
                         <CardTitle>My Portfolio</CardTitle>
                         {
