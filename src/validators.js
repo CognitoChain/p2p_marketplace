@@ -15,9 +15,9 @@ const validator = {
       rules: [
         {
           test: (value) => {
-            return value.length >= 6;
+            return value.length >= 8;
           },
-          message: 'Password must not be shorter than 6 characters',
+          message: 'Password must not be shorter than 8 characters',
         },
         {
             test: /^[a-z0-9A-Z_!@#$%&*]+$/,
@@ -32,9 +32,9 @@ const validator = {
       rules: [
         {
           test: (value) => {
-            return value.length >= 6;
+            return value.length >= 8;
           },
-          message: 'Password must not be shorter than 6 characters',
+          message: 'Password must not be shorter than 8 characters',
         },
         {
             test: /^[a-z0-9A-Z_!@#$%&*]+$/,
@@ -49,9 +49,9 @@ const validator = {
       rules: [
         {
           test: (value) => {
-            return value.length >= 6;
+            return value.length >= 8;
           },
-          message: 'Password must not be shorter than 6 characters',
+          message: 'Password must not be shorter than 8 characters',
         },
         {
             test: /^[a-z0-9A-Z_!@#$%&*]+$/,
