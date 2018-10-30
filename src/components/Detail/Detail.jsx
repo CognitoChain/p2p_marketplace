@@ -187,16 +187,17 @@ class Detail extends Component {
           let expectedRepaidAmount = this.convert_big_number(expectedRepaidAmountBigNumber,principalTokenDecimals);
           expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
 
-          nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
-          nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
+  
 
           if (ts > current_timestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
+            nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
+            nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
             nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
             j++;
           }
           
           let paidStatus = '';
-          if(totalRepaidAmount > expectedRepaidAmount)
+          if(totalRepaidAmount >= expectedRepaidAmount)
           {
             paidStatus = 'paid';   
           }
@@ -205,6 +206,9 @@ class Detail extends Component {
           }
           else{
             paidStatus = 'due';
+            if(ts < current_timestamp){
+              paidStatus = 'missed';
+            }
           }
 
           if(lastExpectedRepaidAmount != expectedRepaidAmount)
@@ -474,6 +478,7 @@ class Detail extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let label = "Due";
           let className = "payment-due";
+          let iconName = "fa-check-circle";
           if (row.status == 'paid') {
             label = "Paid";
             className = "payment-success";
@@ -482,9 +487,14 @@ class Detail extends Component {
             label = "Partial Paid";
             className = "payment-partial-paid";   
           }
+          else if(row.status == "missed"){
+            label = "Missed";
+            className = "payment-missed";   
+            iconName = "fa-times-circle"
+          }
           return (
             <div className={className}>
-              <i className="fa fa-check-circle payment-check-circle" />
+              <i className={"fa payment-check-circle " + iconName } />
               <br />
               {label}
             </div>
@@ -565,7 +575,7 @@ class Detail extends Component {
                             <span>Loan Amount</span>
                             <br />
                             <span className="loan-detail-numbers">
-                              {principal > 0 ? principal : "N/A"}
+                              {principal > 0 ? principal : " - "}
                             </span>{" "}
                             {principal > 0 ? principalTokenSymbol : ""}
                           </div>
@@ -576,7 +586,7 @@ class Detail extends Component {
                             <span>Outstanding Amount</span>
                             <br />
                             <span className="loan-detail-numbers">
-                              {outstandingAmount > 0 ? outstandingAmount : "N/A"}
+                              {outstandingAmount > 0 ? outstandingAmount : " - "}
                             </span>{" "}
                             {outstandingAmount > 0 ? principalTokenSymbol : ""}
                           </div>
@@ -593,7 +603,7 @@ class Detail extends Component {
                                 <span className="loan-detail-numbers">
                                   {nextRepaymentAmount > 0
                                     ? nextRepaymentAmount
-                                    : "N/A"}
+                                    : " - "}
                                 </span>{" "}
                                 {outstandingAmount > 0 ? principalTokenSymbol : ""}
                                 <br />
