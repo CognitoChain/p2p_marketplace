@@ -4,6 +4,7 @@ import ScrollArea from 'react-scrollbar';
 import './Header';
 import marketsidebarImg from "../../assets/images/menu-market.png";
 import walletsidebarImg from "../../assets/images/menu-wallet.png";
+import dashboardsidebarImg from "../../assets/images/menu-dashboard.png";
 class Sidebar extends Component {
   constructor(props) {
     super(props);
@@ -30,7 +31,7 @@ class Sidebar extends Component {
                 <Link to="/market"><img src={marketsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> Market</span></Link>
               </li>
               <li className={this.getSelectedClass("dashboard")}>
-                <Link to="/dashboard"><img src={marketsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> My Loans</span></Link>
+                <Link to="/dashboard"><img src={dashboardsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> My Loans</span></Link>
               </li>
               <li className={this.getSelectedClass("wallet")}>
                 <Link to="/wallet"><img src={walletsidebarImg} alt="Image" height="25" /><span className="right-nav-text"> My Wallet</span></Link>
