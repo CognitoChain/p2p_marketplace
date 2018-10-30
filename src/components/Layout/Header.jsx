@@ -92,7 +92,7 @@ class Header extends Component {
                             <CustomAlertMsg
                                 bsStyle='danger'
                                 extraClass="d-inline-block header-notice mb-0"
-                                title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page."
+                                title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured."
                             />
                         )
                     }
