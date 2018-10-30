@@ -108,6 +108,7 @@ class Detail extends Component {
         let principal = get_terms.principalAmount;
         let interest_rate = get_terms.interestRate;
         let interestAmount = (principal * interest_rate) / 100;
+        interestAmount = (interestAmount > 0) ? parseFloat(interestAmount.toFixed(2)) : 0;
         let totalRepaymentAmount =
           parseFloat(principal) + parseFloat(interestAmount);
 
