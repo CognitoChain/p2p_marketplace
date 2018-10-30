@@ -28,7 +28,9 @@ import LoanRequestContainer from "../../containers/LoanRequest";
 import InvestmentsContainer from "../../containers/Investments";
 import DetailContainer from "../../containers/Detail";
 import FundContainer from '../../containers/Fund';
-
+import ForgotPassword from '../ForgotPassword/ForgotPassword';
+import ResetPassword from '../ResetPassword/ResetPassword';
+import ChangePassword from '../ChangePassword/ChangePassword';
 
 const PrivateRoute = ({component: Component, authenticated, ...rest}) => {
     return (
@@ -76,13 +78,16 @@ class Layout extends Component {
         const urlString = this.props.location.pathname.substr(1);
         const urlStringArr = urlString.split("/");
         const location = urlStringArr[0];
-        if(location ==='login' || location ==='register' || location ==='email-verify'){
+        let path = ["login", "register", "email-verify", "forgot","password-reset"];
+        if(path.indexOf(location) > -1){
               return (
                 <Basepages>
                     <PublicRoute authenticated={authenticated} path="/login" exact={true} component={Login} /> 
                     <PublicRoute authenticated={authenticated} path="/email-verify/" exact={true} component={EmailVerify} />
                     <PublicRoute authenticated={authenticated} path="/email-verify/:token" exact={true} component={EmailVerify} />
-                    <PublicRoute authenticated={authenticated} path="/register" component={Register} />                    
+                    <PublicRoute authenticated={authenticated} path="/register" component={Register} />
+                    <PublicRoute authenticated={authenticated} path="/forgot" component={ForgotPassword} />
+                    <PublicRoute authenticated={authenticated} path="/password-reset/:token" exact={true} component={ResetPassword} />                                    
                 </Basepages>
             );
         }
@@ -130,6 +135,7 @@ class Layout extends Component {
                               <TermsConditions {...this.props} authenticated={authenticated} token={token} />
                             }
                           />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/change-password" component={ChangePassword} userEmail={userEmail} />
                     </Switch>
                 </Base>
             )
