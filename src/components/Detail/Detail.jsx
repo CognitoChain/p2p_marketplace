@@ -125,7 +125,7 @@ class Detail extends Component {
           let displayAgreementId = _(id).truncate(4);
           let nextRepaymentAmount = 0;
           let nextRepaymentDate = '';
-          const all_token_price = api
+          const all_token_price = await api
             .setToken(this.props.token)
             .get(`priceFeed`)
             .then(async priceFeedData => {
