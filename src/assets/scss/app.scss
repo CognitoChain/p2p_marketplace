@@ -403,3 +403,7 @@ body{
   display: flex !important;
   align-items:center !important;
 }
+.btn.cognito.green { 
+  background: $green;
+  color: $white;   
+}
