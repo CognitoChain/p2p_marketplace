@@ -137,14 +137,27 @@ class MyBorrowedLoans extends Component {
                 text: "Actions",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     let buttonText = '';
+                    let buttonClassName = '';
                     if(row.debtorAddress == currentMetamaskAccount)
                     {
-                        buttonText = (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false) ? 'Pay' : ((row.repaidAmount == row.repaymentAmount) ? 'Request Collateral' : '');
+                        if(parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false)
+                        {
+                            buttonText = 'Pay'; 
+                            buttonClassName = 'orange';
+                        }
+                        else if(row.repaidAmount == row.repaymentAmount && row.isRepaid == true){
+                            buttonText = 'Request Collateral'; 
+                            buttonClassName = 'green';
+                        }
+                    }
+                    else if(row.creditorAddress == currentMetamaskAccount && row.isCollateralSeizable === true && row.isRepaid === false){
+                        buttonText = 'Seize Collateral';
+                        buttonClassName = 'green';
                     }
                     return (
                         <div>
                         {buttonText != '' && 
-                            <a href="javascript:void(0)" className="btn cognito x-small orange">{buttonText}</a>
+                            <a href="javascript:void(0)" className={"btn cognito x-small " + buttonClassName }>{buttonText}</a>
                         }
                         {buttonText == '' && 
                             <span>N/A</span>
