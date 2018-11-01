@@ -56,8 +56,6 @@ class Dashboard extends Component {
         });
     }
     componentWillReceiveProps(nextProps) {
-        console.log("nextProps")
-        console.log(nextProps)
         if (nextProps.tokens != this.state.tokenlist) {
             this.setState({ tokenlist: nextProps.tokens })
         }
@@ -187,7 +185,7 @@ class Dashboard extends Component {
                 principal: `${princiaplAmount}`,
                 collateral: `${collateralAmount}`,
                 term: `${investment.termLengthAmount}`,
-                repaidAmount: `${repaidAmount} ${investment.principalSymbol}`,
+                repaidAmount: `${repaidAmount}`,
                 totalExpectedRepaymentAmount: `${repaymentAmount} ${
                     investment.principalSymbol
                     }`,

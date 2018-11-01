@@ -118,7 +118,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span></div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell} {row.principalSymbol}</span></div>
                         </div>
                     )
                 }
