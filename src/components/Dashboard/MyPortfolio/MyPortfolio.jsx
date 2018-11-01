@@ -60,14 +60,14 @@ class MyPortfolio extends Component {
      
         if (myBorrowedRequests.length > 0) {
             myBorrowedRequests.forEach(ml => {
-                let principal = ml.principalAmount;
-                let principalTokenSymbol = ml.principalTokenSymbol;
-                if (!_.isUndefined(priceFeedData[principalTokenSymbol])) {
-                    let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
+                let principal = parseFloat(ml.principal);
+                let principalSymbol = ml.principalSymbol;
+                if (!_.isUndefined(priceFeedData[principalSymbol])) {
+                    let principalTokenCurrentPrice = priceFeedData[principalSymbol].USD;
                     let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
                     totalLiablitiesAmount += principalCurrentAmount;
                 }
-            });
+            });            
         }
         totalLiablitiesAmount = (totalLiablitiesAmount > 0) ? totalLiablitiesAmount.toFixed(2) : 0;
         this.setState({ totalAssetAmount: totalAssetAmount,totalLiablitiesAmount: totalLiablitiesAmount }, () => {
@@ -75,8 +75,6 @@ class MyPortfolio extends Component {
         });
     }
     calculateValues() {
-        console.log("calculateValues")
-      
         const { totalAssetAmount, totalLiablitiesAmount } = this.state;
         const { myBorrowedLoading, isTokenLoading } = this.props;
         console.log("isTokenLoading"+isTokenLoading)
@@ -124,7 +122,7 @@ class MyPortfolio extends Component {
                         <CardTitle>My Portfolio</CardTitle>
                         {
                             isLoading &&  
-                                <Row className="align-items-center h-100 position-absolute portfolio-row justify-content-center w-100">
+                                <Row className="h-100 position-absolute portfolio-row justify-content-center w-100">
                                     <Col md={12}>
                                         <Loading />
                                     </Col>
