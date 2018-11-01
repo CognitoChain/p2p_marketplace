@@ -11,6 +11,7 @@ import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import { Card, CardBody, CardTitle, Col, Row } from "reactstrap";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
+import { BigNumber } from "bignumber.js";
 /**
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
@@ -32,10 +33,6 @@ class MyActivities extends Component {
     };
   }
 
-
-
-
-
   async componentWillReceiveProps(nextProps) {
     const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests,myBorrowedLoading,myFundedLoading } = nextProps;
     const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
@@ -55,30 +52,41 @@ class MyActivities extends Component {
           let i = 1;
           if (!_.isUndefined(repaymentSchedule)) {
             await this.asyncForEach(repaymentSchedule, async st => {
-              if (st > current_timestamp && i == 1) {
+              if (st > current_timestamp * 1000 && i == 1) {
                 let date = new Date(st);
+                st = st / 1000;
+                const principalTokenDecimals = await dharma.token.getNumDecimals(ts.principalSymbol);
                 let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
                   ts.id,
                   st
                 );
-                expectedRepaidAmount = this.convert_big_number(
-                  expectedRepaidAmountBigNumber
-                );
+                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
 
                 let buttonText = '';
+                let buttonClassName = '';
                 if (ts.debtorAddress == currentMetamaskAccount) {
-                  buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) ? 'Pay' : ((ts.repaidAmount == ts.repaymentAmount) ? 'Request Collateral' : '');
+                  if(parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false)
+                  {
+                    buttonText = 'Pay'; 
+                    buttonClassName = 'orange';
+                  }
+                  else if(ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true){
+                    buttonText = 'Claim Collateral'; 
+                    buttonClassName = 'green';
+                  }
                 }
-
+                let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
+                amount = (amount > 0) ? amount.toFixed(2) : 0; 
                 loanRequestsActivities.push({
                   id: "l_"+_.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                  amount: expectedRepaidAmount,
+                  amount: amount,
                   type: "minus",
                   sybmol: ts.principalSymbol,
                   agreementId: ts.id,
                   sortTimestamp: st,
-                  buttonText: buttonText
+                  buttonText: buttonText,
+                  buttonClassName:buttonClassName
                 });
                 i++;
               }
@@ -107,30 +115,34 @@ class MyActivities extends Component {
           repaymentSchedule = ts.repaymentSchedule;
           if (!_.isUndefined(repaymentSchedule)) {
             await this.asyncForEach(repaymentSchedule, async schedule_ts => {
-              if (schedule_ts > current_timestamp && i == 1) {
+              if (schedule_ts > current_timestamp * 1000 && i == 1) {
                 let date = new Date(schedule_ts);
+                const principalTokenDecimals = await dharma.token.getNumDecimals(ts.principalSymbol);
+                schedule_ts = schedule_ts / 1000;
                 let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
                   ts.id,
                   schedule_ts
                 );
-                expectedRepaidAmount = this.convert_big_number(
-                  expectedRepaidAmountBigNumber
-                );
+                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);                
 
                 let buttonText = '';
+                let buttonClassName = '';
                 if (ts.creditorAddress == currentMetamaskAccount) {
-                  buttonText = (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isCollateralSeizable == true) ? 'Seize Collateral' : '';
+                  buttonText = (ts.isCollateralSeizable == true && ts.isRepaid === false) ? 'Seize Collateral' : '';
+                  buttonClassName = 'green';
                 }
-
+                let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
+                amount = (amount > 0) ? amount.toFixed(2) : 0; 
                 investmentsActivities.push({
                   id: "i_"+_.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                  amount: expectedRepaidAmount,
+                  amount: amount,
                   type: "plus",
                   sybmol: ts.principalSymbol,
                   agreementId: ts.id,
                   sortTimestamp: schedule_ts,
-                  buttonText: buttonText
+                  buttonText: buttonText,
+                  buttonClassName:buttonClassName
                 });
                 i++;
               }
@@ -148,9 +160,6 @@ class MyActivities extends Component {
     }
   }
 
-  componentDidMount() {
-  }
-
   componentWillUnmount() {
     this.setState({
       myLoansIsMounted: false,
@@ -162,13 +171,8 @@ class MyActivities extends Component {
       await callback(array[index], index, array);
     }
   }
-  convert_big_number(obj) {
-    let expectedRepaymentAmountScheduleTime = obj.toNumber();
-    let expectedScheduleTimeAmountDecimal = "1E" + obj.e;
-    let expectedRepaidAmount =
-      expectedRepaymentAmountScheduleTime / expectedScheduleTimeAmountDecimal;
-    expectedRepaidAmount = (expectedRepaidAmount > 0) ? expectedRepaidAmount.toFixed(2) : 0;
-    return expectedRepaidAmount;
+  convertBigNumber(obj,power) {
+    return obj.div(new BigNumber(10).pow(power.toNumber()));
   }
   render() {
     const { loanRequestsActivities, investmentsActivities, metaMaskMsg ,myFundedRequestsLoading, myBorrowedRequestsLoading} = this.state;
@@ -245,20 +249,11 @@ class MyActivities extends Component {
         text: "Pay Button",
         isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
-          if (row.type == "minus" && row.buttonText != '') {
             return (
               <div>
-                <a href={`detail/${row.agreementId}`} className="btn cognito x-small orange">{row.buttonText}</a>
+                <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName }>{row.buttonText}</a>
               </div>
             );
-          }
-          else if (row.type == "plus" && row.buttonText != '') {
-            return (
-              <div>
-                <a href={`detail/${row.agreementId}`} className="btn cognito x-small green">{row.buttonText}</a>
-              </div>
-            );
-          }
         }
       },
       {
