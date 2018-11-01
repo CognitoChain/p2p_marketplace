@@ -58,8 +58,17 @@ class Detail extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
   }
-  convert_big_number(obj,power) {
-    return obj.div(new BigNumber(10).pow(power.toNumber()));
+  convertBigNumber(obj,power,flag) {
+    if(_.isUndefined(flag))
+    {
+      return obj.div(new BigNumber(10).pow(power.toNumber()));  
+    }
+    else
+    {
+      let decimal = "1E" + power;
+      let amount = obj / decimal;
+      return amount; 
+    }
   }
   async asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
@@ -70,191 +79,177 @@ class Detail extends Component {
   async componentWillMount() {
     const { LoanRequest, Investments, Investment, Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const currentAccount = await dharma.blockchain.getCurrentAccount();
-
+    let currentAccount = await dharma.blockchain.getCurrentAccount();
+    currentAccount = _.toLower(currentAccount);
     let current_time = moment();
     let collateralReturnable = false;
     let stateObj = {};
     const api = new Api();
     api
       .setToken(this.props.token)
-      .get(`loanRequests/${id}`)
+      .get(`loan/${id}`)
       .then(async loanRequestData => {
-        const loanRequest = await LoanRequest.load(dharma, loanRequestData);
-        var get_terms = loanRequest.getTerms();
-        let creditorEthAddress = loanRequest.data.creditor;
-        let debtorEthAddress = loanRequest.data.debtor;
-        const principalTokenDecimals = await dharma.token.getNumDecimals(get_terms.principalTokenSymbol);
-        const debt = await Debt.fetch(dharma, id);
-        const outstandingAmount = await debt.getOutstandingAmount();
 
-        if (outstandingAmount == 0) {
-          const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
-            id
+        if (!_.isUndefined(loanRequestData)) {
+          console.log(loanRequestData);
+          let principalTokenSymbol = loanRequestData.principalSymbol;
+          let collateralTokenSymbol = loanRequestData.collateralSymbol;
+          let principalAmount = this.convertBigNumber(loanRequestData.principalAmount,loanRequestData.principalNumDecimals,true);
+          let collateralAmount = this.convertBigNumber(loanRequestData.collateralAmount,loanRequestData.collateralNumDecimals,true);
+          let interestRate = parseFloat(loanRequestData.interestRatePercent);
+          let interestAmount = (principalAmount * interestRate) / 100;
+          let creditorEthAddress = loanRequestData.creditorAddress;
+          let debtorEthAddress = loanRequestData.debtorAddress;
+          const principalTokenDecimals = await dharma.token.getNumDecimals(principalTokenSymbol);
+          const debt = await Debt.fetch(dharma, id);
+          const outstandingAmount = await debt.getOutstandingAmount();
+
+          if (outstandingAmount == 0) {
+            const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+              id
+            );
+            const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
+              debtRegistryEntry.termsContract
+            );
+            let issuanceHash = id;
+            collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+              issuanceHash
+            );
+          }
+          const isRepaid = loanRequestData.isRepaid;
+          const isCollateralSeizable = loanRequestData.isCollateralSeizable;
+          let totalRepaymentAmount = this.convertBigNumber(loanRequestData.totalExpectedRepayment,loanRequestData.principalNumDecimals,true);
+          let totalRepaidAmount =
+            parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
+          totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
+          let displayAgreementId = _(id).truncate(4);
+          let nextRepaymentAmount = 0;
+          let nextRepaymentDate = '';
+          const all_token_price = api
+            .setToken(this.props.token)
+            .get(`priceFeed`)
+            .then(async priceFeedData => {
+              let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
+              let principalCurrentAmount = parseFloat(principalAmount) * principalTokenCurrentPrice;
+              let collateralTokenCurrentPrice = priceFeedData[collateralTokenSymbol].USD;
+              let collateralCurrentAmount = parseFloat(collateralAmount) * collateralTokenCurrentPrice;
+              
+              collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
+              stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
+
+              if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
+                let LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
+                stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
+              }
+          });
+
+          stateObj["principal"] = principalAmount;
+          stateObj["principalTokenSymbol"] = principalTokenSymbol;
+          stateObj["collateralAmount"] = collateralAmount;
+          stateObj["collateralTokenSymbol"] = collateralTokenSymbol;
+          stateObj["interestRate"] = interestRate;
+          stateObj["termLength"] = loanRequestData.termLengthAmount;
+          stateObj["termUnit"] = loanRequestData.termLengthUnit;
+          stateObj["createdDate"] = moment(loanRequestData.createdDate).format(
+            "DD/MM/YYYY"
           );
-          const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
-            debtRegistryEntry.termsContract
+          stateObj["createdTime"] = moment(loanRequestData.createdDate).format(
+            "HH:mm:ss"
           );
-          let issuanceHash = id;
-          collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
-            issuanceHash
+          stateObj["interestAmount"] = interestAmount;
+          stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
+          stateObj["outstandingAmount"] = outstandingAmount;
+          stateObj["agreementId"] = displayAgreementId;
+          stateObj["nextRepaymentAmount"] = nextRepaymentAmount;
+          stateObj["nextRepaymentDate"] = "";
+          stateObj["totalRepaidAmount"] = totalRepaidAmount;
+          stateObj["creditorEthAddress"] = creditorEthAddress;
+          stateObj["debtorEthAddress"] = debtorEthAddress;
+          let agreementId = id;
+          const repaymentSchedule = loanRequestData.repaymentSchedule;
+          const valueRepaidAr = await dharma.servicing.getValueRepaid(
+            agreementId
           );
-        }
+          const valueRepaid = this.convertBigNumber(valueRepaidAr,principalTokenDecimals);
+          const repaymentLoanstemp = [];
+          let i = 1;
+          let j = 1;
+          let userTimezone = moment.tz.guess();
+          let current_timestamp = moment().unix();
+          let lastExpectedRepaidAmount = 0;
+          await this.asyncForEach(repaymentSchedule, async ts => {
+            console.log(ts);
+            let date = new Date(ts);
+            ts = ts / 1000;
+            let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+              agreementId,
+              ts
+            );
+            console.log(expectedRepaidAmountBigNumber);
+            let expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
+            expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
 
-        const investment = await Investment.fetch(dharma, id);
-        const isRepaid = await investment.isRepaid();
-        const isCollateralSeizable = await investment.isCollateralSeizable();
-
-        let principal = get_terms.principalAmount;
-        let interest_rate = get_terms.interestRate;
-        let interestAmount = (principal * interest_rate) / 100;
-        interestAmount = (interestAmount > 0) ? parseFloat(interestAmount.toFixed(2)) : 0;
-        let totalRepaymentAmount =
-          parseFloat(principal) + parseFloat(interestAmount);
-
-        let totalRepaidAmount =
-          parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
-        totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
-        let displayAgreementId = _(id).truncate(4);
-        let nextRepaymentAmount = 0;
-        let nextRepaymentDate = '';
-        const all_token_price = api
-          .setToken(this.props.token)
-          .get(`priceFeed`)
-          .then(async priceFeedData => {
-            let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
-            let principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
-            let collateralTokenCurrentPrice = priceFeedData[get_terms.collateralTokenSymbol].USD;
-            let collateralCurrentAmount = parseFloat(get_terms.collateralAmount) * collateralTokenCurrentPrice;
+            if (ts > current_timestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
+              nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
+              nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
+              nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+              j++;
+            }
             
-            collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
-            stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
-
-            if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
-              let LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
-              stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
+            let paidStatus = '';
+            if(totalRepaidAmount >= expectedRepaidAmount)
+            {
+              paidStatus = 'paid';   
+            }
+            else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
+              paidStatus = 'partial_paid';   
+            }
+            else{
+              paidStatus = 'due';
+              if(ts < current_timestamp){
+                paidStatus = 'missed';
+              }
             }
 
+            if(lastExpectedRepaidAmount != expectedRepaidAmount)
+            {
+              lastExpectedRepaidAmount = expectedRepaidAmount;  
+            }
+            repaymentLoanstemp.push({
+              id: i,
+              ts: ts,
+              createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
+              principalAmount: principalAmount,
+              principalTokenSymbol: principalTokenSymbol,
+              interestAmount: 0,
+              totalRepaymentAmount: expectedRepaidAmount,
+              status: paidStatus
+            });
+            i++;
           });
-
-        stateObj["principal"] = get_terms.principalAmount;
-        stateObj["principalTokenSymbol"] = get_terms.principalTokenSymbol;
-        stateObj["collateralAmount"] = get_terms.collateralAmount;
-        stateObj["collateralTokenSymbol"] = get_terms.collateralTokenSymbol;
-        stateObj["interestRate"] = get_terms.interestRate;
-        stateObj["termLength"] = get_terms.termDuration;
-        stateObj["termUnit"] = get_terms.termUnit;
-        stateObj["createdDate"] = moment(loanRequest.data.createdAt).format(
-          "DD/MM/YYYY"
-        );
-        stateObj["createdTime"] = moment(loanRequest.data.createdAt).format(
-          "HH:mm:ss"
-        );
-        stateObj["interestAmount"] = interestAmount;
-        stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
-        stateObj["outstandingAmount"] = outstandingAmount;
-        stateObj["agreementId"] = displayAgreementId;
-        stateObj["nextRepaymentAmount"] = nextRepaymentAmount;
-        stateObj["nextRepaymentDate"] = "";
-        stateObj["totalRepaidAmount"] = totalRepaidAmount;
-        stateObj["creditorEthAddress"] = creditorEthAddress;
-        stateObj["debtorEthAddress"] = debtorEthAddress;
-
-        let agreementId = id;
-        const repaymentSchedule = await dharma.servicing.getRepaymentScheduleAsync(
-          agreementId
-        );
-        const valueRepaidAr = await dharma.servicing.getValueRepaid(
-          agreementId
-        );
-        const valueRepaid = this.convert_big_number(valueRepaidAr,principalTokenDecimals);
-        const repaymentLoanstemp = [];
-        let i = 1;
-        let j = 1;
-        let userTimezone = moment.tz.guess();
-        let current_timestamp = moment().unix();
-        
-        let lastExpectedRepaidAmount = 0;
-        await this.asyncForEach(repaymentSchedule, async ts => {
-
-          let date = new Date(ts * 1000);
-          /*console.log(moment(date, "DD/MM/YYYY HH:mm:ss", true).format());*/
-          let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-            agreementId,
-            ts
-          );
-
-          let expectedRepaidAmount = this.convert_big_number(expectedRepaidAmountBigNumber,principalTokenDecimals);
-          expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
-
-  
-
-          if (ts > current_timestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
-            nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
-            nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
-            nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
-            j++;
-          }
-          
-          let paidStatus = '';
-          if(totalRepaidAmount >= expectedRepaidAmount)
-          {
-            paidStatus = 'paid';   
-          }
-          else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
-            paidStatus = 'partial_paid';   
-          }
-          else{
-            paidStatus = 'due';
-            if(ts < current_timestamp){
-              paidStatus = 'missed';
+          stateObj["repaymentLoans"] = repaymentLoanstemp;
+          stateObj["isLoading"] = false;
+          stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
+          stateObj["nextRepaymentDate"] = nextRepaymentDate;
+          stateObj["currentEthAddress"] = currentAccount;
+          if (typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) {
+            if (outstandingAmount > 0) {
+              stateObj["repaymentBtnDisplay"] = true;
+            }
+            if (outstandingAmount == 0 && collateralReturnable === true) {
+              stateObj["collateralBtnDisplay"] = true;
             }
           }
 
-          if(lastExpectedRepaidAmount != expectedRepaidAmount)
-          {
-            lastExpectedRepaidAmount = expectedRepaidAmount;  
+          if (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount && isCollateralSeizable === true && isRepaid === false) {
+            stateObj["collateralSeizeBtnDisplay"] = true;
           }
 
-          /*let temp = expectedRepaidAmount - valueRepaid + expectedRepaymentAmount;*/
-          repaymentLoanstemp.push({
-            id: i,
-            ts: ts,
-            /*createdDate: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),*/
-            createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
-            principalAmount: get_terms.principalAmount,
-            principalTokenSymbol: get_terms.principalTokenSymbol,
-            interestAmount: 0,
-            totalRepaymentAmount: expectedRepaidAmount,
-            status: paidStatus
-          });
-          i++;
-        });
-        stateObj["repaymentLoans"] = repaymentLoanstemp;
-        stateObj["isLoading"] = false;
-        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
-        stateObj["nextRepaymentDate"] = nextRepaymentDate;
-        stateObj["currentEthAddress"] = currentAccount;
-        if (
-          typeof debtorEthAddress != "undefined" &&
-          debtorEthAddress == currentAccount
-        ) {
-          if (outstandingAmount > 0) {
-            stateObj["repaymentBtnDisplay"] = true;
+          if ((typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) || (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount)) {
+            stateObj["loanScheduleDisplay"] = true;
           }
-          if (outstandingAmount == 0 && collateralReturnable === true) {
-            stateObj["collateralBtnDisplay"] = true;
-          }
+          this.setState(stateObj);
         }
-
-        if (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount && isCollateralSeizable === true && isRepaid === false) {
-          stateObj["collateralSeizeBtnDisplay"] = true;
-        }
-
-        if ((typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) || (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount)) {
-          stateObj["loanScheduleDisplay"] = true;
-        }
-        this.setState(stateObj);
       });
   }
 
@@ -603,7 +598,7 @@ class Detail extends Component {
                                 <span className="loan-detail-numbers">
                                   {nextRepaymentAmount > 0
                                     ? nextRepaymentAmount
-                                    : " - "}
+                                    : " - x"}
                                 </span>{" "}
                                 {outstandingAmount > 0 ? principalTokenSymbol : ""}
                                 <br />
@@ -628,7 +623,7 @@ class Detail extends Component {
                                 className="btn cognito repayment-button icon mb-15 btn-make-repayment"
                                 onClick={event => this.unblockCollateral()}
                               >
-                                Get collateral back
+                                Claim Collateral
                           </button>
                             )}
 
