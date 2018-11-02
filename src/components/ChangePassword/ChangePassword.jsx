@@ -195,7 +195,7 @@ class ChangePassword extends Component {
                                         <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
                                             <ListGroup className="list-unstyled to-do password-details">
                                                 <li>Changing your email password regularly can protect your account from hackers and possible identity theft.</li>
-                                                <li>When changing your password, you should choose a new, strong password that is not used with any other online account, and that contains a minimum of 6 characters comprised of letters, numbers, and symbols.</li>
+                                                <li>When changing your password, you should choose a new, strong password that is not used with any other online account, and that contains a minimum of 8 characters comprised of letters, numbers, and symbols.</li>
                                                 <li>To make your password even more difficult for others to guess, you should avoid including personal information in your password that you often share with others; such as your birth date, phone number, and the name of your pet or child.</li>
                                             </ListGroup>
                                         </div>
