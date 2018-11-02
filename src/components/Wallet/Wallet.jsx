@@ -11,7 +11,8 @@ import {
   Col,
   Breadcrumb,
   BreadcrumbItem,
-  Alert
+  Alert,
+  Tooltip
 } from "reactstrap";
 import "./Wallet.css";
 import classnames from "classnames";
@@ -32,6 +33,7 @@ class Wallet extends Component {
       tokenlist: this.props.tokens,
       isWalletMounted: true
     };
+    this.tooltipTop = this.tooltipTop.bind(this);
   }
 
   componentWillMount() {
@@ -126,6 +128,16 @@ class Wallet extends Component {
     this.handleLoading(token, false)
 
   }
+  tooltipTop(token) {
+    const { tokenlist } = this.state;
+    let tootlTipStatus = !token.tootlTipStatus;
+    let symbol = token.symbol;
+    var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
+    tokenlist[tokenKey].tootlTipStatus = tootlTipStatus;
+    this.setState({
+      tokenlist
+    });
+  }
   renderTokenBalances() {
 
     const { tokenlist } = this.state;
@@ -145,6 +157,7 @@ class Wallet extends Component {
         <Row>
 
           {tokensSorted.map(token => {
+            let tokenSymbol = _.toLower(token.symbol);
             if (token.balance > 0) {
               i++;
               return (
@@ -183,7 +196,7 @@ class Wallet extends Component {
 
                       }
                       </div>
-                      <div className="mt-3 pull-right text-right d-inline-block">
+                      <div className="mt-3 pull-right text-right d-inline-block" id={"token"+tokenSymbol}>
                         {
                           token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
                         }
@@ -191,7 +204,18 @@ class Wallet extends Component {
                               this.updateProxyAllowanceAsync(
                                 token
                               )
-                            } className="react-switch" id="normal-switch" />                       
+                            } className="react-switch" />
+                          <Tooltip placement="top" isOpen={token.tootlTipStatus} target={"token"+tokenSymbol} toggle={() =>
+                              this.tooltipTop(
+                                token
+                              )
+                            }>
+                              {
+                                token.hasUnlimitedAllowance 
+                                ? "Lock"
+                                : "Unlock"
+                              }
+                          </Tooltip>
                       </div>
                     </CardBody>
                   </Card>
