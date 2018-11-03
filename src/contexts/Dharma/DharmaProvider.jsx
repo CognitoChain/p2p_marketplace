@@ -81,7 +81,14 @@ class DharmaProvider extends Component {
                         isTokenLoading:false
                     });
                 });    
-            }            
+            } 
+            else
+            {
+                this.setState({
+                    tokens: [],
+                    isTokenLoading:false
+                });
+            }           
         });
     }
 
