@@ -24,21 +24,20 @@ import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import { BLOCKCHAIN_API } from "../../common/constants";
 import Switch from "react-switch";
+import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 let timer;
 class Wallet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ethAddress: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       tokenlist: this.props.tokens,
       isWalletMounted: true
     };
     this.tooltipTop = this.tooltipTop.bind(this);
   }
-
-  componentWillMount() {
+  /*componentWillMount() {
     this.getETH();
-  }
+  }*/
   componentWillReceiveProps(nextProps) {
     if (nextProps.tokens != this.props.tokenlist) {
       this.setState({ tokenlist: nextProps.tokens })
@@ -49,18 +48,18 @@ class Wallet extends Component {
       isWalletMounted: false
     });
   }
-  async getETH() {
+  /*async getETH() {
     const { dharma } = this.props;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     if (typeof currentAccount != "undefined") {
       dharma.blockchain.getAccounts().then(accounts => {
         const owner = accounts[0];
         this.setState({
-          ethAddress: owner
+          currentMetamaskAccount: owner
         });
       });
     }
-  }
+  }*/
   handleLoading(token, isLoading) {
     const { tokenlist } = this.state;
     let symbol = token.symbol;
@@ -94,7 +93,7 @@ class Wallet extends Component {
           );
         }
         else {
-         
+
           txHash = await Token.revokeAllowance(
             dharma,
             symbol,
@@ -189,33 +188,33 @@ class Wallet extends Component {
                         </div>
                       </div>
                       <div className="mt-3 pull-left text-left d-inline-block">
-                      {
-                        token.hasUnlimitedAllowance 
-                        ? <label className="badge badge-success">Unlocked</label>
-                        : <label className="badge badge-warning">Locked</label>
+                        {
+                          token.hasUnlimitedAllowance
+                            ? <label className="badge badge-success">Unlocked</label>
+                            : <label className="badge badge-warning">Locked</label>
 
-                      }
+                        }
                       </div>
-                      <div className="mt-3 pull-right text-right d-inline-block" id={"token"+tokenSymbol}>
+                      <div className="mt-3 pull-right text-right d-inline-block" id={"token" + tokenSymbol}>
                         {
                           token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
                         }
-                        <Switch height={20} width={40} uncheckedIcon={false} disabled = {token.isLoading} checkedIcon={false} checked={token.hasUnlimitedAllowance} onChange={() =>
-                              this.updateProxyAllowanceAsync(
-                                token
-                              )
-                            } className="react-switch" />
-                          <Tooltip placement="top" isOpen={token.tootlTipStatus} target={"token"+tokenSymbol} toggle={() =>
-                              this.tooltipTop(
-                                token
-                              )
-                            }>
-                              {
-                                token.hasUnlimitedAllowance 
-                                ? "Lock"
-                                : "Unlock"
-                              }
-                          </Tooltip>
+                        <Switch height={20} width={40} uncheckedIcon={false} disabled={token.isLoading} checkedIcon={false} checked={token.hasUnlimitedAllowance} onChange={() =>
+                          this.updateProxyAllowanceAsync(
+                            token
+                          )
+                        } className="react-switch" />
+                        <Tooltip placement="top" isOpen={token.tootlTipStatus} target={"token" + tokenSymbol} toggle={() =>
+                          this.tooltipTop(
+                            token
+                          )
+                        }>
+                          {
+                            token.hasUnlimitedAllowance
+                              ? "Lock"
+                              : "Unlock"
+                          }
+                        </Tooltip>
                       </div>
                     </CardBody>
                   </Card>
@@ -238,9 +237,8 @@ class Wallet extends Component {
   }
   render() {
     let _self = this;
-    const { ethAddress, tokenlist } = this.state;
-    const { isTokenLoading } = this.props;
-
+    const { tokenlist } = this.state;
+    const { isTokenLoading, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
     return (
       <div className="wallet-page">
 
@@ -261,22 +259,37 @@ class Wallet extends Component {
           </Row>
         </div>
 
-        <Row className="mb-30 mt-30">
-          <Col lg={12} md={12} sm={12} xl={12}>
-            <div className="tab nav-border" style={{ position: "relative" }}>
-              <div className="mb-30">
-                <div>Ethereum Address</div>
-                <div className="eth-address">{ethAddress}</div>
-              </div>
+        {currentMetamaskAccount != null && wrongMetamaskNetwork == false &&
+          <Row className="mb-30 mt-30">
+            <Col lg={12} md={12} sm={12} xl={12}>
+              <div className="tab nav-border" style={{ position: "relative" }}>
+                <div className="mb-30">
+                  <div>Ethereum Address</div>
+                  <div className="eth-address">{currentMetamaskAccount}</div>
+                </div>
 
-              <div>
-                <h5>Token Balances</h5>
-                {this.renderTokenBalances()}
-              </div>
+                <div>
+                  <h5>Token Balances</h5>
+                  {this.renderTokenBalances()}
+                </div>
 
-            </div>
-          </Col>
-        </Row>
+              </div>
+            </Col>
+          </Row>
+        }
+
+        {(wrongMetamaskNetwork == true || currentMetamaskAccount == null) &&
+          <div>
+            <Row className="mb-30">
+              <Col md={3}></Col>
+              <Col md={6}>
+                <img src={metamaskConnectionErrorImg} className="img-fluid" />
+              </Col>
+              <Col md={3}></Col>
+            </Row>
+          </div>
+        }
+
       </div>
     );
   }

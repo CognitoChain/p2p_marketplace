@@ -122,7 +122,7 @@ class MyPortfolio extends Component {
                         <CardTitle>My Portfolio</CardTitle>
                         {
                             isLoading &&  
-                                <Row className="h-100 position-absolute portfolio-row justify-content-center w-100">
+                                <Row className="h-100 position-absolute portfolio-row align-items-center justify-content-center w-100">
                                     <Col md={12}>
                                         <Loading />
                                     </Col>

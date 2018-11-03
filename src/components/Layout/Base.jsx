@@ -37,7 +37,12 @@ class Base extends Component {
                                 authenticated={this.props.authenticated}
                                 dharma={dharmaProps.dharma}
                                 token={this.props.token}
-                                userEmail={this.props.userEmail}                                
+                                userEmail={this.props.userEmail}
+                                currentMetamaskAccount={this.props.currentMetamaskAccount}
+                                wrongMetamskNetworkMsg={this.props.wrongMetamskNetworkMsg}
+                                wrongMetamaskNetwork={this.props.wrongMetamaskNetwork}
+                                updateMetamaskAccount={this.props.updateMetamaskAccount}
+                                refreshTokens={dharmaProps.refreshTokens}
                             />
                         );
                     }}

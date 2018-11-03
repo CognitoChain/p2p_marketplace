@@ -12,6 +12,7 @@ import MyActivities from "./MyActivities/MyActivities";
 import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
 import _ from 'lodash';
+import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 class Dashboard extends Component {
 
     constructor(props) {
@@ -30,7 +31,7 @@ class Dashboard extends Component {
             myLoansLoading: true,
             myBorrowedRequestsIsMounted: true,
             myFundedRequestsIsMounted: true,
-            myLoanRequestsIsMounted: true,
+            myLoanRequestsIsMounted: true
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -48,6 +49,16 @@ class Dashboard extends Component {
         this.getFundedLoanRequests();
         this.getMyLoanRequests();
     }
+    /*async componentWillMount(){
+        const { dharma } = this.props;
+        const currentMetamaskAccount = await dharma.blockchain.getCurrentAccount();
+        if(!_.isUndefined(currentMetamaskAccount))
+        {
+            this.setState({
+                currentMetamaskAccount: currentMetamaskAccount
+            });    
+        }
+    }*/
     componentWillUnmount() {
         this.setState({
             myBorrowedRequestsIsMounted: false,
@@ -214,7 +225,7 @@ class Dashboard extends Component {
 
 
     setPriceFeedData() {
-        const { dharma, currentMetamaskAccount, token } = this.props;
+        const { dharma, token, currentMetamaskAccount } = this.props;
         const { Debt, Investments, LoanRequest, Loan, Debts } = Dharma.Types;
         let priceFeedData = [];
         let totalLiablitiesAmountCount = 0;
@@ -233,7 +244,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { token, dharma, tokens, redirect, currentMetamaskAccount, isTokenLoading, authenticated } = this.props;
+        const { token, dharma, tokens, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
         const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist } = this.state;
         return (
             <div>
@@ -247,114 +258,131 @@ class Dashboard extends Component {
                 </div>
                 {/* <!-- widgets --> */}
 
+                {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
+                    <div>
+                        <Row className="mb-30">
+                            <MyPortfolio
+                                authenticated={authenticated}
+                                dharma={dharma}
+                                tokens={tokenlist}
+                                isTokenLoading={isTokenLoading}
+                                myBorrowedLoading={myBorrowedLoading}
+                                token={token}
+                                myBorrowedRequests={myBorrowedRequests}
+                                currentMetamaskAccount={currentMetamaskAccount}
+                                priceFeedData={priceFeedData}
+                            />
+                            <MyActivities
+                                authenticated={authenticated}
+                                dharma={dharma}
+                                token={token}
+                                myBorrowedRequests={myBorrowedRequests}
+                                myFundedRequests={myFundedRequests}
+                                myBorrowedLoading={myBorrowedLoading}
+                                myFundedLoading={myFundedLoading}
+                                currentMetamaskAccount={currentMetamaskAccount}
+                            />
+                        </Row>
 
-                <Row className="mb-30">
-                    <MyPortfolio
-                        authenticated={authenticated}
-                        dharma={dharma}
-                        tokens={tokenlist}
-                        isTokenLoading={isTokenLoading}
-                        myBorrowedLoading={myBorrowedLoading}
-                        token={token}
-                        myBorrowedRequests={myBorrowedRequests}
-                        currentMetamaskAccount={currentMetamaskAccount}
-                        priceFeedData={priceFeedData}
-                    />
-                    <MyActivities
-                        authenticated={authenticated}
-                        dharma={dharma}
-                        token={token}
-                        myBorrowedRequests={myBorrowedRequests}
-                        myFundedRequests={myFundedRequests}
-                        myBorrowedLoading={myBorrowedLoading}
-                        myFundedLoading={myFundedLoading}
-                        currentMetamaskAccount={currentMetamaskAccount}
-                    />
-                </Row>
+                        <Row className="mb-30">
+                            <Col lg={12} md={12} sm={12} xl={12}>
+                                <Card className="card-statistics h-100">
+                                    <CardBody>
+                                        <div className="tab nav-border" style={{ position: 'relative' }}>
+                                            <div className="d-block d-md-flex justify-content-between">
+                                                <div className="d-block w-100">
+                                                    <CardTitle>My Loans</CardTitle>
+                                                </div>
+                                                <div className="d-block d-md-flex" style={{ position: 'absolute', left: 100, top: 0 }}>
+                                                    <Nav tabs>
+                                                        <NavItem>
+                                                            <NavLink
+                                                                className={classnames({ active: this.state.activeTab === '1' })}
+                                                                onClick={() => { this.tabsclick('1'); }}
+                                                            >
+                                                                Borrowed Loans
+                                                        </NavLink>
+                                                        </NavItem>
+                                                        <NavItem>
+                                                            <NavLink className={classnames({ active: this.state.activeTab === '2' })}
+                                                                onClick={() => { this.tabsclick('2'); }}
+                                                            >
+                                                                Funded Loans
+                                                        </NavLink>
+                                                        </NavItem>
+                                                        <NavItem>
+                                                            <NavLink className={classnames({ active: this.state.activeTab === '3' })}
+                                                                onClick={() => { this.tabsclick('3'); }}
+                                                            >
+                                                                My Loan Requests
+                                                        </NavLink>
+                                                        </NavItem>
+                                                    </Nav>
+                                                </div>
+                                            </div>
+                                            <TabContent activeTab={this.state.activeTab}>
+                                                <TabPane tabId="1" title="Borrowed Loans">
 
-                <Row className="mb-30">
-                    <Col lg={12} md={12} sm={12} xl={12}>
-                        <Card className="card-statistics h-100">
-                            <CardBody>
-                                <div className="tab nav-border" style={{ position: 'relative' }}>
-                                    <div className="d-block d-md-flex justify-content-between">
-                                        <div className="d-block w-100">
-                                            <CardTitle>My Loans</CardTitle>
+                                                    <MyBorrowedLoans
+                                                        token={token}
+                                                        dharma={dharma}
+                                                        redirect={redirect}
+                                                        myBorrowedLoading={myBorrowedLoading}
+                                                        myBorrowedRequests={myBorrowedRequests}
+                                                        highlightRow={highlightRow}
+                                                        currentMetamaskAccount={currentMetamaskAccount}
+                                                    />
+
+                                                </TabPane>
+
+                                                <TabPane tabId="2" title="Funded Loans">
+
+                                                    <MyFundedLoans
+                                                        token={token}
+                                                        dharma={dharma}
+                                                        redirect={redirect}
+                                                        myFundedLoading={myFundedLoading}
+                                                        myFundedRequests={myFundedRequests}
+                                                        currentMetamaskAccount={currentMetamaskAccount}
+                                                    />
+
+                                                </TabPane>
+
+                                                <TabPane tabId="3" title="My loan requests">
+
+                                                    <MyLoanRequests
+                                                        token={token}
+                                                        dharma={dharma}
+                                                        redirect={redirect}
+                                                        myLoansLoading={myLoansLoading}
+                                                        myLoanRequests={myLoanRequests}
+                                                    />
+
+                                                </TabPane>
+
+
+                                            </TabContent>
                                         </div>
-                                        <div className="d-block d-md-flex" style={{ position: 'absolute', left: 100, top: 0 }}>
-                                            <Nav tabs>
-                                                <NavItem>
-                                                    <NavLink
-                                                        className={classnames({ active: this.state.activeTab === '1' })}
-                                                        onClick={() => { this.tabsclick('1'); }}
-                                                    >
-                                                        Borrowed Loans
-                                                    </NavLink>
-                                                </NavItem>
-                                                <NavItem>
-                                                    <NavLink className={classnames({ active: this.state.activeTab === '2' })}
-                                                        onClick={() => { this.tabsclick('2'); }}
-                                                    >
-                                                        Funded Loans
-                                                    </NavLink>
-                                                </NavItem>
-                                                <NavItem>
-                                                    <NavLink className={classnames({ active: this.state.activeTab === '3' })}
-                                                        onClick={() => { this.tabsclick('3'); }}
-                                                    >
-                                                        My Loan Requests
-                                                    </NavLink>
-                                                </NavItem>
-                                            </Nav>
-                                        </div>
-                                    </div>
-                                    <TabContent activeTab={this.state.activeTab}>
-                                        <TabPane tabId="1" title="Borrowed Loans">
+                                    </CardBody>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+                }
 
-                                            <MyBorrowedLoans
-                                                token={token}
-                                                dharma={dharma}
-                                                redirect={redirect}
-                                                myBorrowedLoading={myBorrowedLoading}
-                                                myBorrowedRequests={myBorrowedRequests}
-                                                highlightRow={highlightRow}
-                                                currentMetamaskAccount={currentMetamaskAccount}
-                                            />
-
-                                        </TabPane>
-
-                                        <TabPane tabId="2" title="Funded Loans">
-
-                                            <MyFundedLoans
-                                                token={token}
-                                                dharma={dharma}
-                                                redirect={redirect}
-                                                myFundedLoading={myFundedLoading}
-                                                myFundedRequests={myFundedRequests}
-                                                currentMetamaskAccount={currentMetamaskAccount}
-                                            />
-
-                                        </TabPane>
-
-                                        <TabPane tabId="3" title="My loan requests">
-
-                                            <MyLoanRequests
-                                                token={token}
-                                                dharma={dharma}
-                                                redirect={redirect}
-                                                myLoansLoading={myLoansLoading}
-                                                myLoanRequests={myLoanRequests}
-                                            />
-
-                                        </TabPane>
+                {(wrongMetamaskNetwork == true || currentMetamaskAccount == null || currentMetamaskAccount == '') &&
+                    <div>
+                        <Row className="mb-30">
+                            <Col md={3}></Col>
+                            <Col md={6}>
+                                <img src={metamaskConnectionErrorImg} className="img-fluid" />
+                            </Col>
+                            <Col md={3}></Col>
+                        </Row>
+                    </div>
+                }
 
 
-                                    </TabContent>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
             </div>
         );
     }

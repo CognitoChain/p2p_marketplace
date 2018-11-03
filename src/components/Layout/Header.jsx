@@ -6,7 +6,6 @@ import {
     Alert
 } from "reactstrap";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import Api from "../../services/api";
 import Avatar from 'react-avatar';
 class Header extends Component {
 
@@ -15,45 +14,28 @@ class Header extends Component {
         this.interval = '';
         this.state = {
             toggleactive: false,
-            defaultValue: 1,
-            metamaskMsg: false
+            defaultValue: 1                    
         };
         this.togglebutton = this.togglebutton.bind(this);
     }
     togglebutton(toggleactive) {
         this.props.updateParent();
     };
-
     async componentWillMount() {
-        const { dharma } = this.props;
-        const api = new Api();
-        const currentAccount = await dharma.blockchain.getCurrentAccount();
-        let currentMetamaskAccountLocal = localStorage.getItem('currentMetamaskAccount');
-
-        if (typeof currentAccount === "undefined") {
-            this.setState({
-                metamaskMsg: true,
-            });
+        const { dharma,currentMetamaskAccount,wrongMetamskNetworkMsg,wrongMetamaskNetwork } = this.props;
+        
+        let currentAccount = await dharma.blockchain.getCurrentAccount();
+        let currentMetamaskAccountLocal = currentMetamaskAccount;
+        let msg = '';
+        if (_.isUndefined(currentAccount)) {
+            currentAccount = '';
         }
-
-        if (!_.isUndefined(currentAccount) && currentMetamaskAccountLocal != currentAccount) {
-            const walletResponse = api.setToken(this.props.token).create("user/wallet", {
-                address: currentAccount
-            });
-        }
-
-        localStorage.setItem('currentMetamaskAccount', currentAccount);
-
+        this.props.updateMetamaskAccount(currentAccount);   
         this.interval = setInterval(
             () => {
                 this.checkAccount()
             }, 2500);
     }
-
-    // async componentDidMount() {
-
-    // }
-
     componentWillUnmount() {
         console.log("Clear")
         clearInterval(this.interval);
@@ -62,15 +44,13 @@ class Header extends Component {
         const { dharma } = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
-
-        if (currentMetamaskAccount != String(currentAccount) && (typeof currentMetamaskAccount != "undefined" || typeof String(currentAccount) != "undefined")) {
-            /*localStorage.setItem('currentMetamaskAccount', currentAccount);*/
-            window.location.reload();
+        if ((currentMetamaskAccount == null && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) && typeof currentMetamaskAccount != "undefined" && currentMetamaskAccount != null)) {
+            this.props.refreshTokens();
+            this.props.updateMetamaskAccount(currentAccount);
         }
     }
     render() {
-        const { metamaskMsg } = this.state;
-        const { userEmail } = this.props;
+        const { userEmail,wrongMetamskNetworkMsg,wrongMetamaskNetwork,currentMetamaskAccount } = this.props;
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -88,18 +68,26 @@ class Header extends Component {
                 {/* <!-- top bar right --> */}
                 <div className="ml-auto header-right-block">
                     {
-                        metamaskMsg === true && (
+                        (currentMetamaskAccount == '' || currentMetamaskAccount == null || _.isUndefined(currentMetamaskAccount)) && (
                             <CustomAlertMsg
                                 bsStyle='danger'
                                 extraClass="d-inline-block header-notice mb-0"
-                                title="Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured."
+                                title="Please log in to Metamask."
+                            />
+                        )
+                    }
+                    {
+                        currentMetamaskAccount != '' && wrongMetamaskNetwork === true && (
+                            <CustomAlertMsg
+                                bsStyle='danger'
+                                extraClass="d-inline-block header-notice mb-0"
+                                title={wrongMetamskNetworkMsg}
                             />
                         )
                     }
 
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
-
                             {
                                 this.props.authenticated === true && (
                                     <div>
@@ -124,9 +112,6 @@ class Header extends Component {
                                     </div>
                                 )
                             }
-
-
-
                             {
                                 this.props.authenticated === false && (
                                     <div className="header-links">
@@ -135,8 +120,6 @@ class Header extends Component {
 
                                 )
                             }
-
-
                         </li>
                     </ul>
                 </div>
@@ -147,4 +130,3 @@ class Header extends Component {
     }
 }
 export default Header;
-

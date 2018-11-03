@@ -31,7 +31,8 @@ import FundContainer from '../../containers/Fund';
 import ForgotPassword from '../ForgotPassword/ForgotPassword';
 import ResetPassword from '../ResetPassword/ResetPassword';
 import ChangePassword from '../ChangePassword/ChangePassword';
-
+import _ from "lodash";
+import Api from "../../services/api";
 const PrivateRoute = ({component: Component, authenticated, ...rest}) => {
     return (
       <Route
@@ -55,12 +56,18 @@ const PublicRoute = ({component: Component, authenticated, ...rest}) => {
 class Layout extends Component {
     constructor(props) {
         super(props);
+        let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
+        currentMetamaskAccount = (currentMetamaskAccount != null && currentMetamaskAccount != '') ? currentMetamaskAccount : '';
+        this.state = {
+          currentMetamaskAccount: currentMetamaskAccount
+        };
         this.logout = this.logout.bind(this);
+        this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
     }
     logout() {
         localStorage.removeItem('token');
-        localStorage.removeItem('currentMetamaskAccount');
         localStorage.removeItem('userEmail');
+        this.updateMetamaskAccount('');
         this.props.history.push("/login");
     }
     componentDidUpdate() {
@@ -70,15 +77,48 @@ class Layout extends Component {
           behavior: 'smooth' 
         });
     }
+    updateMetamaskAccount(currentMetamaskAccount){
+      const api = new Api();
+      if(!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null)
+      {
+        localStorage.setItem('currentMetamaskAccount', currentMetamaskAccount);  
+        if(this.state.currentMetamaskAccount != currentMetamaskAccount)
+        {
+          const token = localStorage.getItem('token');
+          const walletResponse = api.setToken(token).create("user/wallet", {
+            address: currentMetamaskAccount
+          });
+        }
+      }
+      else
+      {
+        localStorage.removeItem('currentMetamaskAccount');
+      }
+      this.setState({ currentMetamaskAccount: currentMetamaskAccount }, () => {});
+    }
     render() {
         const token = localStorage.getItem('token');
         const userEmail = localStorage.getItem('userEmail');
-        const currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
+        const {currentMetamaskAccount} = this.state;
         const authenticated = ((token && token !== null) ? true : false)
         const urlString = this.props.location.pathname.substr(1);
         const urlStringArr = urlString.split("/");
         const location = urlStringArr[0];
         let path = ["login", "register", "email-verify", "forgot","password-reset"];
+        let networkId = window.web3.version.network;
+        let wrongMetamskNetworkMsg = '';
+        let wrongMetamaskNetwork = false;
+        if(process.env.NODE_ENV == "development" && networkId != "42" && networkId != null && String(currentMetamaskAccount) != "undefined")
+        {
+            wrongMetamskNetworkMsg = 'Please connect to Kovan Test Network in metamask.';
+            wrongMetamaskNetwork = true;
+        }
+        else if(process.env.NODE_ENV == "production" && networkId != "1" && networkId != null && String(currentMetamaskAccount) != "undefined") 
+        {
+            wrongMetamskNetworkMsg = 'Please connect to Main Ethereum Network in metamask.';
+            wrongMetamaskNetwork = true;
+        }
+
         if(path.indexOf(location) > -1){
               return (
                 <Basepages>
@@ -100,22 +140,22 @@ class Layout extends Component {
         }
         else{
             return (
-                <Base logout={this.logout} authenticated={authenticated} token={token} location={location} userEmail={userEmail}>
+                <Base logout={this.logout} authenticated={authenticated} token={token} location={location} userEmail={userEmail} wrongMetamskNetworkMsg={wrongMetamskNetworkMsg} wrongMetamaskNetwork={wrongMetamaskNetwork} updateMetamaskAccount={this.updateMetamaskAccount} currentMetamaskAccount={currentMetamaskAccount}>
                     <Switch>
                         <Route exact={true} path='/' 
                             render={() => 
-                              <Market {...this.props} authenticated={authenticated}  token={token} />
+                              <Market {...this.props} authenticated={authenticated}  token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} />
                             }
                           />
 
                         <Route path='/market' 
                             render={() => 
-                              <Market {...this.props} authenticated={authenticated} token={token} />
+                              <Market {...this.props} authenticated={authenticated} token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} />
                             }
                           />  
 
-                        <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={DashboardContainer} currentMetamaskAccount={currentMetamaskAccount} />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={WalletContainer} /> 
+                        <PrivateRoute authenticated={authenticated} token={token} path='/dashboard' component={DashboardContainer} currentMetamaskAccount={currentMetamaskAccount} networkId={networkId} wrongMetamaskNetwork={wrongMetamaskNetwork} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/wallet" component={WalletContainer} currentMetamaskAccount={currentMetamaskAccount} wrongMetamaskNetwork={wrongMetamaskNetwork} /> 
                         <PrivateRoute authenticated={authenticated} token={token} path="/loanrequests" component={LoanRequestsContainer} />
                         <PrivateRoute path="/createold"  authenticated={authenticated} token={token}  component={CreateLoanRequestContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />

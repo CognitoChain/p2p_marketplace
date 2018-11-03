@@ -69,6 +69,7 @@ class DharmaProvider extends Component {
         // Assume the tokens are out of date.
         this.setState({
             tokens: [],
+            isTokenLoading:true
         });
 
         dharma.blockchain.getAccounts().then((accounts) => {

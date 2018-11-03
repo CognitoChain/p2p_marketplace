@@ -24,9 +24,9 @@ class MyActivities extends Component {
       activities: [],
       investmentsActivities: [],
       loanRequestsActivities: [],
-      isLoading:true,
-      myBorrowedRequestsLoading:true,
-      myFundedRequestsLoading:true,
+      isLoading: true,
+      myBorrowedRequestsLoading: true,
+      myFundedRequestsLoading: true,
       metaMaskMsg: false,
       myLoansIsMounted: true,
       myInvestmensIsMounted: true
@@ -34,7 +34,7 @@ class MyActivities extends Component {
   }
 
   async componentWillReceiveProps(nextProps) {
-    const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests,myBorrowedLoading,myFundedLoading } = nextProps;
+    const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
     const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
     const { myLoansIsMounted, myInvestmensIsMounted, displayNoRecordMsg } = this.state;
 
@@ -60,25 +60,24 @@ class MyActivities extends Component {
                   ts.id,
                   st
                 );
-                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
+                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
 
                 let buttonText = '';
                 let buttonClassName = '';
                 if (ts.debtorAddress == currentMetamaskAccount) {
-                  if(parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false)
-                  {
-                    buttonText = 'Pay'; 
+                  if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
+                    buttonText = 'Pay';
                     buttonClassName = 'orange';
                   }
-                  else if(ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true){
-                    buttonText = 'Claim Collateral'; 
+                  else if (ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true) {
+                    buttonText = 'Claim Collateral';
                     buttonClassName = 'green';
                   }
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = (amount > 0) ? amount.toFixed(2) : 0; 
+                amount = (amount > 0) ? amount.toFixed(2) : 0;
                 loanRequestsActivities.push({
-                  id: "l_"+_.random(999999999),
+                  id: "l_" + _.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                   amount: amount,
                   type: "minus",
@@ -86,7 +85,7 @@ class MyActivities extends Component {
                   agreementId: ts.id,
                   sortTimestamp: st,
                   buttonText: buttonText,
-                  buttonClassName:buttonClassName
+                  buttonClassName: buttonClassName
                 });
                 i++;
               }
@@ -94,7 +93,7 @@ class MyActivities extends Component {
           }
 
         });
-        
+
       }
       myBorrowedRequestsLoading = false
       if (myLoansIsMounted) {
@@ -123,7 +122,7 @@ class MyActivities extends Component {
                   ts.id,
                   schedule_ts
                 );
-                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);                
+                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
 
                 let buttonText = '';
                 let buttonClassName = '';
@@ -132,9 +131,9 @@ class MyActivities extends Component {
                   buttonClassName = 'green';
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = (amount > 0) ? amount.toFixed(2) : 0; 
+                amount = (amount > 0) ? amount.toFixed(2) : 0;
                 investmentsActivities.push({
-                  id: "i_"+_.random(999999999),
+                  id: "i_" + _.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
                   amount: amount,
                   type: "plus",
@@ -142,7 +141,7 @@ class MyActivities extends Component {
                   agreementId: ts.id,
                   sortTimestamp: schedule_ts,
                   buttonText: buttonText,
-                  buttonClassName:buttonClassName
+                  buttonClassName: buttonClassName
                 });
                 i++;
               }
@@ -171,14 +170,14 @@ class MyActivities extends Component {
       await callback(array[index], index, array);
     }
   }
-  convertBigNumber(obj,power) {
+  convertBigNumber(obj, power) {
     return obj.div(new BigNumber(10).pow(power.toNumber()));
   }
   render() {
-    const { loanRequestsActivities, investmentsActivities, metaMaskMsg ,myFundedRequestsLoading, myBorrowedRequestsLoading} = this.state;
+    const { loanRequestsActivities, investmentsActivities, metaMaskMsg, myFundedRequestsLoading, myBorrowedRequestsLoading } = this.state;
     const { myFundedLoading, myBorrowedLoading } = this.props;
     let isLoading = myBorrowedRequestsLoading || myFundedRequestsLoading || myBorrowedLoading || myFundedLoading;
-  
+
     let activities = [];
     if (!isLoading) {
       activities = [...loanRequestsActivities, ...investmentsActivities];
@@ -249,11 +248,11 @@ class MyActivities extends Component {
         text: "Pay Button",
         isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
-            return (
-              <div>
-                <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName }>{row.buttonText}</a>
-              </div>
-            );
+          return (
+            <div>
+              <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName}>{row.buttonText}</a>
+            </div>
+          );
         }
       },
       {
@@ -293,7 +292,12 @@ class MyActivities extends Component {
         <Card className="card-statistics h-100 my-activities-container">
           <CardBody>
             <CardTitle>My Activities</CardTitle>
-            {isLoading && <Loading />}
+            {isLoading &&
+              <Row className="h-100 position-absolute portfolio-row align-items-center justify-content-center w-100">
+                <Col md={12}>
+                  <Loading />
+                </Col>
+              </Row>}
             {!isLoading && activities.length == 0 && <MyActivitiesEmpty />}
             {
               metaMaskMsg &&
