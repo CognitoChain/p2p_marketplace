@@ -68,16 +68,7 @@ class Header extends Component {
                 {/* <!-- top bar right --> */}
                 <div className="ml-auto header-right-block">
                     {
-                        (currentMetamaskAccount == '' || currentMetamaskAccount == null || _.isUndefined(currentMetamaskAccount)) && (
-                            <CustomAlertMsg
-                                bsStyle='danger'
-                                extraClass="d-inline-block header-notice mb-0"
-                                title="Please log in to Metamask."
-                            />
-                        )
-                    }
-                    {
-                        currentMetamaskAccount != '' && wrongMetamaskNetwork === true && (
+                        wrongMetamaskNetwork === true && (
                             <CustomAlertMsg
                                 bsStyle='danger'
                                 extraClass="d-inline-block header-notice mb-0"
@@ -86,6 +77,16 @@ class Header extends Component {
                         )
                     }
 
+                    {
+                        (wrongMetamaskNetwork==false && (currentMetamaskAccount == '' || currentMetamaskAccount == null || _.isUndefined(currentMetamaskAccount))) && (
+                            <CustomAlertMsg
+                                bsStyle='danger'
+                                extraClass="d-inline-block header-notice mb-0"
+                                title="Please log in to Metamask."
+                            />
+                        )
+                    }
+                    
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
                             {
