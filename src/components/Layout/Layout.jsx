@@ -108,13 +108,14 @@ class Layout extends Component {
         let networkId = window.web3.version.network;
         let wrongMetamskNetworkMsg = '';
         let wrongMetamaskNetwork = false;
-        if(process.env.NODE_ENV == "development" && networkId != "42" && networkId != null)
+        if((process.env.NODE_ENV == "development"  || process.env.NODE_ENV == "production" ) && networkId != "42" && networkId != null)
         {
             wrongMetamskNetworkMsg = 'Please connect to Kovan Test Network in metamask.';
             wrongMetamaskNetwork = true;
         }
         else if(process.env.NODE_ENV == "production" && networkId != "1" && networkId != null) 
         {
+          //networkId != "1"
             wrongMetamskNetworkMsg = 'Please connect to Main Ethereum Network in metamask.';
             wrongMetamaskNetwork = true;
         }
