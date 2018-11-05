@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import Modal from "react-responsive-modal";
 import _ from "lodash";
 import { BigNumber } from "bignumber.js";
+import { BLOCKCHAIN_API } from "../../common/constants";
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -53,7 +54,9 @@ class Detail extends Component {
       collateralCurrentAmount: 0,
       LTVRatioValue: 0,
       loanScheduleDisplay: false,
-      nextRepaymentDate:''      
+      nextRepaymentDate:'',
+      loanRequestData:[],
+      repaymentButtonDisabled:false         
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -76,55 +79,154 @@ class Detail extends Component {
     }
   }
 
-  async componentWillMount() {
-    const { LoanRequest, Investments, Investment, Debt } = Dharma.Types;
+  async prepareRepaymentScheduleDetails(){
     const { dharma, id } = this.props;
+    const { Debt } = Dharma.Types;
+    const { loanRequestData } = this.state;
     let currentAccount = await dharma.blockchain.getCurrentAccount();
     currentAccount = _.toLower(currentAccount);
-    let current_time = moment();
     let collateralReturnable = false;
     let stateObj = {};
+    let repaymentLoanstemp = [];
+    const repaymentTemp = [];
+    let agreementId = id;
+    let userTimezone = moment.tz.guess();
+    let principalAmount = this.convertBigNumber(loanRequestData.principalAmount,loanRequestData.principalNumDecimals,true);
+    let principalTokenSymbol = loanRequestData.principalSymbol;
+    let repaymentSchedule = loanRequestData.repaymentSchedule;
+    let nextRepaymentDate = '';
+    let i = 1;
+    let j = 1;
+    let lastExpectedRepaidAmount = 0;
+    let nextRepaymentAmount = 0;
+    const isRepaid = loanRequestData.isRepaid;
+    const isCollateralSeizable = loanRequestData.isCollateralSeizable;
+    let creditorEthAddress = loanRequestData.creditorAddress;
+    let debtorEthAddress = loanRequestData.debtorAddress;
+    const principalTokenDecimals = await dharma.token.getNumDecimals(principalTokenSymbol);
+    const valueRepaidAr = await dharma.servicing.getValueRepaid(
+      agreementId
+    );
+    const valueRepaid = this.convertBigNumber(valueRepaidAr,principalTokenDecimals);
+    const debt = await Debt.fetch(dharma, id);
+    const outstandingAmount = await debt.getOutstandingAmount();
+    if (outstandingAmount == 0) {
+      const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+        id
+        );
+      const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
+        debtRegistryEntry.termsContract
+        );
+      let issuanceHash = id;
+      collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+        issuanceHash
+        );
+    }
+    let totalRepaymentAmount = this.convertBigNumber(loanRequestData.totalExpectedRepayment,loanRequestData.principalNumDecimals,true);
+    let totalRepaidAmount =
+            parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
+    totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
+    await this.asyncForEach(repaymentSchedule, async ts => {
+      let date = new Date(ts);
+      let currentTimestamp = moment().unix();
+      ts = ts / 1000;
+      let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
+        agreementId,
+        ts
+      );
+      let expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
+      expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
+
+      if (ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
+        nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
+        nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
+        nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+        stateObj["nextRepaymentDate"] = nextRepaymentDate;
+        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
+        j++;
+      }
+      let paidStatus = '';
+      if(totalRepaidAmount >= expectedRepaidAmount)
+      {
+        paidStatus = 'paid';   
+      }
+      else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
+        paidStatus = 'partial_paid';   
+      }
+      else{
+        paidStatus = 'due';
+        if(ts < currentTimestamp){
+          paidStatus = 'missed';
+        }
+      }
+
+      if(lastExpectedRepaidAmount != expectedRepaidAmount)
+      {
+        lastExpectedRepaidAmount = expectedRepaidAmount;  
+      }
+      repaymentLoanstemp.push({
+        id: i,
+        ts: ts,
+        createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
+        principalAmount: principalAmount,
+        principalTokenSymbol: principalTokenSymbol,
+        interestAmount: 0,
+        totalRepaymentAmount: expectedRepaidAmount,
+        status: paidStatus
+      });
+      i++;
+    });
+    stateObj["currentEthAddress"] = currentAccount;
+    if (typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) {
+      if (outstandingAmount > 0) {
+        stateObj["repaymentBtnDisplay"] = true;
+      }
+      if (outstandingAmount == 0 && collateralReturnable === true) {
+        stateObj["collateralBtnDisplay"] = true;
+      }
+    }
+    if (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount && isCollateralSeizable === true && isRepaid === false) {
+      stateObj["collateralSeizeBtnDisplay"] = true;
+    }
+    if ((typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) || (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount)) {
+      stateObj["loanScheduleDisplay"] = true;
+    }
+    stateObj["repaymentLoans"] = repaymentLoanstemp;
+    stateObj["principalTokenDecimals"] = principalTokenDecimals;
+    stateObj["totalRepaidAmount"] = totalRepaidAmount;
+    stateObj["nextRepaymentDate"] = nextRepaymentDate;
+    stateObj["isLoading"] = false;
+    stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
+    stateObj["outstandingAmount"] = outstandingAmount;
+    stateObj["debtorEthAddress"] = debtorEthAddress;
+    this.setState(stateObj);
+    return principalTokenDecimals;
+  }
+
+  async componentWillMount() {
+    const { LoanRequest, Investments, Investment, Debt, Token } = Dharma.Types;
+    const { dharma, id } = this.props;
+    let current_time = moment();
+    let stateObj = {};
+    let currentAccount = await dharma.blockchain.getCurrentAccount();
+    let i = 1;
+    let j = 1;
+    let userTimezone = moment.tz.guess();
+    let current_timestamp = moment().unix();
     const api = new Api();
     api
       .setToken(this.props.token)
       .get(`loan/${id}`)
       .then(async loanRequestData => {
-
         if (!_.isUndefined(loanRequestData)) {
-          console.log(loanRequestData);
+
           let principalTokenSymbol = loanRequestData.principalSymbol;
           let collateralTokenSymbol = loanRequestData.collateralSymbol;
           let principalAmount = this.convertBigNumber(loanRequestData.principalAmount,loanRequestData.principalNumDecimals,true);
           let collateralAmount = this.convertBigNumber(loanRequestData.collateralAmount,loanRequestData.collateralNumDecimals,true);
           let interestRate = parseFloat(loanRequestData.interestRatePercent);
           let interestAmount = (principalAmount * interestRate) / 100;
-          let creditorEthAddress = loanRequestData.creditorAddress;
-          let debtorEthAddress = loanRequestData.debtorAddress;
-          const principalTokenDecimals = await dharma.token.getNumDecimals(principalTokenSymbol);
-          const debt = await Debt.fetch(dharma, id);
-          const outstandingAmount = await debt.getOutstandingAmount();
-
-          if (outstandingAmount == 0) {
-            const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
-              id
-            );
-            const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
-              debtRegistryEntry.termsContract
-            );
-            let issuanceHash = id;
-            collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
-              issuanceHash
-            );
-          }
-          const isRepaid = loanRequestData.isRepaid;
-          const isCollateralSeizable = loanRequestData.isCollateralSeizable;
-          let totalRepaymentAmount = this.convertBigNumber(loanRequestData.totalExpectedRepayment,loanRequestData.principalNumDecimals,true);
-          let totalRepaidAmount =
-            parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
-          totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
           let displayAgreementId = _(id).truncate(4);
-          let nextRepaymentAmount = 0;
-          let nextRepaymentDate = '';
           const all_token_price = await api
             .setToken(this.props.token)
             .get(`priceFeed`)
@@ -133,7 +235,6 @@ class Detail extends Component {
               let principalCurrentAmount = parseFloat(principalAmount) * principalTokenCurrentPrice;
               let collateralTokenCurrentPrice = priceFeedData[collateralTokenSymbol].USD;
               let collateralCurrentAmount = parseFloat(collateralAmount) * collateralTokenCurrentPrice;
-              
               collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
               stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
 
@@ -142,7 +243,6 @@ class Detail extends Component {
                 stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
               }
           });
-
           stateObj["principal"] = principalAmount;
           stateObj["principalTokenSymbol"] = principalTokenSymbol;
           stateObj["collateralAmount"] = collateralAmount;
@@ -157,97 +257,11 @@ class Detail extends Component {
             "HH:mm:ss"
           );
           stateObj["interestAmount"] = interestAmount;
-          stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
-          stateObj["outstandingAmount"] = outstandingAmount;
           stateObj["agreementId"] = displayAgreementId;
-          stateObj["nextRepaymentAmount"] = nextRepaymentAmount;
-          stateObj["nextRepaymentDate"] = "";
-          stateObj["totalRepaidAmount"] = totalRepaidAmount;
-          stateObj["creditorEthAddress"] = creditorEthAddress;
-          stateObj["debtorEthAddress"] = debtorEthAddress;
-          let agreementId = id;
-          const repaymentSchedule = loanRequestData.repaymentSchedule;
-          const valueRepaidAr = await dharma.servicing.getValueRepaid(
-            agreementId
-          );
-          const valueRepaid = this.convertBigNumber(valueRepaidAr,principalTokenDecimals);
-          const repaymentLoanstemp = [];
-          let i = 1;
-          let j = 1;
-          let userTimezone = moment.tz.guess();
-          let current_timestamp = moment().unix();
-          let lastExpectedRepaidAmount = 0;
-          await this.asyncForEach(repaymentSchedule, async ts => {
-            console.log(ts);
-            let date = new Date(ts);
-            ts = ts / 1000;
-            let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-              agreementId,
-              ts
-            );
-            console.log(expectedRepaidAmountBigNumber);
-            let expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
-            expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
-
-            if (ts > current_timestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
-              nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
-              nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
-              nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
-              j++;
-            }
-            
-            let paidStatus = '';
-            if(totalRepaidAmount >= expectedRepaidAmount)
-            {
-              paidStatus = 'paid';   
-            }
-            else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
-              paidStatus = 'partial_paid';   
-            }
-            else{
-              paidStatus = 'due';
-              if(ts < current_timestamp){
-                paidStatus = 'missed';
-              }
-            }
-
-            if(lastExpectedRepaidAmount != expectedRepaidAmount)
-            {
-              lastExpectedRepaidAmount = expectedRepaidAmount;  
-            }
-            repaymentLoanstemp.push({
-              id: i,
-              ts: ts,
-              createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
-              principalAmount: principalAmount,
-              principalTokenSymbol: principalTokenSymbol,
-              interestAmount: 0,
-              totalRepaymentAmount: expectedRepaidAmount,
-              status: paidStatus
-            });
-            i++;
+          this.setState({ loanRequestData: loanRequestData }, () => {
+            console.log("Parse request");
+            this.prepareRepaymentScheduleDetails();  
           });
-          stateObj["repaymentLoans"] = repaymentLoanstemp;
-          stateObj["isLoading"] = false;
-          stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
-          stateObj["nextRepaymentDate"] = nextRepaymentDate;
-          stateObj["currentEthAddress"] = currentAccount;
-          if (typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) {
-            if (outstandingAmount > 0) {
-              stateObj["repaymentBtnDisplay"] = true;
-            }
-            if (outstandingAmount == 0 && collateralReturnable === true) {
-              stateObj["collateralBtnDisplay"] = true;
-            }
-          }
-
-          if (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount && isCollateralSeizable === true && isRepaid === false) {
-            stateObj["collateralSeizeBtnDisplay"] = true;
-          }
-
-          if ((typeof debtorEthAddress != "undefined" && debtorEthAddress == currentAccount) || (typeof creditorEthAddress != "undefined" && creditorEthAddress == currentAccount)) {
-            stateObj["loanScheduleDisplay"] = true;
-          }
           this.setState(stateObj);
         }
       });
@@ -260,49 +274,33 @@ class Detail extends Component {
   async processRepayment() {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { repaymentAmount, debtorEthAddress, principalTokenSymbol } = this.state;
+    const { repaymentAmount, debtorEthAddress, principalTokenSymbol,outstandingAmount } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     let collateralReturnable = false;
     let stateObj = {};
-    if (
-      typeof currentAccount != "undefined" &&
-      debtorEthAddress == currentAccount &&
-      repaymentAmount > 0
-    ) {
-      const debt = await Debt.fetch(dharma, id);
-      if (typeof debt != "undefined") {
-        const outstandingAmount = await debt.getOutstandingAmount();
+    if (typeof currentAccount != "undefined" && debtorEthAddress == currentAccount &&repaymentAmount > 0
+    ) 
+    {
+        this.setState({ repaymentButtonDisabled: true });
+        const debt = await Debt.fetch(dharma, id);
         if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
-
           try {
             const txHash = await debt.makeRepayment(repaymentAmount);
             if (txHash != "") {
+              await dharma.blockchain.awaitTransactionMinedAsync(
+                txHash,
+                BLOCKCHAIN_API.POLLING_INTERVAL,
+                BLOCKCHAIN_API.TIMEOUT,
+              );
+              this.prepareRepaymentScheduleDetails();
               toast.success(
-                "Transaction submited successfully.We will notify you once it is completed.",
+                "You have successfully repaid "+repaymentAmount+ " "+principalTokenSymbol+".",
                 {
                   autoClose: 8000
                 }
               );
-              const outstandingAmount = await debt.getOutstandingAmount();
-              stateObj["outstandingAmount"] = outstandingAmount;
               stateObj["modalOpen"] = false;
-              stateObj["repaymentAmount"] = 0;
-              if (outstandingAmount == 0) {
-                const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
-                  id
-                );
-                const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
-                  debtRegistryEntry.termsContract
-                );
-                let issuanceHash = id;
-                collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
-                  issuanceHash
-                );
-                if (collateralReturnable === true) {
-                  stateObj["collateralBtnDisplay"] = true;
-                }
-                stateObj["repaymentBtnDisplay"] = false;
-              }
+              stateObj["repaymentButtonDisabled"] = false;
               this.setState(stateObj);
             }
           }
@@ -312,13 +310,15 @@ class Detail extends Component {
             toast.error(
               "You have not granted the token a sufficient allowance in the specified token to execute this repayment or you does not have sufficient balance."
             );
+            this.setState({ repaymentButtonDisabled: false });
           }
-        } else {
+        }
+        else {
           toast.error(
             "Repayment amount can not be more then outstanding amount."
           );
-        }
-      }
+          this.setState({ repaymentButtonDisabled: false });
+        }      
     } else {
       let msg =
         currentAccount != debtorEthAddress
@@ -329,6 +329,7 @@ class Detail extends Component {
       toast.error(msg, {
         autoClose: 8000
       });
+      this.setState({ repaymentButtonDisabled: false });
     }
   }
 
@@ -407,7 +408,6 @@ class Detail extends Component {
 
   render() {
     const data = this.getData();
-
     const columns = [
       {
         dataField: "createdDate",
@@ -527,9 +527,10 @@ class Detail extends Component {
       collateralCurrentAmount,
       LTVRatioValue,
       loanScheduleDisplay,
-      nextRepaymentDate
+      nextRepaymentDate,
+      repaymentButtonDisabled      
     } = this.state;
-
+    let buttonText = (repaymentButtonDisabled===true) ? 'processing' : 'Make Repayment';
     return (
       <div>
         <div className="page-title">
@@ -754,7 +755,7 @@ class Detail extends Component {
                   <div className="mt-20 text-center">
                     <button
                       className="btn cognito orange small icon mb-15 make-repayment-btn"
-                      onClick={this.processRepayment}>Make Repayment</button>
+                      onClick={this.processRepayment} disabled={repaymentButtonDisabled}>{buttonText}</button>
                     <button
                       className="btn cognito small icon mb-15 ml-10"
                       onClick={this.onCloseModal}>Cancel</button>
