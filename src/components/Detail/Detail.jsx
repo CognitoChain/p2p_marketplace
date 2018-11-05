@@ -22,6 +22,7 @@ import Modal from "react-responsive-modal";
 import _ from "lodash";
 import { BigNumber } from "bignumber.js";
 import { BLOCKCHAIN_API } from "../../common/constants";
+import { Link } from 'react-router-dom';
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -538,9 +539,7 @@ class Detail extends Component {
             <Col>
               <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href="/dashboard" className="link-blue">
-                    My Loans
-                  </a>
+                  <Link className="link-blue" to="/dashboard">My Loans</Link>
                 </BreadcrumbItem>
                 <BreadcrumbItem active>Loan Detail</BreadcrumbItem>
               </Breadcrumb>

@@ -16,6 +16,7 @@ import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import borrowImg from "../../assets/images/borrow.png";
 import _ from "lodash";
+import { Link } from 'react-router-dom';
 
 class CreateLoan extends Component {
 
@@ -490,7 +491,9 @@ class CreateLoan extends Component {
                     <Row>
                         <Col>
                             <Breadcrumb className="float-left">
-                                <BreadcrumbItem><a href="/market" className="link-blue">Market</a></BreadcrumbItem>
+                                <BreadcrumbItem>
+                                    <Link className="link-blue" to="/market">Market</Link>
+                                </BreadcrumbItem>
                                 <BreadcrumbItem active>New Loan</BreadcrumbItem>
                             </Breadcrumb>
                         </Col>

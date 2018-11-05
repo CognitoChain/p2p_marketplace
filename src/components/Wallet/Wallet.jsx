@@ -25,6 +25,7 @@ import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import { BLOCKCHAIN_API } from "../../common/constants";
 import Switch from "react-switch";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import { Link } from 'react-router-dom';
 let timer;
 class Wallet extends Component {
   constructor(props) {
@@ -246,7 +247,7 @@ class Wallet extends Component {
           <Row>
             <Col>
               <Breadcrumb className="float-left">
-                <BreadcrumbItem><a href="/market" className="link-blue">Home</a></BreadcrumbItem>
+                <BreadcrumbItem><Link className="link-blue" to="/market">Market</Link></BreadcrumbItem>
                 <BreadcrumbItem active>Wallet</BreadcrumbItem>
               </Breadcrumb>
             </Col>

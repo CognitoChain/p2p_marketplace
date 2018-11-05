@@ -15,6 +15,7 @@ import * as moment from "moment";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import _ from "lodash";
+import { Link } from 'react-router-dom';
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -327,7 +328,9 @@ class LoanRequest extends Component {
                     <Row>
                         <Col>
                             <Breadcrumb>
-                                <BreadcrumbItem><a href="/market" className="link-blue">Market</a></BreadcrumbItem>
+                                <BreadcrumbItem>
+                                    <Link className="link-blue" to="/market">Market</Link>
+                                </BreadcrumbItem>
                                 <BreadcrumbItem active>Fund Loan</BreadcrumbItem>
                             </Breadcrumb>
                         </Col>
