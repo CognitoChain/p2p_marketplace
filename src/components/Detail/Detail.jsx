@@ -729,17 +729,7 @@ class Detail extends Component {
                   <h2 className="text-center text-bold">Make Repayment</h2>
 
                   <p className="repayment-details mt-15 mb-15">
-                    You are making a repayment for debt agreement{" "}
-                    <span className="text-bold">{agreementId}</span>. You owe{" "}
-                    <span className="text-bold">
-                      {totalRepaymentAmount} {principalTokenSymbol}
-                    </span>{" "}
-                    in total, of which you've already repaid{" "}
-                    <span className="text-bold">{totalRepaidAmount} {principalTokenSymbol}</span>.
-                  </p>
-
-                  <p className="repayment-details mt-15 mb-15">
-                    How large of a repayment would you like to make?
+                    Your outstanding balance is <span className="text-bold">{outstandingAmount} {principalTokenSymbol}</span> in total. You are due <span className="text-bold">{nextRepaymentAmount} {principalTokenSymbol}</span> by <span className="text-bold">{nextRepaymentDate}</span>.
                   </p>
 
                   <input
