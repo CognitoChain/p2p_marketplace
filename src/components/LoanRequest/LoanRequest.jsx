@@ -216,6 +216,12 @@ class LoanRequest extends Component {
                     title = "Steps Required"
                     description = 'Token transfer authorization required. Click "Unlock Token".'
                 }
+                else if (error.message == "Creditor balance is insufficient") {
+                    description = "You don't have sufficient balance to fund this loan"
+                }
+                else if (error.message == "Debtor does not have sufficient balance required for collateral transfer.") {
+                    description = "Borrower does not have sufficient balance required for collateral transfer"
+                }
                 this.setState({
                     error,
                     customAlertMsgDisplay: true,
