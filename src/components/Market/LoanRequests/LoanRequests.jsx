@@ -18,7 +18,7 @@ import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
 import _ from 'lodash';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency} from "../../../utils/Util";
+import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 
 /**
@@ -243,7 +243,7 @@ class LoanRequests extends Component {
                     let repayment_amount = row.principalAmount + interest_amount;
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{repayment_amount}</span><br />{row.principalTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}</div>
                         </div>
                     )
                 }

@@ -15,7 +15,8 @@ import "./MyBorrowedLoans.css";
 import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorrowedLoansRequestsEmpty";
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency} from "../../../utils/Util";
+import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
+
 import paginationFactory from 'react-bootstrap-table2-paginator';
 class MyBorrowedLoans extends Component {
     constructor(props) {
@@ -114,7 +115,7 @@ class MyBorrowedLoans extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}</div>
                         </div>
                     )
                 }

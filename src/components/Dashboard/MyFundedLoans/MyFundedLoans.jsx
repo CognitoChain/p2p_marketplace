@@ -9,7 +9,7 @@ import Loading from "../../Loading/Loading";
 import "./MyFundedLoans.css";
 import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoansRequestsEmpty";
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency} from "../../../utils/Util";
+import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import * as moment from "moment";
 import _ from 'lodash';
@@ -107,7 +107,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{row.totalExpectedRepaymentAmount}</span></div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(row.totalExpectedRepaymentAmount)} {row.principalSymbol}</span></div>
                         </div>
                     )
                 }
@@ -118,7 +118,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell} {row.principalSymbol}</span></div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)} {row.principalSymbol}</span></div>
                         </div>
                     )
                 }

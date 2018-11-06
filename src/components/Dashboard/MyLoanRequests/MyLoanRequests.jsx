@@ -15,7 +15,7 @@ import "./MyLoanRequests.css";
 import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency} from "../../../utils/Util";
+import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 class MyLoanRequests extends Component {
     constructor(props) {
@@ -114,7 +114,7 @@ class MyLoanRequests extends Component {
 
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{totalRepaymentAmount}</span><br />{row.principalTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(totalRepaymentAmount)}</span><br />{row.principalTokenSymbol}</div>
                         </div>
                     )
                 }

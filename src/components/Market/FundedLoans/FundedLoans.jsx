@@ -15,7 +15,7 @@ import Api from "../../../services/api";
 import "./FundedLoans.css";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import _ from 'lodash';
-import { amortizationUnitToFrequency } from "../../../utils/Util";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 /**
  * Here we define the columns that appear in the table that holds all of the
@@ -88,7 +88,7 @@ const columns = [
             let repayment_amount = row.principalAmount + interest_amount;
             return (
                 <div>
-                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{repayment_amount}</span><br />{row.principalTokenSymbol}</div>
+                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}</div>
                 </div>
             )
         }
