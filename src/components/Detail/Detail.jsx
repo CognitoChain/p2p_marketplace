@@ -126,7 +126,13 @@ class Detail extends Component {
     let totalRepaymentAmount = this.convertBigNumber(loanRequestData.totalExpectedRepayment,loanRequestData.principalNumDecimals,true);
     let totalRepaidAmount =
             parseFloat(totalRepaymentAmount) - parseFloat(outstandingAmount);
-    totalRepaidAmount = (totalRepaidAmount > 0) ? parseFloat(totalRepaidAmount.toFixed(2)) : 0;
+    totalRepaidAmount = (totalRepaidAmount > 0) ? totalRepaidAmount : 0;
+
+    let installmentPrincipal = principalAmount / loanRequestData.termLengthAmount;
+    installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
+
+    let interestRate = parseFloat(loanRequestData.interestRatePercent);
+    let interestAmount = (installmentPrincipal * interestRate) / 100;
     await this.asyncForEach(repaymentSchedule, async ts => {
       let date = new Date(ts);
       let currentTimestamp = moment().unix();
@@ -135,15 +141,17 @@ class Detail extends Component {
         agreementId,
         ts
       );
-      let expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
-      expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount.toFixed(2)) : 0;
+      let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(interestAmount);
+      let expectedRepaidAmountDharma = this.convertBigNumber(expectedRepaidAmountBigNumber,principalTokenDecimals);
+      expectedRepaidAmount = (expectedRepaidAmount > 0) ? parseFloat(expectedRepaidAmount) : 0;
+      expectedRepaidAmountDharma = (expectedRepaidAmountDharma > 0) ? parseFloat(expectedRepaidAmountDharma) : 0;
 
-      if (ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmount) {
-        nextRepaymentAmount = expectedRepaidAmount - totalRepaidAmount;
-        nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount.toFixed(2) : 0;
+      if (ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmountDharma) {
+        nextRepaymentAmount = expectedRepaidAmountDharma - totalRepaidAmount;
+        nextRepaymentAmount = (nextRepaymentAmount > 0) ? nextRepaymentAmount : 0;
         nextRepaymentDate  = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
         stateObj["nextRepaymentDate"] = nextRepaymentDate;
-        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = nextRepaymentAmount;
+        stateObj["nextRepaymentAmount"] = stateObj["repaymentAmount"] = niceNumberDisplay(nextRepaymentAmount);
         j++;
       }
       let paidStatus = '';
