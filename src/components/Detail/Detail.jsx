@@ -22,6 +22,7 @@ import Modal from "react-responsive-modal";
 import _ from "lodash";
 import { BigNumber } from "bignumber.js";
 import { BLOCKCHAIN_API } from "../../common/constants";
+import {niceNumberDisplay} from "../../utils/Util";
 import { Link } from 'react-router-dom';
 class Detail extends Component {
   constructor(props) {
@@ -177,10 +178,10 @@ class Detail extends Component {
         id: i,
         ts: ts,
         createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
-        principalAmount: principalAmount,
+        principalAmount: niceNumberDisplay(installmentPrincipal),
         principalTokenSymbol: principalTokenSymbol,
-        interestAmount: 0,
-        totalRepaymentAmount: expectedRepaidAmount,
+        interestAmount: niceNumberDisplay(interestAmount),
+        totalRepaymentAmount: niceNumberDisplay(expectedRepaidAmount),
         status: paidStatus
       });
       i++;
@@ -202,12 +203,14 @@ class Detail extends Component {
     }
     stateObj["repaymentLoans"] = repaymentLoanstemp;
     stateObj["principalTokenDecimals"] = principalTokenDecimals;
-    stateObj["totalRepaidAmount"] = totalRepaidAmount;
+    stateObj["totalRepaidAmount"] = niceNumberDisplay(totalRepaidAmount);
     stateObj["nextRepaymentDate"] = nextRepaymentDate;
     stateObj["isLoading"] = false;
-    stateObj["totalRepaymentAmount"] = totalRepaymentAmount;
-    stateObj["outstandingAmount"] = outstandingAmount;
+    stateObj["totalRepaymentAmount"] = niceNumberDisplay(totalRepaymentAmount);
+    stateObj["outstandingAmount"] = niceNumberDisplay(outstandingAmount);
     stateObj["debtorEthAddress"] = debtorEthAddress;
+    stateObj["overViewBackgroundClass"] = overViewBackgroundClass;
+    stateObj["overViewButtonBackgroundClass"] = overViewButtonBackgroundClass;
     this.setState(stateObj);
     return principalTokenDecimals;
   }
@@ -244,17 +247,17 @@ class Detail extends Component {
               let principalCurrentAmount = parseFloat(principalAmount) * principalTokenCurrentPrice;
               let collateralTokenCurrentPrice = priceFeedData[collateralTokenSymbol].USD;
               let collateralCurrentAmount = parseFloat(collateralAmount) * collateralTokenCurrentPrice;
-              collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
-              stateObj["collateralCurrentAmount"] = collateralCurrentAmount;
+              collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount : 0;
+              stateObj["collateralCurrentAmount"] = niceNumberDisplay(collateralCurrentAmount);
 
               if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
                 let LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
-                stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
+                stateObj["LTVRatioValue"] = (LTVRatioValue > 0) ? niceNumberDisplay(LTVRatioValue): 0;
               }
           });
-          stateObj["principal"] = principalAmount;
+          stateObj["principal"] = niceNumberDisplay(principalAmount);
           stateObj["principalTokenSymbol"] = principalTokenSymbol;
-          stateObj["collateralAmount"] = collateralAmount;
+          stateObj["collateralAmount"] = niceNumberDisplay(collateralAmount);
           stateObj["collateralTokenSymbol"] = collateralTokenSymbol;
           stateObj["interestRate"] = interestRate;
           stateObj["termLength"] = loanRequestData.termLengthAmount;
