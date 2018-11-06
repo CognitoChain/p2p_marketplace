@@ -12,7 +12,7 @@
 }
 .btn.cognito.repayment-button
 {
-	background-color: #17A086 !important;
+	background-color: #17A086;
 	color: white !important;
 	padding:10px 15px;
 }
@@ -47,4 +47,22 @@
 .payment-missed{
 	opacity: 0.7 !important;
 	color:#dc3545 !important;	
+}
+.overview-bg-success{
+	background-color: #E3FAE0 !important;
+}
+.overview-bg-btn-success{
+	background-color: #17A086 !important
+}
+.overview-bg-orange{
+	background-color: rgba(254, 178, 115, 0.52) !important;
+}
+.overview-bg-btn-orange{
+	background-color: #f09335 !important;
+}
+.overview-bg-error{
+	background-color: rgba(231, 114, 125, 0.35) !important;
+}
+.overview-bg-btn-error{
+	background-color: #e77882 !important;
 }

@@ -58,7 +58,9 @@ class Detail extends Component {
       loanScheduleDisplay: false,
       nextRepaymentDate:'',
       loanRequestData:[],
-      repaymentButtonDisabled:false         
+      repaymentButtonDisabled:false,
+      overViewBackgroundClass:'',
+      overViewButtonBackgroundClass:''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -101,6 +103,8 @@ class Detail extends Component {
     let j = 1;
     let lastExpectedRepaidAmount = 0;
     let nextRepaymentAmount = 0;
+    let overViewBackgroundClass = '';
+    let overViewButtonBackgroundClass = '';
     const isRepaid = loanRequestData.isRepaid;
     const isCollateralSeizable = loanRequestData.isCollateralSeizable;
     let creditorEthAddress = loanRequestData.creditorAddress;
@@ -156,23 +160,29 @@ class Detail extends Component {
         j++;
       }
       let paidStatus = '';
-      if(totalRepaidAmount >= expectedRepaidAmount)
+      if(totalRepaidAmount >= expectedRepaidAmountDharma)
       {
-        paidStatus = 'paid';   
+        paidStatus = 'paid';
+        overViewBackgroundClass = 'overview-bg-success';   
+        overViewButtonBackgroundClass = 'overview-bg-btn-success';   
       }
-      else if(totalRepaidAmount < expectedRepaidAmount && totalRepaidAmount > lastExpectedRepaidAmount){
+      else if(totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount){
         paidStatus = 'partial_paid';   
+        overViewBackgroundClass = 'overview-bg-orange';   
+        overViewButtonBackgroundClass = 'overview-bg-btn-orange';
       }
       else{
         paidStatus = 'due';
         if(ts < currentTimestamp){
           paidStatus = 'missed';
+          overViewBackgroundClass = 'overview-bg-error';   
+          overViewButtonBackgroundClass = 'overview-bg-btn-error';
         }
       }
 
-      if(lastExpectedRepaidAmount != expectedRepaidAmount)
+      if(lastExpectedRepaidAmount != expectedRepaidAmountDharma)
       {
-        lastExpectedRepaidAmount = expectedRepaidAmount;  
+        lastExpectedRepaidAmount = expectedRepaidAmountDharma;  
       }
       repaymentLoanstemp.push({
         id: i,
@@ -540,7 +550,9 @@ class Detail extends Component {
       LTVRatioValue,
       loanScheduleDisplay,
       nextRepaymentDate,
-      repaymentButtonDisabled      
+      repaymentButtonDisabled,
+      overViewBackgroundClass,
+      overViewButtonBackgroundClass      
     } = this.state;
     let buttonText = (repaymentButtonDisabled===true) ? 'processing' : 'Make Repayment';
     return (
@@ -572,7 +584,7 @@ class Detail extends Component {
             <Row className="mb-30">
               <Col lg={4} md={4} sm={6} xl={4}>
                 <div>
-                  <Card className="card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics">
+                  <Card className={"card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics " + overViewBackgroundClass}>
                     <CardBody>
                       <CardTitle>Overview</CardTitle>
                       <Row>
@@ -621,7 +633,7 @@ class Detail extends Component {
                         <Col lg={6} md={6} sm={6} xl={6}>
                           {repaymentBtnDisplay === true && (
                             <button
-                              className="btn cognito repayment-button icon mb-15 btn-make-repayment btn-sm"
+                              className={"btn cognito repayment-button icon mb-15 btn-make-repayment btn-sm "+overViewButtonBackgroundClass}
                               onClick={event => this.makeRepayment()}
                             >
                               Make Repayment
