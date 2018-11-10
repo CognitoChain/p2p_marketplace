@@ -16,6 +16,7 @@ import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import _ from "lodash";
 import { Link } from 'react-router-dom';
+import {niceNumberDisplay} from "../../utils/Util";
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -103,10 +104,10 @@ class LoanRequest extends Component {
                     }
                     if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
                         LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
-                        LTVRatioValue = (LTVRatioValue > 0) ? LTVRatioValue.toFixed(2) : 0;
+                        LTVRatioValue = niceNumberDisplay(LTVRatioValue);
                     }
 
-                    collateralCurrentAmount = (collateralCurrentAmount > 0) ? collateralCurrentAmount.toFixed(2) : 0;
+                    collateralCurrentAmount = niceNumberDisplay(collateralCurrentAmount);
 
                     let principal = get_terms.principalAmount;
                     let interest_rate = get_terms.interestRate;

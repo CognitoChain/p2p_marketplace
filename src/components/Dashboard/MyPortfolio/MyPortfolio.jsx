@@ -18,6 +18,7 @@ import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
  * Here we define the columns that appear in the table that holds all of the
  * open Loan Requests.
  */
+import { niceNumberDisplay } from "../../../utils/Util";
 class MyPortfolio extends Component {
     constructor(props) {
         super(props);
@@ -56,7 +57,7 @@ class MyPortfolio extends Component {
                 });
             }
         }
-        totalAssetAmount = (totalAssetAmount > 0) ? totalAssetAmount.toFixed(2) : 0;
+        totalAssetAmount = niceNumberDisplay(totalAssetAmount);
      
         if (myBorrowedRequests.length > 0) {
             myBorrowedRequests.forEach(ml => {
@@ -69,7 +70,7 @@ class MyPortfolio extends Component {
                 }
             });            
         }
-        totalLiablitiesAmount = (totalLiablitiesAmount > 0) ? totalLiablitiesAmount.toFixed(2) : 0;
+        totalLiablitiesAmount = niceNumberDisplay(totalLiablitiesAmount);
         this.setState({ totalAssetAmount: totalAssetAmount,totalLiablitiesAmount: totalLiablitiesAmount }, () => {
             this.calculateValues()
         });
@@ -83,7 +84,7 @@ class MyPortfolio extends Component {
             return;
         }
         let assetLiabilitiesPercentage = ((totalAssetAmount-totalLiablitiesAmount)/totalAssetAmount)*100;
-        assetLiabilitiesPercentage = (assetLiabilitiesPercentage < 100) ? assetLiabilitiesPercentage.toFixed(2) : 99.99;
+        assetLiabilitiesPercentage = (assetLiabilitiesPercentage < 100) ? niceNumberDisplay(assetLiabilitiesPercentage) : 99.99;
         const data = {
             labels: [
                 'Assets',

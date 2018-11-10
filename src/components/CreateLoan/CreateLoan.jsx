@@ -14,6 +14,7 @@ import Api from "../../services/api";
 import Error from "../Error/Error";
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
+import { niceNumberDisplay } from "../../utils/Util";
 import borrowImg from "../../assets/images/borrow.png";
 import _ from "lodash";
 import { Link } from 'react-router-dom';
@@ -268,8 +269,8 @@ class CreateLoan extends Component {
         if (interestRate > 0) {
             interestAmount = (principal * interestRate) / 100;
             totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
-            stateObj["interestAmount"] = (interestAmount > 0) ? interestAmount.toFixed(2) : 0;
-            stateObj["totalReapaymentAmount"] = totalReapaymentAmount.toFixed(2);
+            stateObj["interestAmount"] = niceNumberDisplay(interestAmount);
+            stateObj["totalReapaymentAmount"] = niceNumberDisplay(totalReapaymentAmount);
         }
         this.setState(stateObj);
     }
@@ -431,13 +432,13 @@ class CreateLoan extends Component {
                     if (countCollateral.indexOf(name) > -1 && principal > 0 && LTVRatioValue > 0) {
                         let collateralCount = (pricinipalMarketValue / LTVRatioValue) * 100;
                         let collateralPurchasable = parseFloat(collateralCount) / parseFloat(collateralTokenCurrentPrice);
-                        collateralPurchasable = (collateralPurchasable > 0) ? collateralPurchasable.toFixed(2) : 0;
+                        collateralPurchasable = niceNumberDisplay(collateralPurchasable);
                         this.setState({ collateral: collateralPurchasable });
                     }
                     if (name == "collateral" && principal > 0 && collateral > 0) {
                         let collateralMarketValue = parseFloat(collateral) * parseFloat(collateralTokenCurrentPrice);
                         let newLTVRatio = (pricinipalMarketValue / collateralMarketValue) * 100;
-                        newLTVRatio = (newLTVRatio > 0) ? newLTVRatio.toFixed(2) : 0;
+                        newLTVRatio = niceNumberDisplay(newLTVRatio);
                         this.setState({ LTVRatioValue: newLTVRatio });
                     }
                 }

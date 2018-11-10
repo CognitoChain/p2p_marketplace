@@ -22,7 +22,7 @@ export const amortizationUnitToFrequency = (unit: string) => {
     return frequency;
 };
 
-export const niceNumberDisplay = (value: number) => {
+export const niceNumberDisplay = (value) => {
     let niceNumber = parseFloat(value);
     niceNumber = (niceNumber > 0) ? niceNumber.toFixed(3) : 0;
     return niceNumber;

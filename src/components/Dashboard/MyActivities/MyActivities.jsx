@@ -17,6 +17,7 @@ import { BigNumber } from "bignumber.js";
  * open Loan Requests.
  */
 
+import { niceNumberDisplay } from "../../../utils/Util";
 class MyActivities extends Component {
   constructor(props) {
     super(props);
@@ -75,7 +76,7 @@ class MyActivities extends Component {
                   }
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = (amount > 0) ? amount.toFixed(2) : 0;
+                amount = niceNumberDisplay(amount);
                 loanRequestsActivities.push({
                   id: "l_" + _.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
@@ -131,7 +132,7 @@ class MyActivities extends Component {
                   buttonClassName = 'green';
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = (amount > 0) ? amount.toFixed(2) : 0;
+                amount = niceNumberDisplay(amount);
                 investmentsActivities.push({
                   id: "i_" + _.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
