@@ -87,7 +87,7 @@ const validator = {
     principal: {
       rules: [
         {
-          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
           message: 'Pricipal amount must be greater then zero',
         },
         {
@@ -102,7 +102,7 @@ const validator = {
     collateral: {
       rules: [
         {
-          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
           message: 'Collateral amount must be greater then zero',
         },
         {
@@ -117,7 +117,7 @@ const validator = {
     termLength: {
       rules: [
         {
-          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
           message: 'Term Length must be greater then zero',
         },
         {
@@ -132,7 +132,7 @@ const validator = {
     interestRate: {
       rules: [
         {
-          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,2})?\s*$/i,
+          test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
           message: 'Enter valid interest rate.',
         },
         {
