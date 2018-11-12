@@ -278,9 +278,11 @@ class Detail extends Component {
   async processRepayment() {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { repaymentAmount, debtorEthAddress, principalTokenSymbol,outstandingAmount } = this.state;
+    const { debtorEthAddress, principalTokenSymbol } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     let stateObj = {};
+    let repaymentAmount = parseFloat(niceNumberDisplay(this.state.repaymentAmount));
+    let outstandingAmount = parseFloat(niceNumberDisplay(this.state.outstandingAmount));
     if (typeof currentAccount != "undefined" && debtorEthAddress == currentAccount &&repaymentAmount > 0
     ) 
     {
