@@ -473,7 +473,7 @@ class Detail extends Component {
             className = "payment-success";
           }
           else if(row.status == "partial_paid"){
-            label = "Partial Paid";
+            label = "Partially Paid";
             className = "payment-partial-paid";   
           }
           else if(row.status == "missed"){
