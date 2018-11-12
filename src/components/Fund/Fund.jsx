@@ -4,11 +4,6 @@ import "./Fund.css";
 import { Link } from "react-router-dom";
 
 class Fund extends Component {
-  constructor(props) {
-    super(props);
-    console.log(this.props);
-  }
-
   render() {
     const { id } = this.props;
     return (

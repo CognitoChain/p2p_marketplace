@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { Button } from "react-bootstrap";
-
-// Styling
 import "./AuthorizableAction.css";
 
 class AuthorizableAction extends Component {
@@ -33,5 +31,4 @@ class AuthorizableAction extends Component {
         );
     }
 }
-
 export default AuthorizableAction;

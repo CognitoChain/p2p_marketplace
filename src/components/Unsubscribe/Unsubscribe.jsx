@@ -1,9 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { Link } from 'react-router-dom';
-import { Alert } from "react-bootstrap";
 import { Container, Row, Col } from 'reactstrap';
-import { toast } from 'react-toastify';
 import Api from "../../services/api";
 import CustomAlertMsg from '../CustomAlertMsg/CustomAlertMsg';
 const login_innner_bg = require("../../assets/images/login-inner-bg.png");
@@ -12,7 +9,6 @@ const logo_full = require("../../assets/images/logo-full.svg")
 class Unsubscribe extends React.Component {
   constructor(props) {
     super(props);
-    let locationState = this.props.location.state ;
     let token = this.props.match.params.token;
     if(_.isUndefined(token)){
       this.props.history.push("/")

@@ -85,7 +85,7 @@ class Layout extends Component {
         if(this.state.currentMetamaskAccount != currentMetamaskAccount)
         {
           const token = localStorage.getItem('token');
-          const walletResponse = api.setToken(token).create("user/wallet", {
+          api.setToken(token).create("user/wallet", {
             address: currentMetamaskAccount
           });
         }
@@ -108,7 +108,6 @@ class Layout extends Component {
         let networkId = window.web3.version.network;
         let wrongMetamskNetworkMsg = '';
         let wrongMetamaskNetwork = false;
-        console.log(process.env)
         if(process.env.REACT_APP_METAMASK_NETWORK == "kovan" && networkId != "42" && networkId != null)
         {
             wrongMetamskNetworkMsg = 'Please connect to Kovan Test Network in metamask.';

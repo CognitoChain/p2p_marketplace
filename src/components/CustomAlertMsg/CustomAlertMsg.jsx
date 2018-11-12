@@ -2,10 +2,6 @@ import React, { Component } from "react";
 import { Alert } from "react-bootstrap";
 import './CustomAlertMsg.css';
 class CustomAlertMsg extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { bsStyle, className, title, description, extraClass } = this.props;
         return (

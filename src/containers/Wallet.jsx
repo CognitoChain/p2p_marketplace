@@ -1,10 +1,5 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import Wallet from "../components/Wallet/Wallet";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class WalletContainer extends Component {

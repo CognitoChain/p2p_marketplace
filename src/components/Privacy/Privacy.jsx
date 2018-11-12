@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import { Row, Col, Breadcrumb, BreadcrumbItem, Alert,Card,CardBody } from "reactstrap";
+import { Row, Col,Card,CardBody } from "reactstrap";
 import "./Privacy.css";
-import { Link } from "react-router-dom";
 
 class Privacy extends Component {
   
@@ -88,7 +87,7 @@ class Privacy extends Component {
                         <p>
                           Any client understands, that should he demand the restriction of his personal data processing, Data Controller may terminate any cooperation with the agreement if such a demand makes it impossible for Data Controller to carry out its legal obligations, including obligations in the field of money laundering prevention.
 
-                          Any client who gave his consent to data gathering and processing may withdraw his consent at any time by sending the message with the withdrawal at <a href="mailto:contact@cognitochain.io" className="contact-mail">contact@cognitochain.io</a>.
+                          Any client who gave his consent to data gathering and processing may withdraw his consent at any time by sending the message with the withdrawal at <a href="mailto:contact@cognitochain.io" rel="noopener noreferrer" className="contact-mail">contact@cognitochain.io</a>.
                           Any data processing that was carried out prior to the withdrawal shall be deemed lawful.
                         </p>
 

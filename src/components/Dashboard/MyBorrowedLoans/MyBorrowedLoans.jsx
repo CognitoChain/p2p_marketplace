@@ -1,27 +1,14 @@
-// External libraries
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
-
-// Components
-import Loading from "../../Loading/Loading";
-
-// Services
-import Api from "../../../services/api";
-
-// Styling
-import "./MyBorrowedLoans.css";
-import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorrowedLoansRequestsEmpty";
-import _ from 'lodash';
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
-
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import _ from 'lodash';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import Loading from "../../Loading/Loading";
+import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorrowedLoansRequestsEmpty";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import "./MyBorrowedLoans.css";
 class MyBorrowedLoans extends Component {
-    constructor(props) {
-        super(props);      
-    }
     renderShowsTotal(start, to, total) {
         return (
           <p style={ { color: 'blue' } }>
@@ -48,15 +35,12 @@ class MyBorrowedLoans extends Component {
                 dataField: "createdDate",
                 text: "Created Date",
                 formatter:function(cell,row,rowIndex,formatExtraData){
+                    let date = '-';
+                    let time = '';
                     if(!_.isUndefined(cell) && cell != null)
                     {
-                        var date = moment(cell).format("DD/MM/YYYY");
-                        var time = moment(cell).format("HH:mm:ss");    
-                    }
-                    else
-                    {
-                        var date = '-';
-                        var time = '';
+                        date = moment(cell).format("DD/MM/YYYY");
+                        time = moment(cell).format("HH:mm:ss");    
                     }
                     return (
                         <div>

@@ -1,10 +1,5 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import LoanRequest from "../components/LoanRequest/LoanRequest";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 import Api from "../services/api";
 
@@ -45,5 +40,4 @@ class LoanRequestContainer extends Component {
         );
     }
 }
-
 export default LoanRequestContainer;

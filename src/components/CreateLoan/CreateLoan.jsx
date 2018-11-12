@@ -2,25 +2,22 @@ import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, InputGroup, Input, InputGroupAddon, ListGroup, Form } from 'reactstrap';
 import InputRange from 'react-input-range';
 import { Dharma } from "@dharmaprotocol/dharma.js";
+import _ from "lodash";
+import { Link } from 'react-router-dom';
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
-import Loading from "../Loading/Loading";
 import LoadingFull from "../LoadingFull/LoadingFull";
 import TransactionManager from "../TransactionManager/TransactionManager";
 import TokenSelect from "./TokenSelect/TokenSelect";
 import TimeUnitSelect from "./TimeUnitSelect/TimeUnitSelect";
 import SummaryItem from "./SummaryItem/SummaryItem";
-import './CreateLoan.css';
 import Api from "../../services/api";
 import Error from "../Error/Error";
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import { niceNumberDisplay } from "../../utils/Util";
 import borrowImg from "../../assets/images/borrow.png";
-import _ from "lodash";
-import { Link } from 'react-router-dom';
-
+import './CreateLoan.css';
 class CreateLoan extends Component {
-
     constructor(props) {
         super(props);
         this.toggleSplit = this.toggleSplit.bind(this);
@@ -72,7 +69,6 @@ class CreateLoan extends Component {
         if (nextProps.tokens.length > 0 && this.props.tokens.length == 0) {
             let firstToken = '';
             let principalTokenSymbol = this.state.principalTokenSymbol;
-            let collateralTokenSymbol = this.state.collateralTokenSymbol;
             _.every(nextProps.tokens, function (token) {
                 if (token.balance > 0 && firstToken == '' && token.symbol != principalTokenSymbol) {
                     firstToken = token.symbol;
@@ -115,19 +111,15 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
-        const { userLoanAgree, principal, collateral, collateralCurrentBalance, termLength } = this.state;
         if (this.isFormValid()) {
             try {
                 const { dharma } = this.props;
                 const currentAccount = await dharma.blockchain.getCurrentAccount();
-                console.log("createLoanRequest() - currentAccount: ", currentAccount);
                 const loanRequest = await this.generateLoanRequest(currentAccount);
-                const id = api.setToken(this.props.token).create("loanRequests", {
+                api.setToken(this.props.token).create("loanRequests", {
                     ...loanRequest.toJSON(),
                     id: loanRequest.getAgreementId(),
                 });
-                console.log("Get agreement ID");
-                console.log(loanRequest.getAgreementId());
                 this.props.onCompletion(loanRequest.getAgreementId());
             } catch (e) {
                 let error = new Error(e);
@@ -154,7 +146,7 @@ class CreateLoan extends Component {
 
     async setHasSufficientAllowance(tokenSymbol, status) {
         const { dharma } = this.props;
-        const { collateralTokenSymbol, collateralAmount, principal, collateral, LTVRatioValue, interestRate, termLength, userLoanAgree } = this.state;
+        const { collateralTokenSymbol, collateralAmount} = this.state;
         const symbol = tokenSymbol ? tokenSymbol : collateralTokenSymbol;
         const isCompleted = status && status == "success" ? true : false;
         const { Token } = Dharma.Types;
@@ -311,7 +303,6 @@ class CreateLoan extends Component {
     }
 
     handleLTVChange(NewLTVRatioValue) {
-        let stateObj = {};
         this.setState({ LTVRatioValue: NewLTVRatioValue }, () => {
             this.countLtv("LTVRatioValue");
         });
@@ -357,7 +348,6 @@ class CreateLoan extends Component {
             this.validators[fieldName].errors.push("Please accept loan agreement terms.");
             this.validators[fieldName].valid = false;
         }
-        console.log(value)
         if (fieldName == "LTVRatioValue" && value > 60) {
             this.validators[fieldName].errors.push("LTV ratio can not be greater then 60.");
             this.validators[fieldName].valid = false;
@@ -366,7 +356,6 @@ class CreateLoan extends Component {
 
     isFormValid() {
         let status = true;
-        const { LTVRatioValue } = this.state;
         const validationFields = ["principal", "collateral", "collateralTokenSymbol", "termLength", "interestRate", "userLoanAgree", "LTVRatioValue"];
         validationFields.forEach((field) => {
             this.updateValidators(field, this.state[field])
@@ -411,14 +400,10 @@ class CreateLoan extends Component {
             principalTokenSymbol,
             collateral,
             collateralTokenSymbol,
-            LTVRatioValue,
-            interestRate,
-            termLength,
-            userLoanAgree
+            LTVRatioValue
         } = this.state;
         const api = new Api();
-        const all_token_price = api
-            .setToken(this.props.token)
+        api.setToken(this.props.token)
             .get(`priceFeed`)
             .then(async priceFeedData => {
                 if (!_.isUndefined(priceFeedData[principalTokenSymbol]) && !_.isUndefined(priceFeedData[collateralTokenSymbol])) {
@@ -451,19 +436,14 @@ class CreateLoan extends Component {
             principalTokenSymbolDropdownOpen,
             collateralTokenSymbolDropdownOpen,
             termUnitDropdownOpen,
-            expirationUnitDropdownOpen,
             principal,
             principalTokenSymbol,
             collateral,
-            relayerFeeAmount,
             collateralTokenSymbol,
             termUnit,
             termLength,
             interestRate,
-            expirationUnit,
-            expirationLength,
             disabled,
-            error,
             hasSufficientAllowance,
             txHash,
             LTVRatioValue,
@@ -502,7 +482,7 @@ class CreateLoan extends Component {
 
                     <Row className="mt-4 mb-4">
                         <Col>
-                            <h5 className="mb-2"> <div className="round-icon round-icon-lg orange"><img className="mb-1" src={borrowImg} height="20" /></div> New Loan</h5>
+                            <h5 className="mb-2"> <div className="round-icon round-icon-lg orange"><img className="mb-1" src={borrowImg} height="20" alt="New Loan"/></div> New Loan</h5>
                         </Col>
                     </Row>
                 </div>

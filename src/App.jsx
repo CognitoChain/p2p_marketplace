@@ -6,8 +6,6 @@ import {
 	Col
 } from "reactstrap";
 import Modal from "react-responsive-modal";
-
-
 class App extends Component {
 
 	constructor(props) {
@@ -60,7 +58,7 @@ class App extends Component {
 							<p className="mt-15 mb-15">In order to use Cognito Chain on the web, you will need to install the MetaMask browser extension, available for Chrome, Firefox, Opera, and the new Brave browser.
 			              	</p>
 							<div className="mt-30 mb-30 text-center">
-								<a href="https://metamask.io/" target="_blank" className="btn cognito orange">Download Metamask</a>
+								<a href="https://metamask.io/" target="_blank" rel="noopener noreferrer" className="btn cognito orange">Download Metamask</a>
 							</div>
 						</Col>
 					</Row>

@@ -1,26 +1,13 @@
-// External libraries
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
-
-// Components
-import Loading from "../../Loading/Loading";
-
-// Services
-import Api from "../../../services/api";
-
-// Styling
-import "./MyLoanRequests.css";
-import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
-import _ from 'lodash';
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import Loading from "../../Loading/Loading";
+import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import "./MyLoanRequests.css";
 class MyLoanRequests extends Component {
-    constructor(props) {
-        super(props);      
-    }
     renderShowsTotal(start, to, total) {
         return (
           <p style={ { color: 'blue' } }>

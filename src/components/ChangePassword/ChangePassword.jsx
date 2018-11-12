@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, Row, Col, ListGroup, Form } from 'reactstrap';
-import InputRange from 'react-input-range';
 import './ChangePassword.css';
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
@@ -128,7 +127,7 @@ class ChangePassword extends Component {
     }
 
     render() {
-        const { tokens,userEmail } = this.props;
+        const { userEmail } = this.props;
         const {
             customAlertMsgDisplay,
             customAlertMsgStyle,

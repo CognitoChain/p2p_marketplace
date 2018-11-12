@@ -1,27 +1,23 @@
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
-import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, Input, ListGroup } from 'reactstrap';
+import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, ListGroup } from 'reactstrap';
+import _ from "lodash";
+import * as moment from "moment";
+import { Link } from 'react-router-dom';
 import Api from "../../services/api";
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
-import Terms from "./Terms/Terms";
-import NotFillableAlert from "./Alert/NotFillableAlert";
 import TransactionManager from "../TransactionManager/TransactionManager";
-import Loading from "../Loading/Loading";
 import LoadingFull from "../LoadingFull/LoadingFull";
-import "./LoanRequest.css";
 import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
-import * as moment from "moment";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import _ from "lodash";
-import { Link } from 'react-router-dom';
 import {niceNumberDisplay} from "../../utils/Util";
+import "./LoanRequest.css";
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
 };
-
 class LoanRequest extends Component {
     constructor(props) {
         super(props);
@@ -38,10 +34,6 @@ class LoanRequest extends Component {
             interestRate: 0,
             termLength: 0,
             termUnit: "weeks",
-            expirationLength: 30,
-            expirationUnit: "days",
-            disabled: false,
-            error: null,
             hasSufficientAllowance: false,
             txHash: null,
             createdDate:null,
@@ -71,7 +63,7 @@ class LoanRequest extends Component {
     }
 
     componentWillMount() {
-        const { LoanRequest, Debt } = Dharma.Types;
+        const { LoanRequest } = Dharma.Types;
 
         const { dharma, id } = this.props;
 
@@ -87,7 +79,7 @@ class LoanRequest extends Component {
             });
             var get_terms = loanRequest.getTerms();
 
-            const all_token_price = await api.setToken(this.props.token).get(`priceFeed`)
+            await api.setToken(this.props.token).get(`priceFeed`)
                 .then(async priceFeedData => {
 
                     if (!_.isUndefined(priceFeedData[get_terms.principalTokenSymbol])) {
@@ -158,8 +150,6 @@ class LoanRequest extends Component {
                     });
             }
             catch (e) {
-                console.log(e)
-                console.log(e.message)
                 let error = new Error(e);
                 this.setState({
                     customAlertMsgDisplay: true,
@@ -182,7 +172,7 @@ class LoanRequest extends Component {
     }
 
     async handleAuthorize() {
-        const { loanRequest, transactions, userLoanAgree } = this.state;
+        const { loanRequest, transactions } = this.state;
         const { dharma } = this.props;
         const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
@@ -246,18 +236,12 @@ class LoanRequest extends Component {
 
         const terms = loanRequest.getTerms();
         const isCompleted = status && status == "success" ? true : false;
-        console.log(status + "status")
         let stateObj = {};
 
         if (typeof currentAccount != "undefined") {
             const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
             const hasSufficientAllowance =
                 tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount || isCompleted;
-            console.log("tokenData")
-
-            console.log(tokenData)
-            console.log("setHasSufficientAllowance--" + hasSufficientAllowance)
-
             stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
             stateObj["isBottomButtonLoading"] = false;
         }
@@ -293,9 +277,6 @@ class LoanRequest extends Component {
             termUnit,
             termLength,
             interestRate,
-            expirationUnit,
-            expirationLength,
-            disabled,
             error,
             hasSufficientAllowance,
             txHash,
@@ -317,11 +298,6 @@ class LoanRequest extends Component {
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
-        console.log("------------")
-        console.log("hasSufficientAllowance--" + hasSufficientAllowance)
-        console.log("disableSubmitBtn--" + disableSubmitBtn)
-        console.log("error--" + error)
-        console.log(transactions)
         return (
             <div>
 
@@ -339,7 +315,7 @@ class LoanRequest extends Component {
 
                     <Row className="mt-4 mb-4">
                         <Col>
-                            <h4 className="mb-0"> <div className="round-icon round-icon-lg olivegreen"><img className="mb-2" src={fundLoanImg} height="20" /></div> Fund Loan</h4>
+                            <h4 className="mb-0"> <div className="round-icon round-icon-lg olivegreen"><img className="mb-2" src={fundLoanImg} height="20" alt="Fund Loan" /></div> Fund Loan</h4>
                         </Col>
                     </Row>
                 </div>

@@ -1,24 +1,11 @@
-// External libraries
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
-import * as moment from "moment";
-import "./MyPortfolio.css";
-import { amortizationUnitToFrequency } from "../../../utils/Util";
-import BootstrapTable from "react-bootstrap-table-next";
-import fundLoanImg from "../../../assets/images/fund_loan.png";
-import borrowLoanImg from "../../../assets/images/borrow.png";
+import { Card, CardBody, CardTitle, Row, Col, Progress } from 'reactstrap';
 import _ from "lodash";
-import paginationFactory from 'react-bootstrap-table2-paginator';
-import Loading from "../../Loading/Loading";
 import { Doughnut } from 'react-chartjs-2';
-import { Card, CardBody, CardTitle, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Progress, Table } from 'reactstrap';
-import Api from "../../../services/api";
+import Loading from "../../Loading/Loading";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-/**
- * Here we define the columns that appear in the table that holds all of the
- * open Loan Requests.
- */
 import { niceNumberDisplay } from "../../../utils/Util";
+import "./MyPortfolio.css";
 class MyPortfolio extends Component {
     constructor(props) {
         super(props);
@@ -35,13 +22,10 @@ class MyPortfolio extends Component {
         };
     }
     async componentWillReceiveProps(nextProps) {
-        console.log("componentWillReceiveProps")
-        console.log(nextProps)
-        const { dharma,currentMetamaskAccount } = this.props;
+        const { currentMetamaskAccount } = this.props;
         const { priceFeedData,myBorrowedRequests,tokens } = nextProps;
         let totalAssetAmount = 0;
         let totalLiablitiesAmount = 0;
-        let stateObj = {};
         if (!_.isUndefined(priceFeedData) && !_.isUndefined(currentMetamaskAccount)) {
             if (tokens.length>0) {
                 tokens.forEach(ts => {
@@ -78,8 +62,6 @@ class MyPortfolio extends Component {
     calculateValues() {
         const { totalAssetAmount, totalLiablitiesAmount } = this.state;
         const { myBorrowedLoading, isTokenLoading } = this.props;
-        console.log("isTokenLoading"+isTokenLoading)
-        console.log("myBorrowedLoading"+myBorrowedLoading)
         if (isTokenLoading || myBorrowedLoading) {
             return;
         }

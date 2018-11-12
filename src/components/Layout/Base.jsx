@@ -23,8 +23,6 @@ class Base extends Component {
     }
     
     render() {
-        const {contentLoading} = this.state;
-        let showContentLoaing = (contentLoading === true) ? '' : 'd-none';
         return (
             <div className={this.state.toggleactive ? "wrapper  slide-menu" : "wrapper"}>
                 <ToastContainer />

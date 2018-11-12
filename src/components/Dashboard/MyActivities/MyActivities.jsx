@@ -1,23 +1,17 @@
-// External libraries
 import React, { Component } from "react";
+import { Card, CardBody, CardTitle, Col, Row } from "reactstrap";
 import * as moment from "moment";
-import "./MyActivities.css";
-import BootstrapTable from "react-bootstrap-table-next";
-import fundLoanImg from "../../../assets/images/fund_loan.png";
-import borrowLoanImg from "../../../assets/images/borrow.png";
 import _ from "lodash";
+import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import { BigNumber } from "bignumber.js";
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
-import { Card, CardBody, CardTitle, Col, Row } from "reactstrap";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { BigNumber } from "bignumber.js";
-/**
- * Here we define the columns that appear in the table that holds all of the
- * open Loan Requests.
- */
-
 import { niceNumberDisplay } from "../../../utils/Util";
+import fundLoanImg from "../../../assets/images/fund_loan.png";
+import borrowLoanImg from "../../../assets/images/borrow.png";
+import "./MyActivities.css";
 class MyActivities extends Component {
   constructor(props) {
     super(props);
@@ -37,7 +31,7 @@ class MyActivities extends Component {
   async componentWillReceiveProps(nextProps) {
     const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
     const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
-    const { myLoansIsMounted, myInvestmensIsMounted, displayNoRecordMsg } = this.state;
+    const { myLoansIsMounted, myInvestmensIsMounted } = this.state;
 
     let repaymentSchedule;
     let expectedRepaidAmount;
@@ -204,7 +198,7 @@ class MyActivities extends Component {
               <div className="text-left">
                 <div className="d-inline-block">
                   <div className={classname}>
-                    <img src={img} height="20" className="mt-10" alt="Image" />
+                    <img src={img} height="20" className="mt-10" alt="acitivity_img" />
                   </div>
                 </div>
               </div>

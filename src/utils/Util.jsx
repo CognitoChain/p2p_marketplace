@@ -1,5 +1,5 @@
-export const amortizationUnitToFrequency = (unit: string) => {
-    let frequency: string = "";
+export const amortizationUnitToFrequency = (unit) => {
+    let frequency = "";
     switch (unit) {
         case "hours":
             frequency = "Hourly";

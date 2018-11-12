@@ -1,9 +1,6 @@
 import React from 'react';
-import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Alert } from "react-bootstrap";
 import { Container, Row, Col } from 'reactstrap';
-import { toast } from 'react-toastify';
 import Api from "../../services/api";
 import validators from '../../validators';
 import CustomAlertMsg from '../CustomAlertMsg/CustomAlertMsg';

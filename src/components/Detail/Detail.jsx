@@ -1,29 +1,20 @@
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
-import {
-  Card,
-  CardBody,
-  CardTitle,
-  Row,
-  Col,
-  Breadcrumb,
-  BreadcrumbItem,
-  ListGroup
-} from "reactstrap";
-import "./Detail.css";
-import SummaryItem from "./SummaryItem/SummaryItem";
+import { Link } from 'react-router-dom';
+import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, ListGroup } from "reactstrap";
+import { BigNumber } from "bignumber.js";
 import * as moment from "moment-timezone";
-import Api from "../../services/api";
-import BootstrapTable from "react-bootstrap-table-next";
-import LoadingFull from "../LoadingFull/LoadingFull";
-import Loading from "../Loading/Loading";
 import { toast } from "react-toastify";
+import BootstrapTable from "react-bootstrap-table-next";
 import Modal from "react-responsive-modal";
 import _ from "lodash";
-import { BigNumber } from "bignumber.js";
+import SummaryItem from "./SummaryItem/SummaryItem";
+import Api from "../../services/api";
+import LoadingFull from "../LoadingFull/LoadingFull";
+import Loading from "../Loading/Loading";
 import { BLOCKCHAIN_API } from "../../common/constants";
-import {niceNumberDisplay} from "../../utils/Util";
-import { Link } from 'react-router-dom';
+import { niceNumberDisplay } from "../../utils/Util";
+import "./Detail.css";
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -92,7 +83,6 @@ class Detail extends Component {
     let collateralReturnable = false;
     let stateObj = {};
     let repaymentLoanstemp = [];
-    const repaymentTemp = [];
     let agreementId = id;
     let userTimezone = moment.tz.guess();
     let principalAmount = this.convertBigNumber(loanRequestData.principalAmount,loanRequestData.principalNumDecimals,true);
@@ -110,19 +100,19 @@ class Detail extends Component {
     let creditorEthAddress = loanRequestData.creditorAddress;
     let debtorEthAddress = loanRequestData.debtorAddress;
     const principalTokenDecimals = await dharma.token.getNumDecimals(principalTokenSymbol);
-    const valueRepaidAr = await dharma.servicing.getValueRepaid(
+    /*const valueRepaidAr = await dharma.servicing.getValueRepaid(
       agreementId
     );
-    const valueRepaid = this.convertBigNumber(valueRepaidAr,principalTokenDecimals);
+    const valueRepaid = this.convertBigNumber(valueRepaidAr,principalTokenDecimals);*/
     const debt = await Debt.fetch(dharma, id);
     const outstandingAmount = await debt.getOutstandingAmount();
     if (outstandingAmount == 0) {
-      const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
+      /*const debtRegistryEntry = await dharma.servicing.getDebtRegistryEntry(
         id
         );
       const adapter = await dharma.adapters.getAdapterByTermsContractAddress(
         debtRegistryEntry.termsContract
-        );
+        );*/
       let issuanceHash = id;
       collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
         issuanceHash
@@ -226,15 +216,8 @@ class Detail extends Component {
   }
 
   async componentWillMount() {
-    const { LoanRequest, Investments, Investment, Debt, Token } = Dharma.Types;
-    const { dharma, id } = this.props;
-    let current_time = moment();
+    const { id } = this.props;
     let stateObj = {};
-    let currentAccount = await dharma.blockchain.getCurrentAccount();
-    let i = 1;
-    let j = 1;
-    let userTimezone = moment.tz.guess();
-    let current_timestamp = moment().unix();
     const api = new Api();
     api
       .setToken(this.props.token)
@@ -249,7 +232,7 @@ class Detail extends Component {
           let interestRate = parseFloat(loanRequestData.interestRatePercent);
           let interestAmount = (principalAmount * interestRate) / 100;
           let displayAgreementId = _(id).truncate(4);
-          const all_token_price = await api
+          await api
             .setToken(this.props.token)
             .get(`priceFeed`)
             .then(async priceFeedData => {
@@ -281,7 +264,6 @@ class Detail extends Component {
           stateObj["interestAmount"] = interestAmount;
           stateObj["agreementId"] = displayAgreementId;
           this.setState({ loanRequestData: loanRequestData }, () => {
-            console.log("Parse request");
             this.prepareRepaymentScheduleDetails();  
           });
           this.setState(stateObj);
@@ -298,7 +280,6 @@ class Detail extends Component {
     const { dharma, id } = this.props;
     const { repaymentAmount, debtorEthAddress, principalTokenSymbol,outstandingAmount } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
-    let collateralReturnable = false;
     let stateObj = {};
     if (typeof currentAccount != "undefined" && debtorEthAddress == currentAccount &&repaymentAmount > 0
     ) 
@@ -358,23 +339,17 @@ class Detail extends Component {
   handleInputChange(event) {
     const target = event.target;
     const value = target.value;
-    const name = target.name;
-    console.log(value);
-    console.log(name);
     this.setState({ repaymentAmount: value });
   }
 
   async unblockCollateral(event, callback) {
-    console.log("Collateral back inside");
-    const { LoanRequest, Debt } = Dharma.Types;
+    const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { repaymentAmount, debtorEthAddress } = this.state;
     const debt = await Debt.fetch(dharma, id);
     if (typeof debt != "undefined") {
       const outstandingAmount = await debt.getOutstandingAmount();
       if (outstandingAmount == 0) {
         const txHash = await debt.returnCollateral();
-        console.log(txHash);
         if (txHash != "") {
           toast.success("Collateral return requested successfully.", {
             autoClose: 8000
@@ -385,14 +360,11 @@ class Detail extends Component {
   }
 
   async seizeCollateral(event, callback) {
-    console.log("Seize Collateral back inside");
-    const { LoanRequest, Debt, Investment } = Dharma.Types;
+    const { Investment } = Dharma.Types;
     const { dharma, id } = this.props;
     const investment = await Investment.fetch(dharma, id);
     const isRepaid = await investment.isRepaid();
-    console.log("Is Repaid or not");
-    console.log(isRepaid);
-
+    
     if (typeof investment != "undefined" && isRepaid === false) {
       const isCollateralSeizable = await investment.isCollateralSeizable();
       if (isCollateralSeizable === true) {
@@ -532,20 +504,16 @@ class Detail extends Component {
       createdTime,
       interestAmount,
       totalRepaymentAmount,
-      repaymentLoans,
       isLoading,
       outstandingAmount,
       modalOpen,
       nextRepaymentAmount,
-      totalRepaidAmount,
-      agreementId,
       repaymentAmount,
       collateralBtnDisplay,
       repaymentBtnDisplay,
       collateralSeizeBtnDisplay,
       currentEthAddress,
       debtorEthAddress,
-      creditorEthAddress,
       collateralCurrentAmount,
       LTVRatioValue,
       loanScheduleDisplay,

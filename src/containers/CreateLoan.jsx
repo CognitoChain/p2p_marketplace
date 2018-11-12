@@ -1,10 +1,5 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import CreateLoan from "../components/CreateLoan/CreateLoan";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class CreateLoanContainer extends Component {
@@ -44,5 +39,4 @@ class CreateLoanContainer extends Component {
         );
     }
 }
-
 export default CreateLoanContainer;

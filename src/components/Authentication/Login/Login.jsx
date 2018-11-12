@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Alert } from "react-bootstrap";
 import { Container, Row, Col } from 'reactstrap';
 import { toast } from 'react-toastify';
 import validators from '../../../validators';

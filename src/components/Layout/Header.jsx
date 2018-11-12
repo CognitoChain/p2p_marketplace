@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import logoImg from "../../assets/images/logo.svg";
-import {
-    Alert
-} from "reactstrap";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Avatar from 'react-avatar';
 class Header extends Component {
@@ -22,11 +19,8 @@ class Header extends Component {
         this.props.updateParent();
     };
     async componentWillMount() {
-        const { dharma,currentMetamaskAccount,wrongMetamskNetworkMsg,wrongMetamaskNetwork } = this.props;
-        
+        const { dharma } = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
-        let currentMetamaskAccountLocal = currentMetamaskAccount;
-        let msg = '';
         if (_.isUndefined(currentAccount)) {
             currentAccount = '';
         }
@@ -37,7 +31,6 @@ class Header extends Component {
             }, 2500);
     }
     componentWillUnmount() {
-        console.log("Clear")
         clearInterval(this.interval);
     }
     async checkAccount() {

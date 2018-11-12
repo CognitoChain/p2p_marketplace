@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
-import { Card, CardBody, CardTitle, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Progress, Table } from 'reactstrap';
+import { Card, CardBody, CardTitle, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
 import './Dashboard.css';
 import classnames from 'classnames';
-import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import MyBorrowedLoans from "./MyBorrowedLoans/MyBorrowedLoans";
 import MyFundedLoans from "./MyFundedLoans/MyFundedLoans";
 import MyPortfolio from "./MyPortfolio/MyPortfolio";
@@ -197,9 +196,7 @@ class Dashboard extends Component {
                 collateral: `${collateralAmount}`,
                 term: `${investment.termLengthAmount}`,
                 repaidAmount: `${repaidAmount}`,
-                totalExpectedRepaymentAmount: `${repaymentAmount} ${
-                    investment.principalSymbol
-                    }`,
+                totalExpectedRepaymentAmount: `${repaymentAmount}`,
             };
         });
     }
@@ -225,14 +222,11 @@ class Dashboard extends Component {
 
 
     setPriceFeedData() {
-        const { dharma, token, currentMetamaskAccount } = this.props;
-        const { Debt, Investments, LoanRequest, Loan, Debts } = Dharma.Types;
-        let priceFeedData = [];
-        let totalLiablitiesAmountCount = 0;
+        const { token, currentMetamaskAccount } = this.props;
+     
         if (typeof currentMetamaskAccount != "undefined") {
             const api = new Api();
-            const all_token_price = api
-                .setToken(token)
+            api.setToken(token)
                 .get(`priceFeed`)
                 .then(async priceFeedData => {
                     this.setState({ priceFeedData: priceFeedData });
@@ -244,7 +238,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { token, dharma, tokens, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
+        const { token, dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
         const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist } = this.state;
         return (
             <div>
@@ -375,7 +369,7 @@ class Dashboard extends Component {
                         <Row className="mb-30">
                             <Col md={3}></Col>
                             <Col md={6}>
-                                <img src={metamaskConnectionErrorImg} className="img-fluid" />
+                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error"/>
                             </Col>
                             <Col md={3}></Col>
                         </Row>

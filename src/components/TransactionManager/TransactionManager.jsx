@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import _ from "lodash";
 const MAX_RETRIES = 10;
 
 const TX_STATES = {
@@ -31,15 +30,11 @@ class TransactionManager extends Component {
     constructor(props) {
         super(props);
         const { canAuthorize } = this.props;
-        console.log("canAuthorizeTransactionManager");
-        console.log(canAuthorize);
-
         this.state = {
             txState: (canAuthorize) ? TX_STATES.success : TX_STATES.awaiting,
             numRetries: 0,
             canAuthorize: canAuthorize
         };
-
         this.retry = this.retry.bind(this);
         this.awaitTransactionMined = this.awaitTransactionMined.bind(this);
     }
@@ -87,14 +82,12 @@ class TransactionManager extends Component {
 
     render() {
         const { txState } = this.state;
-        const { txHash, description, tokenAuthorised } = this.props;
+        const { txHash, description } = this.props;
         let extraTitle = '';
 
         if (txHash != '' && txHash != null) {
             extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
         }
-        console.log("this.state.canAuthorize")
-        console.log(this.state.canAuthorize)
 
         return (
 

@@ -2,11 +2,6 @@ import React, { Component } from "react";
 import {
   Card,
   CardBody,
-  TabContent,
-  TabPane,
-  Nav,
-  NavItem,
-  NavLink,
   Row,
   Col,
   Breadcrumb,
@@ -15,8 +10,6 @@ import {
   Tooltip
 } from "reactstrap";
 import "./Wallet.css";
-import classnames from "classnames";
-/*import WalletTokenEmpty from "./WalletTokenEmpty/WalletTokenEmpty";*/
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import _ from "lodash";
 import Loading from "../Loading/Loading";
@@ -26,7 +19,6 @@ import { BLOCKCHAIN_API } from "../../common/constants";
 import Switch from "react-switch";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import { Link } from 'react-router-dom';
-let timer;
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -77,7 +69,6 @@ class Wallet extends Component {
     const { tokenlist } = this.state;
     const currentAccount = await dharma.blockchain.getCurrentAccount();
     let symbol = token.symbol;
-    let tokenAddress = token.address;
     if (token.isLoading == true) {
       return true;
     }
@@ -109,11 +100,7 @@ class Wallet extends Component {
             BLOCKCHAIN_API.POLLING_INTERVAL,
             BLOCKCHAIN_API.TIMEOUT,
           );
-
-          // const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
-          // console.log("tokenData")
-
-          //console.log(tokenData)
+          /*const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);*/
           var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
           tokenlist[tokenKey].hasUnlimitedAllowance = status;
           this.setState({
@@ -142,8 +129,6 @@ class Wallet extends Component {
 
     const { tokenlist } = this.state;
     const { isTokenLoading } = this.props;
-    console.log(this.props)
-    console.log(this.state)
     let i = 0;
     if (isTokenLoading) {
       return <Loading />
@@ -167,7 +152,7 @@ class Wallet extends Component {
                       <div className="clearfix mb-10">
                         <div className="float-left icon-box rounded-circle">
                           <span className="text-white">
-                            <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" />
+                            <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" alt={token.symbol} />
                           </span>
                         </div>
 
@@ -222,12 +207,15 @@ class Wallet extends Component {
                 </Col>
               );
             }
+            else{
+              return '';
+            }
           })}
 
           {!isTokenLoading && i == 0 &&
             <Col xl={12} md={12} lg={12} xs={12} sm={12} className="mb-30">
               <Alert color="warning" className="mb-30">
-                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link">https://wallet.dharma.io/</a>.
+                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link" rel="noopener noreferrer">https://wallet.dharma.io/</a>.
               </Alert>
             </Col>
           }
@@ -237,9 +225,7 @@ class Wallet extends Component {
 
   }
   render() {
-    let _self = this;
-    const { tokenlist } = this.state;
-    const { isTokenLoading, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
+    const { wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
     return (
       <div className="wallet-page">
 
@@ -284,7 +270,7 @@ class Wallet extends Component {
             <Row className="mb-30">
               <Col md={3}></Col>
               <Col md={6}>
-                <img src={metamaskConnectionErrorImg} className="img-fluid" />
+                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Connection Error" />
               </Col>
               <Col md={3}></Col>
             </Row>

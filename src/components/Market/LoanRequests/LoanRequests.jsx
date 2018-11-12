@@ -1,31 +1,16 @@
-// External libraries
 import React, { Component } from 'react';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
-/*import { Link } from 'react-router-dom';*/
-
-// Components
-import Loading from "../../Loading/Loading";
-
-// Services
-import Api from "../../../services/api";
-
-// Styling
-import "./LoanRequests.css";
-/*import Title from "../Title/Title";*/
-import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-import _ from 'lodash';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
-
-/**
- * Here we define the columns that appear in the table that holds all of the
- * open Loan Requests.
- */
-
+import { confirmAlert } from 'react-confirm-alert'; 
+import _ from 'lodash';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import Loading from "../../Loading/Loading";
+import Api from "../../../services/api";
+import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import "./LoanRequests.css";
 class LoanRequests extends Component {
     constructor(props) {
         super(props);
@@ -40,52 +25,29 @@ class LoanRequests extends Component {
         this.toggle = this.toggle.bind(this);
         /*this.openlink = this.openlink.bind(this);*/
     }
-
-    /**
-     * When the component mounts, use the API to get all of the load requests from the relayer
-     * database, and parse those into LoanRequest objects using Dharma.js. Then, set the state of
-     * the current component to include those loan requests so that they can be rendered as a table.
-     *
-     * This function assumes that there is a database with Loan Request data, and that we have
-     * access to Dharma.js, which is connected to a blockchain.
-     */
     async componentDidMount() {
-        const { highlightRow,dharma } = this.props;
-        const currentAccount = await dharma.blockchain.getCurrentAccount();
-        // if(typeof currentAccount != "undefined")
-        // {
-            this.setState({
-                highlightRow,
-            });
-            const api = new Api();
-            const sort = "createdAt";
-            const order = "desc";
+        const { highlightRow } = this.props;
+        this.setState({
+            highlightRow,
+        });
+        const api = new Api();
+        const sort = "createdAt";
+        const order = "desc";
 
-            api.setToken(this.props.token).get("loanRequests", { sort, order })
-                .then(this.parseLoanRequests)
-                .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
-                .catch((error) => {
-                    if(error.status && error.status === 403){
-                        this.props.redirect(`/login/`);
-                    }
-            });
-        // }        
+        api.setToken(this.props.token).get("loanRequests", { sort, order })
+            .then(this.parseLoanRequests)
+            .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
+            .catch((error) => {
+                if(error.status && error.status === 403){
+                    this.props.redirect(`/login/`);
+                }
+        });       
     }
 
     parseLoanRequests(loanRequestData) {
-        console.log(loanRequestData)
         var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
         return Promise.all(filteredRequestData.map(this.parseLoanRequest));
     }
-
-    /**
-     * Given loan data that comes from the relayer database, `parseLoanRequest` uses Dharma.js to
-     * instantiate a `LoanRequest` type, which has access to more information about the loan. It
-     * then adds an id and requestedAt (both from the relayer database) to that object.
-     *
-     * @param datum
-     * @returns {Promise<any>}
-     */
     parseLoanRequest(datum) {
         const { dharma } = this.props;
 
@@ -102,13 +64,6 @@ class LoanRequests extends Component {
             });
         });
     }
-
-    /**
-     * Returns an array of loan requests, which can be rendered in a table.
-     *
-     * For each `LoanRequest` object from Dharma.js, it adds two human-readable timestamps - one
-     * describing when the request was created, and one describing its expiration date.
-     */
     getData() {
         const { loanRequests } = this.state;
         return loanRequests.map((request) => {
@@ -129,8 +84,6 @@ class LoanRequests extends Component {
         });
     }
     openlink(row_id){
-        console.log("ABCDEF");
-        console.log(this.props.authenticated);
         if(this.props.authenticated)
         {
             this.props.redirect(`/request/${row_id}`);            

@@ -8,14 +8,11 @@ import './Market.css';
 class Market extends Component {
     constructor(props) {
         super(props);
-        console.log(this.props)
         this.state = {};
         this.redirect = this.redirect.bind(this);
         this.parseQueryParams = this.parseQueryParams.bind(this);
     }
     
-    componentWillMount() {        
-    }
     redirect(location) {
         this.props.history.push(location);
     }

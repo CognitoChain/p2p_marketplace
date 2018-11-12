@@ -1,26 +1,14 @@
-// External libraries
 import React, { Component } from 'react';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
-
-// Components
-import Loading from "../../Loading/Loading";
-
-// Services
-import Api from "../../../services/api";
-
-// Styling
-
-import "./FundedLoans.css";
-import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
-import _ from 'lodash';
-import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
-/**
- * Here we define the columns that appear in the table that holds all of the
- * open Loan Requests.
- */
+import _ from 'lodash';
+import Loading from "../../Loading/Loading";
+import Api from "../../../services/api";
+import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import "./FundedLoans.css";
 const columns = [
     {
         dataField: "createdAt",

@@ -1,23 +1,14 @@
-// External libraries
 import React, { Component } from 'react';
 import BootstrapTable from "react-bootstrap-table-next";
-
-// Components
-import Loading from "../../Loading/Loading";
-
-// Styling
-import "./MyFundedLoans.css";
-import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoansRequestsEmpty";
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {amortizationUnitToFrequency,niceNumberDisplay} from "../../../utils/Util";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import * as moment from "moment";
 import _ from 'lodash';
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import Loading from "../../Loading/Loading";
+import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoansRequestsEmpty";
+import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import "./MyFundedLoans.css";
 class MyFundedLoans extends Component {
-    constructor(props) {
-        super(props);        
-    }
-
     render() {
         const { myFundedRequests,myFundedLoading,currentMetamaskAccount } = this.props;
         if (myFundedLoading) {
@@ -38,15 +29,12 @@ class MyFundedLoans extends Component {
                 dataField: "createdDate",
                 text: "Created Date",
                 formatter:function(cell,row,rowIndex,formatExtraData){
+                    let date = '-';
+                    let time = '';
                     if(!_.isUndefined(cell) && cell != null)
                     {
-                        var date = moment(cell).format("DD/MM/YYYY");
-                        var time = moment(cell).format("HH:mm:ss");    
-                    }
-                    else
-                    {
-                        var date = '-';
-                        var time = '';
+                         date = moment(cell).format("DD/MM/YYYY");
+                         time = moment(cell).format("HH:mm:ss");    
                     }
                     
                     return (

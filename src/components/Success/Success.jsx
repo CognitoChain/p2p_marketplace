@@ -12,7 +12,6 @@ class Success extends Component {
             activeTab: '1',
             widths:80
         };
-        console.log(this.props)
     }
     tabsclick(tab) {
         if (this.state.activeTab !== tab) {

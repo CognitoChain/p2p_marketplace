@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Breadcrumb, BreadcrumbItem, Alert,Card,CardBody } from "reactstrap";
+import { Row, Col,Card,CardBody } from "reactstrap";
 import "./TermsConditions.css";
 class TermsConditions extends Component {
   
@@ -122,7 +122,7 @@ class TermsConditions extends Component {
                             <li className="main-title"><span>Currencies and Transfer of Crypto assets</span>
                               <ol className="ml-30">
                                 <li>The Platform allows the following crypto assets to be used as a collateral for the purpose of the loans given through the Cognitochain platform:
-                                  <a href="https://wallet.dharma.io/" target="_blank" className="weblink">https://wallet.dharma.io/</a><br />
+                                  <a href="https://wallet.dharma.io/" target="_blank" rel="noopener noreferrer" className="weblink">https://wallet.dharma.io/</a><br />
 
                                   The given token list in above site may be amended by the operator of the Cognitochain platform at any time, by making the relevant changes to these Terms and Conditions.Should Cognitochain remove any of the crypto assets from list of available collaterals, the loans already secured by such crypto assets shall remain in force.Cognitochain is entitled to make changes to the given list at any given time in the future. The loans already active shall remain active despite any changes made to this list after the loan was already granted.
                                 </li>
@@ -256,7 +256,7 @@ class TermsConditions extends Component {
 
                             <li className="main-title"><span>User’s Personal Data</span>
                               <ol className="ml-30">
-                                <li>Cognitochain is entitled to process all User’s personal data received from the User in accordance with the Privacy Policy available for review at <a href="http://app.cognitochain.io/privacy-policy" target="_blank" className="weblink">http://app.cognitochain.io/privacy-policy</a> the applicable legislation of UK. By entering into the present agreement, the User also accepts the provisions of the Privacy Policy.</li>
+                                <li>Cognitochain is entitled to process all User’s personal data received from the User in accordance with the Privacy Policy available for review at <a href="http://app.cognitochain.io/privacy-policy" target="_blank" rel="noopener noreferrer" className="weblink">http://app.cognitochain.io/privacy-policy</a> the applicable legislation of UK. By entering into the present agreement, the User also accepts the provisions of the Privacy Policy.</li>
                                 <li>
                                   The purpose of processing the User’s personal data is keeping User records, offering, rendering and maintaining services, financial and statistical analysis, exercising and protection of the rights of Cognitochain and/or User arising from the Agreement.
                                 </li>

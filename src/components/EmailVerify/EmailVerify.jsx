@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Alert } from "react-bootstrap";
 import { Container, Row, Col } from 'reactstrap';
 import { toast } from 'react-toastify';
 import Api from "../../services/api";
@@ -155,7 +154,7 @@ class EmailVerify extends React.Component {
     }
   }
   render() {
-    const { isEmailVerifiedFailed, errorMessage, successMessage,token } = this.state;
+    const {  errorMessage, successMessage,token } = this.state;
     if (!token) {
       return (
         <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: `url(${login_bg})` }}>

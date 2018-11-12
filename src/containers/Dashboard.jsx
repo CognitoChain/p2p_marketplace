@@ -1,10 +1,5 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import Dashboard from "../components/Dashboard/Dashboard";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class DashboardContainer extends Component {
@@ -25,5 +20,4 @@ class DashboardContainer extends Component {
         );
     }
 }
-
 export default DashboardContainer;
