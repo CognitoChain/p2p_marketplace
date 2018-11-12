@@ -43,32 +43,35 @@ class Market extends Component {
                             <div className="image" style={{backgroundImage:"url('assets/images/loans.jpg')"}}></div>
                             <div className="bg-overlay"></div>
                             <div className="market-bg-content">
-                                <h1>EASY LOAN</h1>
-                                <div className="row justify-content-center mt-20">
-                                    <div className="col-md-2"><p className="market-bg-feature">Secured</p></div>
-                                    <div className="col-md-2"><p className="market-bg-feature">Asset Backed</p></div>
-                                    <div className="col-md-2"><p className="market-bg-feature">Flexible Terms</p></div>
-                                </div>
+                                <h5>Digital assets backed loans got much easier. Here is how</h5>
                                 <div className="row mt-30 how-it-works">
-                                    <div className="col-md-3">
-                                        <h5 className="text-muted">Step 1</h5>
-                                        <p>Login to Cognitochain Marketplace</p>
-                                        <h6>Create Loan Request</h6>
+                                    <div className="col-md-3 p-2">
+                                        <div className="step-container p-2">
+                                            <h5 className="text-muted">Step 1</h5>
+                                            <p>Login to Cognitochain Marketplace</p>
+                                            <h6>Create Loan Request</h6>
+                                        </div>
                                     </div>
-                                    <div className="col-md-3">
-                                        <h5 className="text-muted">Step 2</h5>
-                                        <p>Authorize Smart Contract</p>
-                                        <h6>Unlock Collateral</h6>
+                                    <div className="col-md-3 p-2">
+                                        <div className="step-container p-2">
+                                            <h5 className="text-muted">Step 2</h5>
+                                            <p>Authorize Smart Contract</p>
+                                            <h6>Unlock Collateral</h6>
+                                        </div>
                                     </div>
-                                    <div className="col-md-3">
-                                        <h5 className="text-muted">Step 3</h5>
-                                        <p>Publish in Cognitochain Marketplace</p>
-                                        <h6>Get Funded</h6>
+                                    <div className="col-md-3 p-2">
+                                        <div className="step-container p-2">
+                                            <h5 className="text-muted">Step 3</h5>
+                                            <p>Publish in Cognitochain Marketplace</p>
+                                            <h6>Get Funded</h6>
+                                        </div>
                                     </div>
-                                    <div className="col-md-3">
-                                        <h5 className="text-muted">Step 4</h5>
-                                        <p>Repay Loan</p>
-                                        <h6>Get Collateral back in full</h6>
+                                    <div className="col-md-3 p-2">
+                                        <div className="step-container p-2">
+                                            <h5 className="text-muted">Step 4</h5>
+                                            <p>Repay Loan</p>
+                                            <h6>Get Collateral back in full</h6>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
