@@ -19,6 +19,7 @@ import { BLOCKCHAIN_API } from "../../common/constants";
 import Switch from "react-switch";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import { Link } from 'react-router-dom';
+import { niceNumberDisplay } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -166,7 +167,7 @@ class Wallet extends Component {
                           <div className="float-right text-right">
                             <p className="card-text text-dark">
                               <span className="wallet-token-balance">
-                                {token.balance}
+                                {niceNumberDisplay(token.balance)}
                               </span>{" "}
                               {token.symbol}
                             </p>

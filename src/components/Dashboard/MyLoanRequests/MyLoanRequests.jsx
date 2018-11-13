@@ -49,7 +49,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}</div>
                         </div>
                     )
                 },
@@ -82,7 +82,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralTokenSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}</div>
                         </div>
                     )
                 }

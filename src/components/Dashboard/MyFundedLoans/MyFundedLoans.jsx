@@ -50,7 +50,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.principalSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}</div>
                         </div>
                     )
                 },
@@ -83,7 +83,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{cell}</span><br />{row.collateralSymbol}</div>
+                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralSymbol}</div>
                         </div>
                     )
                 }
