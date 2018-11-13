@@ -9,16 +9,16 @@ import {
   Alert,
   Tooltip
 } from "reactstrap";
-import "./Wallet.css";
+import { Link } from 'react-router-dom';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import _ from "lodash";
+import { BLOCKCHAIN_API } from "../../common/constants";
+import Switch from "react-switch";
 import Loading from "../Loading/Loading";
 import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import { BLOCKCHAIN_API } from "../../common/constants";
-import Switch from "react-switch";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
-import { Link } from 'react-router-dom';
+import "./Wallet.css";
 import { niceNumberDisplay } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
