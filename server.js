@@ -60,6 +60,12 @@ var putProxyRules = new HttpProxyRules({
   }
 });
 
+var deleteProxyRules = new HttpProxyRules({
+  rules: {
+    '/api/loanRequests/([a-zA-Z0-9]+)': 'http://localhost:3000/loanrequest/$1'
+  }
+});
+
 // Create reverse proxy instance
 var proxy = httpProxy.createProxy();
 const server = jsonServer.create();
@@ -101,6 +107,12 @@ server.post("/api/*", function(req, res) {
 server.put("/api/*", function(req, res) {
     proxyRequestHandler(req, res, putProxyRules);
   }
+);
+
+// DELETE requests use 'deleteProxyRules'
+server.delete("/api/*", function(req, res) {
+    proxyRequestHandler(req, res, deleteProxyRules);
+  } 
 );
 
 server.use(middlewares);
