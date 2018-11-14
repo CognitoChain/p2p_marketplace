@@ -19,7 +19,7 @@ class Login extends React.Component {
       processing: false,
       locationState: this.props.location.state || {}
     };
-    this.signup = this.signup.bind(this);
+    this.socialSignup = this.socialSignup.bind(this);
     this.validators = validators;
     this.onchange = this.onchange.bind(this);
     this.login = this.login.bind(this);
@@ -46,18 +46,23 @@ class Login extends React.Component {
     });
   }
 
-  signup(res, type) {
-    // console.log("have google profile: ", res.w3.U3);
+  socialSignup(res, type) {
     if (typeof res.tokenId != "undefined") {
-      this.googleSignIn(res.tokenId).then(response => {
-        console.log("logged-in as '", response.name, "' email: ", response.email);
-        const authorization = response.headers.get('Authorization');
-        if (authorization && authorization != null) {
-          localStorage.setItem('token', authorization);
-          localStorage.setItem('userEmail', response.email);
-          this.props.history.push("/");
+      this.googleSignIn(res.tokenId).then((result)=> {
+        try{
+          const response =  result[0];
+          const headers = result[1];
+          const authorization = headers.get('Authorization');
+          if (authorization && authorization != null) {
+            localStorage.setItem('token', authorization);
+            localStorage.setItem('userEmail', response.email);
+            this.props.history.push("/");
+          }
+          else {
+            toast.error("Please try again later..");
+          }
         }
-        else {
+        catch(e){
           toast.error("Please try again later..");
         }
       });
@@ -214,9 +219,7 @@ class Login extends React.Component {
   render() {
 
     const responseGoogle = response => {
-      console.log("google console");
-      console.log(response);
-      this.signup(response, "google");
+      this.socialSignup(response, "google");
     };
 
     const { email, password } = this.state;
@@ -271,6 +274,7 @@ class Login extends React.Component {
 
                   <GoogleLogin
                     clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
+                    //clientId = "922612504921-b9pc828k1osg1s8cf8pq27cm2g2f5vk5.apps.googleusercontent.com"
                     buttonText="Login with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}

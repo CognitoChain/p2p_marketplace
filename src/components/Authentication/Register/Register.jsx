@@ -23,6 +23,7 @@ class Register extends React.Component {
     this.validators = validators;
     this.onchange = this.onchange.bind(this);
     this.register = this.register.bind(this);
+    this.socialSignup = this.socialSignup.bind(this);
     this.displayValidationErrors = this.displayValidationErrors.bind(this);
     this.updateValidators = this.updateValidators.bind(this);
   }
@@ -34,17 +35,28 @@ class Register extends React.Component {
       });
     });
   }
-  signup(res, type) {
-    console.log("have google profile: ", res.w3.U3);
-    console.log("tokenId: ", res.tokenId);
-    this.googleSignIn(res.tokenId).then(response => {
-      console.log("logged-in as '", response.name, "' email: ", response.email);
-      this.setState({
-        name: response.name,
-        email: response.email,
-        pictureUrl: response.pictureUrl
-      })
-    });
+ 
+  socialSignup(res, type) {
+    if (typeof res.tokenId != "undefined") {
+      this.googleSignIn(res.tokenId).then((result)=> {
+        try{
+          const response =  result[0];
+          const headers = result[1];
+          const authorization = headers.get('Authorization');
+          if (authorization && authorization != null) {
+            localStorage.setItem('token', authorization);
+            localStorage.setItem('userEmail', response.email);
+            this.props.history.push("/");
+          }
+          else {
+            toast.error("Please try again later..");
+          }
+        }
+        catch(e){
+          toast.error("Please try again later..");
+        }
+      });
+    }
   }
   onchange(event) {
     this.setState({
@@ -138,9 +150,7 @@ class Register extends React.Component {
   }
   render() {
     const responseGoogle = response => {
-      console.log("google console");
-      console.log(response);
-      this.signup(response, "google");
+      this.socialSignup(response, "google");
     };
     const { email, password, confirmPassword } = this.state;
     const isFormValid = this.isFormValid();
