@@ -24,7 +24,7 @@ class Header extends Component {
         if (_.isUndefined(currentAccount)) {
             currentAccount = '';
         }
-        this.props.updateMetamaskAccount(currentAccount);   
+        this.props.updateMetamaskAccount(currentAccount,false);   
         this.interval = setInterval(
             () => {
                 this.checkAccount()
@@ -39,11 +39,11 @@ class Header extends Component {
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         if ((currentMetamaskAccount == null && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) && typeof currentMetamaskAccount != "undefined" && currentMetamaskAccount != null)) {
             this.props.refreshTokens();
-            this.props.updateMetamaskAccount(currentAccount);
+            this.props.updateMetamaskAccount(currentAccount,true);
         }
     }
     render() {
-        const { userEmail,wrongMetamskNetworkMsg,wrongMetamaskNetwork,currentMetamaskAccount } = this.props;
+        const { userEmail,wrongMetamskNetworkMsg,wrongMetamaskNetwork,currentMetamaskAccount,socialLogin } = this.props;
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 

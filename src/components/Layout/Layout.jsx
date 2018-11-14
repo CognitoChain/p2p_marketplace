@@ -59,7 +59,8 @@ class Layout extends Component {
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         currentMetamaskAccount = (currentMetamaskAccount != null && currentMetamaskAccount != '') ? currentMetamaskAccount : '';
         this.state = {
-          currentMetamaskAccount: currentMetamaskAccount
+          currentMetamaskAccount: currentMetamaskAccount,
+          reloadDetails:false
         };
         this.logout = this.logout.bind(this);
         this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
@@ -67,7 +68,7 @@ class Layout extends Component {
     logout() {
         localStorage.removeItem('token');
         localStorage.removeItem('userEmail');
-        this.updateMetamaskAccount('');
+        this.updateMetamaskAccount('',false);
         this.props.history.push("/login");
     }
     componentDidUpdate() {
@@ -77,7 +78,7 @@ class Layout extends Component {
           behavior: 'smooth' 
         });
     }
-    updateMetamaskAccount(currentMetamaskAccount){
+    updateMetamaskAccount(currentMetamaskAccount,reloadDetails){
       const api = new Api();
       if(!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null)
       {
@@ -94,11 +95,12 @@ class Layout extends Component {
       {
         localStorage.removeItem('currentMetamaskAccount');
       }
-      this.setState({ currentMetamaskAccount: currentMetamaskAccount }, () => {});
+      this.setState({ currentMetamaskAccount: currentMetamaskAccount,reloadDetails: reloadDetails }, () => {});
     }
     render() {
         const token = localStorage.getItem('token');
         const userEmail = localStorage.getItem('userEmail');
+        const socialLogin = localStorage.getItem('socialLogin');
         const {currentMetamaskAccount} = this.state;
         const authenticated = ((token && token !== null) ? true : false)
         const urlString = this.props.location.pathname.substr(1);
@@ -141,7 +143,7 @@ class Layout extends Component {
         }
         else{
             return (
-                <Base logout={this.logout} authenticated={authenticated} token={token} location={location} userEmail={userEmail} wrongMetamskNetworkMsg={wrongMetamskNetworkMsg} wrongMetamaskNetwork={wrongMetamaskNetwork} updateMetamaskAccount={this.updateMetamaskAccount} currentMetamaskAccount={currentMetamaskAccount}>
+                <Base socialLogin={socialLogin} logout={this.logout} authenticated={authenticated} token={token} location={location} userEmail={userEmail} wrongMetamskNetworkMsg={wrongMetamskNetworkMsg} wrongMetamaskNetwork={wrongMetamaskNetwork} updateMetamaskAccount={this.updateMetamaskAccount} currentMetamaskAccount={currentMetamaskAccount}>
                     <Switch>
                         <Route exact={true} path='/' 
                             render={() => 
@@ -162,7 +164,7 @@ class Layout extends Component {
                         <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/tokens" component={TokensContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/request/:id" component={LoanRequestContainer} />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} reloadDetails={this.state.reloadDetails} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/investments" component={InvestmentsContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/success" component={Success} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/fund/:id" component={FundContainer} />
