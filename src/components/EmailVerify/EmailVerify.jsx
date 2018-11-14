@@ -31,6 +31,7 @@ class EmailVerify extends React.Component {
     this.state = {
       token: token,
       email:email,
+      buttonLoading:false,
       locationState:locationState,
       errorMessage: errorMessage,
       successMessage: "",
@@ -132,15 +133,16 @@ class EmailVerify extends React.Component {
       email
     } = this.state;
     if (email != "") {
+      this.setState({
+        buttonLoading:true
+      })
       const api = new Api();
       const response = await api.create("email/send", {
         email: email
-      }).catch((error) => {
-        if (error.status && error.status === 403) {
-          // this.props.redirect(`/login`);
-          // return;
-        }
-      });
+      })
+      this.setState({
+        buttonLoading:false
+      })
       if (response.status == "SUCCESS") {
         this.setState({
           errorMessage : "",
@@ -154,7 +156,7 @@ class EmailVerify extends React.Component {
     }
   }
   render() {
-    const {  errorMessage, successMessage,token } = this.state;
+    const {  errorMessage, successMessage,token,buttonLoading } = this.state;
     if (!token) {
       return (
         <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: `url(${login_bg})` }}>
@@ -198,6 +200,7 @@ class EmailVerify extends React.Component {
                   <div>
                     <a onClick={this.resendVerificationEmail} className={`btn cognito btn-theme ${this.isFormValid() ? '' : 'disabled'}`}>
                       <span className="text-white">Send verification link</span>
+                      {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                     </a>
                   </div>
                   <p className="mt-20 mb-0 remember-checkbox">After Verification  <Link to="/login"> Login here</Link></p>

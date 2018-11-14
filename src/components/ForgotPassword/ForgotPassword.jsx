@@ -15,6 +15,7 @@ class ForgotPassword extends React.Component {
     this.state = {
       email:email,
       errorMessage: errorMessage,
+      buttonLoading:false,
       successMessage: ""
     };
     this.onchange = this.onchange.bind(this);
@@ -79,15 +80,16 @@ class ForgotPassword extends React.Component {
       email
     } = this.state;
     if (email != "") {
+      this.setState({
+        buttonLoading:true
+      })
       const api = new Api();
       const response = await api.create("password-reset-request", {
         email: email
-      }).catch((error) => {
-        if (error.status && error.status === 403) {
-          // this.props.redirect(`/login`);
-          // return;
-        }
-      });
+      })
+      this.setState({
+        buttonLoading:false
+      })
       if (response.status == "SUCCESS") {
         this.setState({
           errorMessage : "",
@@ -103,7 +105,7 @@ class ForgotPassword extends React.Component {
     }
   }
   render() {
-    const { errorMessage, successMessage, email } = this.state;
+    const { errorMessage, successMessage, email,buttonLoading } = this.state;
     const isFormValid = this.isFormValid();
       return (
         <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: `url(${login_bg})` }}>
@@ -146,6 +148,7 @@ class ForgotPassword extends React.Component {
                   <div>
                     <a onClick={this.sendPasswordLink} className={`btn cognito btn-theme ${isFormValid ? '' : 'disabled'}`}>
                       <span className="text-white">Submit</span>
+                      {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                     </a>
                   </div>
                   <p className="mt-20 mb-0 remember-checkbox">Already have password? <Link to="/login" >Login</Link></p>

@@ -17,6 +17,7 @@ class Login extends React.Component {
       password: '',
       error: null,
       processing: false,
+      buttonLoading:false,
       locationState: this.props.location.state || {}
     };
     this.socialSignup = this.socialSignup.bind(this);
@@ -128,14 +129,20 @@ class Login extends React.Component {
       email,
       password,
     } = this.state;
+    this.setState({
+      buttonLoading:true
+    })
     const api = new Api();
     const response = await api.create("login", {
       email: email,
       password: password
     });
+    this.setState({
+      buttonLoading:false
+    })
     //const authorization = response.headers.get('Authorization');
     const authorization = response.headers.get('Authorization');
-    console.log(authorization)
+
     if (authorization && authorization != null) {
       localStorage.setItem('token', authorization);
       localStorage.setItem('userEmail', email);
@@ -222,7 +229,7 @@ class Login extends React.Component {
       this.socialSignup(response, "google");
     };
 
-    const { email, password } = this.state;
+    const { email, password,buttonLoading } = this.state;
     const isFormValid = this.isFormValid();
 
     return (
@@ -265,16 +272,16 @@ class Login extends React.Component {
 
                 <p className="mb-3 remember-checkbox text-right"><Link to="/forgot" > Forgot Password? </Link></p>
 
-                <div className="d-inline-block">
-                  <a onClick={this.login} className={`btn cognito btn-theme pull-md-left ${isFormValid ? '' : 'disabled'}`}>
+                <div className="d-block">
+                  <a onClick={this.login} className={`btn cognito btn-theme ${isFormValid ? '' : 'disabled'}`}>
                     <span className="text-white">Log in</span>
+                    {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                   </a>
 
                   <span className="login-buttons-seperator"></span>
 
                   <GoogleLogin
                     clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
-                    //clientId = "922612504921-b9pc828k1osg1s8cf8pq27cm2g2f5vk5.apps.googleusercontent.com"
                     buttonText="Login with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}
@@ -282,11 +289,7 @@ class Login extends React.Component {
                   />
 
                 </div>
-
                 <p className="mt-20 mb-0 remember-checkbox">Don't have an account? <Link to="/register" > Create one here </Link></p>
-
-                
-
               </div>
             </Col>
           </Row>

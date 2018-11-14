@@ -14,9 +14,10 @@ class ChangePassword extends Component {
             customAlertMsgStyle: '',
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
-            currentPassword:'',
-            password:'',
-            confirmPassword:'',
+            currentPassword: '',
+            password: '',
+            confirmPassword: '',
+            buttonLoading: false
         };
         this.onchange = this.onchange.bind(this);
         this.validators = validators;
@@ -26,40 +27,40 @@ class ChangePassword extends Component {
     }
     onchange(event) {
         this.setState({
-          [event.target.name]: event.target.value
+            [event.target.name]: event.target.value
         });
     }
     updateValidators(fieldName, value) {
         const { password, confirmPassword } = this.state;
         if (!this.validators[fieldName]) {
-          this.validators[fieldName] = {}
+            this.validators[fieldName] = {}
         }
         this.validators[fieldName].errors = [];
         this.validators[fieldName].state = value;
         this.validators[fieldName].valid = true;
         this.validators[fieldName].rules.forEach((rule) => {
-          if (rule.test instanceof RegExp) {
-            if (!rule.test.test(value)) {
-              this.validators[fieldName].errors.push(rule.message);
-              this.validators[fieldName].valid = false;
+            if (rule.test instanceof RegExp) {
+                if (!rule.test.test(value)) {
+                    this.validators[fieldName].errors.push(rule.message);
+                    this.validators[fieldName].valid = false;
+                }
+            } else if (typeof rule.test === 'function') {
+                if (!rule.test(value)) {
+                    this.validators[fieldName].errors.push(rule.message);
+                    this.validators[fieldName].valid = false;
+                }
             }
-          } else if (typeof rule.test === 'function') {
-            if (!rule.test(value)) {
-              this.validators[fieldName].errors.push(rule.message);
-              this.validators[fieldName].valid = false;
-            }
-          }
         });
         if ((fieldName == "confirmPassword" || fieldName == "password") && password != confirmPassword) {
-          this.validators["confirmPassword"].errors = [];
-          this.validators["confirmPassword"].errors.push("Password and Confirm Password should match.");
-          this.validators["confirmPassword"].valid = false;
+            this.validators["confirmPassword"].errors = [];
+            this.validators["confirmPassword"].errors.push("Password and Confirm Password should match.");
+            this.validators["confirmPassword"].valid = false;
         }
     }
 
     isFormValid() {
         let status = true;
-        const validationFields = ["password","confirmPassword","currentPassword"];
+        const validationFields = ["password", "confirmPassword", "currentPassword"];
         validationFields.forEach((field) => {
             this.updateValidators(field, this.state[field])
             if (!this.validators[field].valid) {
@@ -89,40 +90,45 @@ class ChangePassword extends Component {
     async changePassword(event) {
         event.preventDefault();
         const {
-          currentPassword,
-          password          
+            currentPassword,
+            password
         } = this.state;
         if (currentPassword != "" && password != '') {
-          const api = new Api();
-          let data = {'currentPassword': currentPassword,'newPassword':password};
-          const response = await api.setToken(this.props.token).put("user/password", null, data).catch((error) => {
-            if (error.status && error.status === 500) {
+            this.setState({
+                buttonLoading: true
+            })
+            const api = new Api();
+            let data = { 'currentPassword': currentPassword, 'newPassword': password };
+            const response = await api.setToken(this.props.token).put("user/password", null, data).catch((error) => {
+                if (error.status && error.status === 500) {
+                    this.setState({
+                        customAlertMsgDisplay: true,
+                        customAlertMsgStyle: 'danger',
+                        customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                        customAlertMsgTitle: error.message
+                    })
+                }
+            });;
+            this.setState({
+                buttonLoading: false
+            })
+            if (!_.isUndefined(response) && response.status == "SUCCESS") {
+                localStorage.removeItem('token');
+                localStorage.removeItem('currentMetamaskAccount');
+                localStorage.removeItem('userEmail');
+                this.props.history.push({
+                    pathname: '/login',
+                    state: { message: "PASSWORD_CHANGED_SUCCESSFULLY" }
+                });
+            }
+            else {
                 this.setState({
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
-                    customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2', 
-                    customAlertMsgTitle:error.message       
+                    customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
+                    customAlertMsgTitle: response.message
                 })
             }
-          });;
-
-          if (!_.isUndefined(response) && response.status == "SUCCESS") {
-            localStorage.removeItem('token');
-            localStorage.removeItem('currentMetamaskAccount');
-            localStorage.removeItem('userEmail');
-            this.props.history.push({
-              pathname: '/login',
-              state: { message: "PASSWORD_CHANGED_SUCCESSFULLY" }
-            });
-          }
-          else {
-            this.setState({
-                customAlertMsgDisplay: true,
-                customAlertMsgStyle: 'danger',
-                customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2', 
-                customAlertMsgTitle:response.message         
-            })
-          }
         }
     }
 
@@ -135,7 +141,8 @@ class ChangePassword extends Component {
             customAlertMsgTitle,
             currentPassword,
             password,
-            confirmPassword
+            confirmPassword,
+            buttonLoading
         } = this.state;
         const isFormValid = this.isFormValid();
         return (
@@ -162,24 +169,25 @@ class ChangePassword extends Component {
                                             <input type="password" value={this.state.currentPassword} placeholder="Old Password" id="currentPassword" className="form-control" name="currentPassword" onChange={this.onchange} />
                                             {currentPassword && this.displayValidationErrors('currentPassword')}
                                         </div>
-                                        
+
                                         <div className="mt-30">
                                             <label>New Password<span className="red">*</span></label>
                                             <input type="password" value={this.state.password} placeholder="New Password" id="password" className="form-control" name="password" onChange={this.onchange} />
                                             {password && this.displayValidationErrors('password')}
                                         </div>
-                                            
+
                                         <div className="mt-30">
                                             <label>Confirm New Password<span className="red">*</span></label>
                                             <input type="password" value={this.state.confirmPassword} placeholder="Confirm New Password" id="confirmPassword" className="form-control" name="confirmPassword" onChange={this.onchange} />
                                             {confirmPassword && this.displayValidationErrors('confirmPassword')}
-                                        </div>    
+                                        </div>
 
                                         <div className="mt-30">
                                             <a onClick={this.changePassword} className={`btn cognito btn-theme pull-md-left ${isFormValid ? '' : 'disabled'}`}>
                                                 <span className="text-white">Change</span>
+                                                {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                                             </a>
-                                        </div>                                        
+                                        </div>
                                     </Form>
                                 </CardBody>
                             </Card>

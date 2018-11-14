@@ -18,6 +18,7 @@ class Register extends React.Component {
       password: '',
       confirmPassword: '',
       error: null,
+      buttonLoading:false,
       apiError: ""
     };
     this.validators = validators;
@@ -127,12 +128,17 @@ class Register extends React.Component {
       email,
       password,
     } = this.state;
+    this.setState({
+      buttonLoading:true
+    })
     const api = new Api();
     const response = await api.create("sign-up", {
       email: email,
       password: password
     });
-
+    this.setState({
+      buttonLoading:false
+    })
     if (response.status === "SUCCESS") {
       this.props.history.push({
         pathname: '/login',
@@ -152,7 +158,7 @@ class Register extends React.Component {
     const responseGoogle = response => {
       this.socialSignup(response, "google");
     };
-    const { email, password, confirmPassword } = this.state;
+    const { email, password, confirmPassword,buttonLoading } = this.state;
     const isFormValid = this.isFormValid();
     return (
       <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: 'url(assets/images/register-bg.png)' }}>
@@ -193,13 +199,12 @@ class Register extends React.Component {
                 </div>
 
                 <div className="d-inline-block">
-
                   {
                     <a onClick={this.register} className={`btn cognito btn-theme pull-md-left  ${isFormValid ? '' : 'disabled'}`}>
                       <span className="text-white">Signup</span>
+                      {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                     </a>
                   }
-
                   <span className="login-buttons-seperator"></span>
 
                   <GoogleLogin
