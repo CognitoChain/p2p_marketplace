@@ -21,12 +21,12 @@ class TokenSelect extends Component {
                     </DropdownToggle>
                     <DropdownMenu>
                         {tokens.map((token) => {
-                            if(allowedTokens === false || (allowedTokens === true && token.balance > 0)){
+                            // if(allowedTokens === false || (allowedTokens === true && token.balance > 0)){
                                 return  <DropdownItem disabled={disableValue == token.symbol} key={token.symbol} value={token.symbol} name={dropdownFieldName}          onClick={onChange}>
                                             {`${token.symbol} (${token.name})`}
                                         </DropdownItem>;        
-                            }
-                            return false;
+                            // }
+                            //return false;
                         })}
                     </DropdownMenu>
                 </InputGroupButtonDropdown>
