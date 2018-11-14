@@ -17,7 +17,8 @@ class ResetPassword extends React.Component {
       password:'',
       confirmPassword: '',
       errorMessage: errorMessage,
-      successMessage: ""      
+      successMessage: "" ,
+      buttonLoading:false    
     };
     this.onchange = this.onchange.bind(this);
     this.displayValidationErrors = this.displayValidationErrors.bind(this);
@@ -91,15 +92,17 @@ class ResetPassword extends React.Component {
       token
     } = this.state;
     if (password != "") {
+      this.setState({
+        buttonLoading:true
+      })
       const api = new Api();
       const response = await api.create("password-reset", {
         password: password,
         token:token
-      }).catch((error) => {
-        if (error.status && error.status === 403) {
-          
-        }
-      });
+      })
+      this.setState({
+        buttonLoading:false
+      })
       if (response.status == "SUCCESS") {
         this.props.history.push({
           pathname: '/login',
@@ -114,7 +117,7 @@ class ResetPassword extends React.Component {
     }
   }
   render() {
-    const { errorMessage, successMessage, token, password, confirmPassword } = this.state;
+    const { errorMessage, successMessage, token, password, confirmPassword,buttonLoading } = this.state;
     const isFormValid = this.isFormValid();
     if (token) {
       return (
@@ -164,6 +167,7 @@ class ResetPassword extends React.Component {
                   <div>
                     <a onClick={this.resetPassword} className={`btn cognito btn-theme ${isFormValid ? '' : 'disabled'}`}>
                       <span className="text-white">Update Password</span>
+                      {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
                     </a>
                   </div>
 
