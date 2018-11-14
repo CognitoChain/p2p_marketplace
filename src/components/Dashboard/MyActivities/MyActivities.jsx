@@ -71,24 +71,25 @@ class MyActivities extends Component {
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
                 amount = niceNumberDisplay(amount);
-                loanRequestsActivities.push({
-                  id: "l_" + _.random(999999999),
-                  date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                  amount: amount,
-                  type: "minus",
-                  sybmol: ts.principalSymbol,
-                  agreementId: ts.id,
-                  sortTimestamp: st,
-                  buttonText: buttonText,
-                  buttonClassName: buttonClassName
-                });
-                i++;
+                if(amount > 0)
+                {
+                  loanRequestsActivities.push({
+                    id: "l_" + _.random(999999999),
+                    date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                    amount: amount,
+                    type: "minus",
+                    sybmol: ts.principalSymbol,
+                    agreementId: ts.id,
+                    sortTimestamp: st,
+                    buttonText: buttonText,
+                    buttonClassName: buttonClassName
+                  });
+                  i++;
+                }
               }
             });
           }
-
         });
-
       }
       myBorrowedRequestsLoading = false
       if (myLoansIsMounted) {
