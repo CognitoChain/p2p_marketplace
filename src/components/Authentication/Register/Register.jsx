@@ -45,6 +45,7 @@ class Register extends React.Component {
           const headers = result[1];
           const authorization = headers.get('Authorization');
           if (authorization && authorization != null) {
+            localStorage.setItem('socialLogin', "yes");
             localStorage.setItem('token', authorization);
             localStorage.setItem('userEmail', response.email);
             this.props.history.push("/");

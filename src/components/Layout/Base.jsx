@@ -41,6 +41,7 @@ class Base extends Component {
                                 wrongMetamaskNetwork={this.props.wrongMetamaskNetwork}
                                 updateMetamaskAccount={this.props.updateMetamaskAccount}
                                 refreshTokens={dharmaProps.refreshTokens}
+                                socialLogin = {this.props.socialLogin}
                             />
                         );
                     }}

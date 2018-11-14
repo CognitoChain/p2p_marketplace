@@ -176,7 +176,9 @@ class Layout extends Component {
                               <TermsConditions {...this.props} authenticated={authenticated} token={token} />
                             }
                           />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/change-password" component={ChangePassword} userEmail={userEmail} />
+                          {
+                            <PrivateRoute authenticated={authenticated && socialLogin=="no"} socialLogin={socialLogin} token={token} path="/change-password" component={ChangePassword} userEmail={userEmail} />
+                          }
                     </Switch>
                 </Base>
             )
