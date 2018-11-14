@@ -2,11 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Container } from 'reactstrap';
 import { toast } from 'react-toastify';
-import validators from '../../../validators';
+import _ from "lodash";
 import GoogleLogin from "react-google-login";
+import validators from '../../../validators';
 import Api from "../../../services/api";
 import './Register.css';
-import _ from "lodash";
+
 
 
 class Register extends React.Component {

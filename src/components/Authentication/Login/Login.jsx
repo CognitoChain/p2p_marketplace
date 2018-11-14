@@ -2,11 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col } from 'reactstrap';
 import { toast } from 'react-toastify';
-import validators from '../../../validators';
+import _ from 'lodash';
 import GoogleLogin from "react-google-login";
+import validators from '../../../validators';
 import Api from "../../../services/api";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import _ from 'lodash';
+
 import './Login.css';
 class Login extends React.Component {
   constructor(props) {
