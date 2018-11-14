@@ -6,7 +6,7 @@ import "./LoadingFull.css";
 
 class LoadingFull extends React.Component {
   render() {
-    return <section className="loading">
+    return <section className="loading-full">
       We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings. 
         
 
