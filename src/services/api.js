@@ -141,6 +141,11 @@ class Api {
                 if(resource === "login"){
                     resolve(response);
                 }
+                else if(resource === "goauthlogin"){
+                    const headers = response.headers;
+                    const json = await response.json();
+                    resolve([json,headers]);
+                }
                 else{
                     const json = await response.json();
                     resolve(json);    
