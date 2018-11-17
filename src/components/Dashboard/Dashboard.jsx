@@ -10,6 +10,7 @@ import MyPortfolio from "./MyPortfolio/MyPortfolio";
 import MyActivities from "./MyActivities/MyActivities";
 import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
+import { convertBigNumber } from "../../utils/Util";
 import _ from 'lodash';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 class Dashboard extends Component {
@@ -34,14 +35,8 @@ class Dashboard extends Component {
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
+        this.amountTooltipTop = this.amountTooltipTop.bind(this);
     }
-
-    convertBigNumber(number, decimal) {
-        let divider = "1E" + decimal;
-        let formatedAmount = number / divider;
-        return formatedAmount;
-    }
-
     componentDidMount() {
         this.setPriceFeedData();
         this.getBorrowedLoanRequests();
@@ -69,6 +64,16 @@ class Dashboard extends Component {
         if (nextProps.tokens != this.state.tokenlist) {
             this.setState({ tokenlist: nextProps.tokens })
         }
+    }
+    amountTooltipTop(token) {
+        /*const { tokenlist } = this.state;
+        let tootlTipStatus = !token.tootlTipStatus;
+        let symbol = token.symbol;
+        var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
+        tokenlist[tokenKey].tootlTipStatus = tootlTipStatus;
+        this.setState({
+          tokenlist
+        });*/
     }
     async getBorrowedLoanRequests() {
         const api = new Api();
@@ -161,10 +166,10 @@ class Dashboard extends Component {
         }
 
         return myBorrowedRequests.map((request) => {
-            let princiaplAmount = this.convertBigNumber(request.principalAmount, request.principalNumDecimals);
-            let collateralAmount = this.convertBigNumber(request.collateralAmount, request.collateralNumDecimals);
-            let repaymentAmount = this.convertBigNumber(request.totalExpectedRepayment, request.principalNumDecimals);
-            let repaidAmount = this.convertBigNumber(request.repaidAmount, request.principalNumDecimals);
+            let princiaplAmount = convertBigNumber(request.principalAmount, request.principalNumDecimals);
+            let collateralAmount = convertBigNumber(request.collateralAmount, request.collateralNumDecimals);
+            let repaymentAmount = convertBigNumber(request.totalExpectedRepayment, request.principalNumDecimals);
+            let repaidAmount = convertBigNumber(request.repaidAmount, request.principalNumDecimals);
 
             return {
                 ...request,
@@ -185,10 +190,10 @@ class Dashboard extends Component {
         }
 
         return myFundedRequests.map((investment) => {
-            let princiaplAmount = this.convertBigNumber(investment.principalAmount, investment.principalNumDecimals);
-            let collateralAmount = this.convertBigNumber(investment.collateralAmount, investment.collateralNumDecimals);
-            let repaymentAmount = this.convertBigNumber(investment.totalExpectedRepayment, investment.principalNumDecimals);
-            let repaidAmount = this.convertBigNumber(investment.repaidAmount, investment.principalNumDecimals);
+            let princiaplAmount = convertBigNumber(investment.principalAmount, investment.principalNumDecimals);
+            let collateralAmount = convertBigNumber(investment.collateralAmount, investment.collateralNumDecimals);
+            let repaymentAmount = convertBigNumber(investment.totalExpectedRepayment, investment.principalNumDecimals);
+            let repaidAmount = convertBigNumber(investment.repaidAmount, investment.principalNumDecimals);
 
             return {
                 ...investment,

@@ -4,11 +4,11 @@ import * as moment from "moment";
 import _ from "lodash";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
-import { BigNumber } from "bignumber.js";
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay,convertBigNumber } from "../../../utils/Util";
+
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
 import "./MyActivities.css";
@@ -43,6 +43,7 @@ class MyActivities extends Component {
       if (nextBorrowedRequests.length > 0) {
         await this.asyncForEach(nextBorrowedRequests, async ts => {
           repaymentSchedule = ts.repaymentSchedule;
+          console.log(repaymentSchedule)
           let current_timestamp = moment().unix();
           let i = 1;
           if (!_.isUndefined(repaymentSchedule)) {
@@ -55,7 +56,7 @@ class MyActivities extends Component {
                   ts.id,
                   st
                 );
-                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
+                expectedRepaidAmount = convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
 
                 let buttonText = '';
                 let buttonClassName = '';
@@ -69,8 +70,13 @@ class MyActivities extends Component {
                     buttonClassName = 'green';
                   }
                 }
+               
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
                 amount = niceNumberDisplay(amount);
+                console.log(ts.id)
+                console.log(parseFloat(expectedRepaidAmount))
+                console.log(parseFloat(ts.repaidAmount))
+                console.log(amount)
                 if(amount > 0)
                 {
                   loanRequestsActivities.push({
@@ -118,7 +124,7 @@ class MyActivities extends Component {
                   ts.id,
                   schedule_ts
                 );
-                expectedRepaidAmount = this.convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
+                expectedRepaidAmount = convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
 
                 let buttonText = '';
                 let buttonClassName = '';
@@ -166,9 +172,7 @@ class MyActivities extends Component {
       await callback(array[index], index, array);
     }
   }
-  convertBigNumber(obj, power) {
-    return obj.div(new BigNumber(10).pow(power.toNumber()));
-  }
+
   render() {
     const { loanRequestsActivities, investmentsActivities, metaMaskMsg, myFundedRequestsLoading, myBorrowedRequestsLoading } = this.state;
     const { myFundedLoading, myBorrowedLoading } = this.props;
@@ -246,7 +250,9 @@ class MyActivities extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div>
-              <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName}>{row.buttonText}</a>
+              {
+                row.buttonText!='' && <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName}>{row.buttonText}</a>
+              }
             </div>
           );
         }
