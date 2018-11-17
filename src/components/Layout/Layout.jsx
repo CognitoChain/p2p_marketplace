@@ -101,7 +101,7 @@ class Layout extends Component {
         const token = localStorage.getItem('token');
         const userEmail = localStorage.getItem('userEmail');
         const socialLogin = localStorage.getItem('socialLogin');
-        const {currentMetamaskAccount} = this.state;
+        const {currentMetamaskAccount,reloadDetails} = this.state;
         const authenticated = ((token && token !== null) ? true : false)
         const urlString = this.props.location.pathname.substr(1);
         const urlStringArr = urlString.split("/");
@@ -147,13 +147,13 @@ class Layout extends Component {
                     <Switch>
                         <Route exact={true} path='/' 
                             render={() => 
-                              <Market {...this.props} authenticated={authenticated}  token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} />
+                              <Market {...this.props} authenticated={authenticated}  token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} currentMetamaskAccount={currentMetamaskAccount} reloadDetails={reloadDetails} />
                             }
                           />
 
                         <Route path='/market' 
                             render={() => 
-                              <Market {...this.props} authenticated={authenticated} token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} />
+                              <Market {...this.props} authenticated={authenticated} token={token} wrongMetamaskNetwork={wrongMetamaskNetwork} currentMetamaskAccount={currentMetamaskAccount} reloadDetails={reloadDetails} />
                             }
                           />  
 
@@ -164,7 +164,7 @@ class Layout extends Component {
                         <PrivateRoute authenticated={authenticated} token={token} path="/create" component={Create} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/tokens" component={TokensContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/request/:id" component={LoanRequestContainer} />
-                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} reloadDetails={this.state.reloadDetails} />
+                        <PrivateRoute authenticated={authenticated} token={token} path="/detail/:id" component={DetailContainer} reloadDetails={reloadDetails} currentMetamaskAccount={currentMetamaskAccount}/>
                         <PrivateRoute authenticated={authenticated} token={token} path="/investments" component={InvestmentsContainer} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/success" component={Success} />
                         <PrivateRoute authenticated={authenticated} token={token} path="/fund/:id" component={FundContainer} />

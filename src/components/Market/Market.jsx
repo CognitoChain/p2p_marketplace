@@ -106,6 +106,9 @@ class Market extends Component {
                                             dharma={dharmaProps.dharma}
                                             redirect={this.redirect}
                                             highlightRow={highlightRow}
+                                            currentMetamaskAccount={this.props.currentMetamaskAccount}
+                                            isTokenLoading={ dharmaProps.isTokenLoading }
+                                            reloadDetails={this.props.reloadDetails}
                                         />
                                     )}
                                 </DharmaConsumer>
