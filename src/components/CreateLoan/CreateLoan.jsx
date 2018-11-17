@@ -593,23 +593,23 @@ class CreateLoan extends Component {
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"
-                                                        labelValue={principal > 0 ? principal + ' ' + principalTokenSymbol : 'N/A'}
+                                                        labelValue={principal > 0 ? niceNumberDisplay(principal) + ' ' + principalTokenSymbol : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Amount"
-                                                        labelValue={collateral > 0 ? collateral + ' ' + collateralTokenSymbol : 'N/A'}
+                                                        labelValue={collateral > 0 ? collateral + ' ' + collateralTokenSymbol : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="LTV"
-                                                        labelValue={LTVRatio > 0 ? LTVRatio + "%" : 'N/A'}
+                                                        labelValue={LTVRatio > 0 ? LTVRatio + "%" : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Loan Term"
-                                                        labelValue={termLength > 0 ? termLength + " " + termUnit : 'N/A'}
+                                                        labelValue={termLength > 0 ? termLength + " " + termUnit : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Rate(Per Loan Term)"
-                                                        labelValue={interestRate > 0 ? interestRate + "%" : 'N/A'}
+                                                        labelValue={interestRate > 0 ? interestRate + "%" : '-'}
                                                     />
                                                     {/*<SummaryItem 
                                                     labelName = "Expiration"
@@ -617,11 +617,11 @@ class CreateLoan extends Component {
                                                 />*/}
                                                     <SummaryItem
                                                         labelName="Interest Amount"
-                                                        labelValue={interestAmount > 0 ? interestAmount + ' ' + principalTokenSymbol : 'N/A'}
+                                                        labelValue={interestAmount > 0 ? interestAmount + ' ' + principalTokenSymbol : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Total Repayment Amount"
-                                                        labelValue={totalReapaymentAmount > 0 ? totalReapaymentAmount + ' ' + principalTokenSymbol : 'N/A'}
+                                                        labelValue={totalReapaymentAmount > 0 ? totalReapaymentAmount + ' ' + principalTokenSymbol : '-'}
                                                     />
                                                     {/*<SummaryItem 
                                                     labelName = "Relayer Fee"
