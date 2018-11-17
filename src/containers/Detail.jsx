@@ -16,6 +16,7 @@ class DetailContainer extends Component {
                             refreshTokens={ dharmaProps.refreshTokens }
                             reloadDetails={this.props.reloadDetails}
                             isTokenLoading={ dharmaProps.isTokenLoading }
+                            currentMetamaskAccount = {this.props.currentMetamaskAccount}
                         />
                     )
                 } }

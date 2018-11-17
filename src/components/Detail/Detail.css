@@ -66,3 +66,13 @@
 .overview-bg-btn-error{
 	background-color: #e77882 !important;
 }
+.repayment-schedule td {
+    text-align: center!important;
+}
+.table.transaction-history thead th:nth-child(2){
+	text-align: right !important; 
+}
+.detail-unlock-tokens-button,.detail-unlock-tokens-button:hover{
+	background-color: #17A086 !important;
+	color: white !important;
+}
