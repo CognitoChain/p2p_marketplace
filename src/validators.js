@@ -88,7 +88,7 @@ const validator = {
       rules: [
         {
           test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
-          message: 'Pricipal amount must be greater then zero',
+          message: 'Enter Valid Principal Amount',
         },
         {
             test: /^[0-9.]+$/,
@@ -103,7 +103,7 @@ const validator = {
       rules: [
         {
           test:/^\s*(?=.*[1-9])\d*(?:\.\d{1,3})?\s*$/i,
-          message: 'Collateral amount must be greater then zero',
+          message: 'Enter Valid Collateral Amount',
         },
         {
             test: /^[0-9.]+$/,
