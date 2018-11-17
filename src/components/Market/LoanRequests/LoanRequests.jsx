@@ -3,13 +3,13 @@ import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import { confirmAlert } from 'react-confirm-alert'; 
+import { confirmAlert } from 'react-confirm-alert';
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency, niceNumberDisplay } from "../../../utils/Util";
 import "./LoanRequests.css";
 class LoanRequests extends Component {
     constructor(props) {
@@ -26,6 +26,16 @@ class LoanRequests extends Component {
         /*this.openlink = this.openlink.bind(this);*/
     }
     async componentDidMount() {
+        this.getLoanRequests();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.reloadDetails === true && !nextProps.isTokenLoading) {
+            this.getLoanRequests();
+        }
+    }
+
+    getLoanRequests() {
         const { highlightRow } = this.props;
         this.setState({
             highlightRow,
@@ -38,10 +48,10 @@ class LoanRequests extends Component {
             .then(this.parseLoanRequests)
             .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
             .catch((error) => {
-                if(error.status && error.status === 403){
+                if (error.status && error.status === 403) {
                     this.props.redirect(`/login/`);
                 }
-        });       
+            });
     }
 
     parseLoanRequests(loanRequestData) {
@@ -59,7 +69,8 @@ class LoanRequests extends Component {
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
-                    status:datum.status
+                    status: datum.status,
+                    debtorEthAddress: datum.debtor
                 });
             });
         });
@@ -74,7 +85,7 @@ class LoanRequests extends Component {
                 term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
                 requestedDate: moment(request.requestedAt).calendar(),
-                authenticated:this.props.authenticated
+                authenticated: this.props.authenticated
             };
         });
     }
@@ -83,35 +94,34 @@ class LoanRequests extends Component {
             modal: !this.state.modal
         });
     }
-    openlink(row_id){
-        if(this.props.authenticated)
-        {
-            this.props.redirect(`/request/${row_id}`);            
+    openlink(row_id) {
+        if (this.props.authenticated) {
+            this.props.redirect(`/request/${row_id}`);
         }
-        else
-        {
-             confirmAlert({
-              title: 'Login to fund',
-              buttons: [
-                {
-                  label: 'Login',
-                  onClick: () => this.props.redirect(`/login`)
-                },
-                {
-                  label: 'Cancel'
-                }
-              ]
+        else {
+            confirmAlert({
+                title: 'Login to fund',
+                buttons: [
+                    {
+                        label: 'Login',
+                        onClick: () => this.props.redirect(`/login`)
+                    },
+                    {
+                        label: 'Cancel'
+                    }
+                ]
             });
         }
     }
     render() {
-        let _self=this;
+        let _self = this;
         const { highlightRow, isLoading } = this.state;
+        const { currentMetamaskAccount } = this.props;
 
         const data = this.getData();
 
         if (isLoading) {
-            return <Loading/>;
+            return <Loading />;
         }
 
         /*const rowEvents = {
@@ -131,25 +141,27 @@ class LoanRequests extends Component {
         };
         const columns = [
             {
+                headerClasses: "created-title",
                 dataField: "createdAt",
                 text: "Created Date",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     var date = moment(row.requestedAt).format("DD/MM/YYYY");
                     var time = moment(row.requestedAt).format("HH:mm:ss");
                     return (
                         <div>
-                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
+                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="loans-time-label">{time}</span></div>
                         </div>
                     )
                 },
             },
             {
+                headerClasses: "amount-title",
                 dataField: "principalAmount",
                 text: "Loan Amount",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 },
@@ -157,9 +169,9 @@ class LoanRequests extends Component {
             {
                 dataField: "termDuration",
                 text: "Term",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
-                        <div>
+                        <div className="text-center">
                             <span className="number-highlight">{cell}</span> {row.termUnit}
                         </div>
                     )
@@ -168,35 +180,37 @@ class LoanRequests extends Component {
             {
                 dataField: "interestRate",
                 text: "Interest Rate",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
-                        <div>
+                        <div className="text-center">
                             <span className="number-highlight">{cell}</span> %
                         </div>
                     )
                 }
             },
             {
+                headerClasses: "amount-title",
                 dataField: "collateralAmount",
                 text: "Collateral",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                         </div>
                     )
                 }
             },
             {
+                headerClasses: "amount-title",
                 dataField: "repayment",
                 isDummyField: true,
                 text: "Total Repayment",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     let interest_amount = (row.principalAmount * row.interestRate) / 100;
                     let repayment_amount = row.principalAmount + interest_amount;
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 }
@@ -205,9 +219,9 @@ class LoanRequests extends Component {
                 dataField: "repaymentFrequency",
                 isDummyField: true,
                 text: "Repayment Frequency",
-                formatter:function(cell,row,rowIndex,formatExtraData){
+                formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
-                        <div>
+                        <div className="text-center">
                             <span className="number-highlight">{amortizationUnitToFrequency(row.termUnit)}</span>
                         </div>
                     )
@@ -217,12 +231,20 @@ class LoanRequests extends Component {
                 dataField: "fund",
                 isDummyField: true,
                 text: "Action",
-                formatter:function(cell,row,rowIndex,formatExtraData){
-                    return (
-                        <div className="d-inline-block">
-                            <a href="javascript:;" className="btn btn-outline-success cognito x-small" onClick={() => _self.openlink(row.id)}>Fund</a>
-                        </div>
-                    )
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    if (row.debtorEthAddress != currentMetamaskAccount) {
+                        return (
+                            <div className="text-center">
+                                    <a href="javascript:;" className="btn btn-outline-success cognito x-small" onClick={() => _self.openlink(row.id)}>Fund</a>
+                            </div>
+                        )
+                    }
+                    else {
+                        return (
+                            <div className="text-center">-</div>
+                        )
+                    }
+
                 }
             }
         ];
@@ -230,9 +252,9 @@ class LoanRequests extends Component {
         const pagination = paginationFactory({
             page: 1,
             /*showTotal:true,*/
-            alwaysShowAllBtns:true            
+            alwaysShowAllBtns: true
         });
-        if(data.length==0){
+        if (data.length == 0) {
             return <LoanRequestsEmpty />
         }
         return (
@@ -240,13 +262,13 @@ class LoanRequests extends Component {
                 <BootstrapTable
                     hover={false}
                     keyField="id"
-                    classes = {"open-request"}
+                    classes={"market-open-request"}
                     columns={columns}
                     data={data}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
-                    bordered={ false }
-                    pagination={pagination}                    
+                    bordered={false}
+                    pagination={pagination}
                 />
             </div>
         );

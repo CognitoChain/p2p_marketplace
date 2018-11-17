@@ -168,11 +168,6 @@ body{
 .web3-error-description{
   font-size:16px;
 }
-.google-login-btn{
-  // font-weight:400;
-  // font-family:'Poppins', sans-serif;  
-  // font-size:0.85rem;
-}
 .bg-green{
   background-color: $green;
 }
@@ -343,6 +338,12 @@ body{
   line-height: 1.5;
   font-size: 1rem;
 }
+.react-bootstrap-table .created-title{
+  text-align:left;
+}
+.react-bootstrap-table .amount-title{
+  text-align: right;
+}
 @-webkit-keyframes animate {
   50% {
     -ms-transform: rotate(360deg) scale(0.8); 
@@ -395,6 +396,9 @@ body{
 	font-weight: 600 !important;
 	font-size: 14px !important; 
 	color:#0f3b56;
+}
+.loans-time-label{
+  font-size: 11px !important;
 }
 .number-bold{
 	font-weight: 800;

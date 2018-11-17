@@ -11,6 +11,7 @@ import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Ut
 import "./FundedLoans.css";
 const columns = [
     {
+        headerClasses : "created-title",
         dataField: "createdAt",
         text: "Created Date",
         formatter: function (cell, row, rowIndex, formatExtraData) {
@@ -18,18 +19,19 @@ const columns = [
             var time = moment(row.requestedAt).format("HH:mm:ss");
             return (
                 <div>
-                    <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
+                    <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="loans-time-label">{time}</span></div>
                 </div>
             )
         },
     },
     {
+        headerClasses:"amount-title",
         dataField: "principalAmount",
         text: "Amount",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
-                <div>
-                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span> <br />{row.principalTokenSymbol}</div>
+                <div className="text-right">
+                    <span className="number-highlight">{niceNumberDisplay(cell)}</span> <br />{row.principalTokenSymbol}
                 </div>
             )
         }
@@ -39,7 +41,7 @@ const columns = [
         text: "Term",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
-                <div>
+                <div className="text-center">
                     <span className="number-highlight">{cell}</span> {row.termUnit}
                 </div>
             )
@@ -50,24 +52,26 @@ const columns = [
         text: "Interest Rate",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
-                <div>
+                <div className="text-center">
                     <span className="number-highlight">{cell}</span> %
                 </div>
             )
         }
     },
     {
+        headerClasses:"amount-title",
         dataField: "collateralAmount",
         text: "Collateral",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
-                <div>
-                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}</div>
+                <div className="text-right">
+                    <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                 </div>
             )
         }
     },
     {
+        headerClasses:"amount-title",
         dataField: "repaidAmount",
         isDummyField: true,
         text: "Total Repayment",
@@ -75,8 +79,8 @@ const columns = [
             let interest_amount = (row.principalAmount * row.interestRate) / 100;
             let repayment_amount = row.principalAmount + interest_amount;
             return (
-                <div>
-                    <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}</div>
+                <div className="text-right">
+                    <span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
                 </div>
             )
         }
@@ -87,7 +91,7 @@ const columns = [
         text: "Repayment Frequency",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
-                <div>
+                <div className="text-center">
                     <span className="number-highlight">{amortizationUnitToFrequency(row.termUnit)}</span>
                 </div>
             )
@@ -239,7 +243,7 @@ class FundedLoans extends Component {
                 <BootstrapTable
                     hover={false}
                     keyField="id"
-                    classes={"open-request"}
+                    classes={"market-funded-request"}
                     columns={columns}
                     data={data}
                     headerClasses={"text-center"}

@@ -17,6 +17,8 @@ class MyLoanRequests extends Component {
     }
     render() {
         const { myLoanRequests,myLoansLoading } = this.props;
+        const { currentMetamaskAccount } = this.props;
+
         if (myLoansLoading) {
             return <Loading/>;
         }
@@ -31,6 +33,7 @@ class MyLoanRequests extends Component {
         };
         const columns = [
             {
+                headerClasses:"created-title",
                 dataField: "createdAt",
                 text: "Created Date",
                 formatter:function(cell,row,rowIndex,formatExtraData){
@@ -38,18 +41,19 @@ class MyLoanRequests extends Component {
                     var time = moment(row.requestedAt).format("HH:mm:ss");
                     return (
                         <div>
-                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="funded-loans-time-label">{time}</span></div>
+                            <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="loans-time-label">{time}</span></div>
                         </div>
                     )
                 }
             },
             {
+                headerClasses:"amount-title",
                 dataField: "principalAmount",
                 text: "Amount",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 },
@@ -77,17 +81,19 @@ class MyLoanRequests extends Component {
                 }
             },
             {
+                headerClasses:"amount-title",
                 dataField: "collateralAmount",
                 text: "Collateral",
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                         </div>
                     )
                 }
             },
             {
+                headerClasses:"amount-title",
                 dataField: "repayment",
                 isDummyField: true,
                 text: "Total Repayment",
@@ -100,8 +106,8 @@ class MyLoanRequests extends Component {
                       parseFloat(principal) + parseFloat(interestAmount);
 
                     return (
-                        <div>
-                            <div className="text-right dispaly-inline-block"><span className="number-highlight">{niceNumberDisplay(totalRepaymentAmount)}</span><br />{row.principalTokenSymbol}</div>
+                        <div className="text-right">
+                            <span className="number-highlight">{niceNumberDisplay(totalRepaymentAmount)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 }
@@ -116,6 +122,26 @@ class MyLoanRequests extends Component {
                             {amortizationUnitToFrequency(row.termUnit)}
                         </div>
                     )
+                }
+            },
+            {
+                dataField: "fund",
+                isDummyField: true,
+                text: "Action",
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    if (row.creditorAddress == currentMetamaskAccount) {
+                        return (
+                            <div className="text-center">
+                                    <a href="javascript:;" className="btn btn-outline-danger cognito x-small" onClick={() => alert(row.id)}>Cancel Request</a>
+                            </div>
+                        )
+                    }
+                    else {
+                        return (
+                            <div className="text-center">-</div>
+                        )
+                    }
+
                 }
             }
         ];
