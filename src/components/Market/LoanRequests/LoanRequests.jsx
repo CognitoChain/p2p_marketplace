@@ -85,7 +85,8 @@ class LoanRequests extends Component {
                 term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
                 requestedDate: moment(request.requestedAt).calendar(),
-                authenticated: this.props.authenticated
+                authenticated: this.props.authenticated,
+                currentMetamaskAccount:this.props.currentMetamaskAccount
             };
         });
     }
@@ -116,8 +117,6 @@ class LoanRequests extends Component {
     render() {
         let _self = this;
         const { highlightRow, isLoading } = this.state;
-        const { currentMetamaskAccount } = this.props;
-
         const data = this.getData();
 
         if (isLoading) {
@@ -232,7 +231,7 @@ class LoanRequests extends Component {
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    if (row.debtorEthAddress != currentMetamaskAccount) {
+                    if (row.debtorEthAddress != row.currentMetamaskAccount) {
                         return (
                             <div className="text-center">
                                     <a href="javascript:;" className="btn btn-outline-success cognito x-small" onClick={() => _self.openlink(row.id)}>Fund</a>
@@ -261,6 +260,7 @@ class LoanRequests extends Component {
             <div className="LoanRequests">
                 <BootstrapTable
                     hover={false}
+                    ref='LoanRequestsTable' 
                     keyField="id"
                     classes={"market-open-request"}
                     columns={columns}
