@@ -283,10 +283,10 @@ class MyActivities extends Component {
 
     const pagination = paginationFactory({
       page: 1,
+      hideSizePerPage:true,
       /*showTotal:true,*/
       alwaysShowAllBtns: true,
       sizePerPage: 4,
-      sizePerPageList: [{ text: "4", value: 4 }, { text: "10", value: 10 }]
     });
 
     return (
@@ -313,7 +313,7 @@ class MyActivities extends Component {
               <div className="LoanRequests">
                 <BootstrapTable
                   hover={false}
-                  hideSizePerPage={true}
+                 
                   keyField="id"
                   classes={"open-request"}
                   columns={columns}
