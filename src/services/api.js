@@ -87,8 +87,21 @@ class Api {
      * @returns {Promise}
      */
     delete(resource, id) {
-        return new Promise((resolve, reject) => {
+        let url = this.apiUrl+'/'+resource+'/'+id; 
+        /*return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}/${id}`, { method: "DELETE" })
+                .then((response) => resolve(response.json()))
+                .catch((reason) => reject(reason));
+        });*/
+        return new Promise((resolve, reject) => {
+            fetch(url, { 
+                    method: "DELETE",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": this.token
+                    }
+                })
                 .then((response) => resolve(response.json()))
                 .catch((reason) => reject(reason));
         });
