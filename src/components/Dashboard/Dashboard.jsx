@@ -29,6 +29,7 @@ class Dashboard extends Component {
             myBorrowedLoading: true,
             myFundedLoading: true,
             myLoansLoading: true,
+            cancelLoanButtonLoading: false,
             myBorrowedRequestsIsMounted: true,
             myFundedRequestsIsMounted: true,
             myLoanRequestsIsMounted: true
@@ -132,7 +133,9 @@ class Dashboard extends Component {
     }
 
     parseMyLoanRequests(loanRequestData) {
-        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
+        var filteredRequestData =  loanRequestData.filter(function(loan) {
+            return (loan.status == "OPEN" || loan.status == "DELETED");
+        });
         return Promise.all(filteredRequestData.map(this.parseLoanRequest));
     }
 
@@ -145,7 +148,9 @@ class Dashboard extends Component {
                     ...loanRequest.getTerms(),
                     id: datum.id,
                     requestedAt: datum.createdAt,
-                    loanStatus: datum.status
+                    loanStatus: datum.status,
+                    debtor:datum.debtor,
+                    creditor:datum.creditor
                 });
             });
         });
@@ -239,12 +244,34 @@ class Dashboard extends Component {
         }
     }
 
+    cancelLoanRequest(row){
+       let agreementId = row.id;
+       let debtorEthAddress = row.debtor;
+        const { token, currentMetamaskAccount } = this.props;
+        if(!_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
+        {
+            this.setState({ cancelLoanButtonLoading: true })
+            const api = new Api();
+            api.setToken(token)
+            .delete('loanRequests',agreementId)
+            .then(async cancelResponse => {
+                if(cancelResponse.status == "SUCCESS")
+                {
+                    this.getMyLoanRequests();
+                    this.setState({ cancelLoanButtonLoading: false },()=>{
+                        toast.success("We're processing your cancellation request. We'll notify you, Once payment is confirmed.");
+                    });
+                }
+            });
+        }
+    }
+
     render() {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
         const { token, dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
-        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist } = this.state;
+        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist ,cancelLoanButtonLoading } = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -355,6 +382,9 @@ class Dashboard extends Component {
                                                         redirect={redirect}
                                                         myLoansLoading={myLoansLoading}
                                                         myLoanRequests={myLoanRequests}
+                                                        cancelLoanRequest={(row) => this.cancelLoanRequest(row)}
+                                                        currentMetamaskAccount={currentMetamaskAccount}
+                                                        cancelLoanButtonLoading={cancelLoanButtonLoading}
                                                     />
 
                                                 </TabPane>
