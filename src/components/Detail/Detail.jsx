@@ -45,7 +45,7 @@ class Detail extends Component {
       alertMessage: '',
       modalMessage: '',
       modalMessageDisplay: '',
-      isLoanUser:false
+      isLoanUser: false
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -67,7 +67,7 @@ class Detail extends Component {
   }
   getScheduledata() {
     const { currentMetamaskAccount } = this.props;
-    const { loanDetails, userTimezone, repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay ,isLoanUser} = this.state;
+    const { loanDetails, userTimezone, repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay, isLoanUser } = this.state;
     const {
       principalAmount,
       creditorAddress,
@@ -131,7 +131,7 @@ class Detail extends Component {
               }
             }
           }
-          else if (collateralBtnDisplay == true|| isCollateralReturned) {
+          else if (collateralBtnDisplay == true || isCollateralReturned) {
             overViewBackgroundClass = 'overview-bg-success';
             overViewButtonBackgroundClass = 'overview-bg-btn-success';
           } else if ((collateralSeizeBtnDisplay && creditorAddress == currentMetamaskAccount) || isCollateralSeized) {
@@ -239,8 +239,8 @@ class Detail extends Component {
     this.setState({ priceFeeds })
   }
   async getDetailData(isRefreshOnly = false) {
-    const { dharma, id,currentMetamaskAccount } = this.props;
-    let collateralReturnable, isCollateralSeizable,isCollateralSeized = false;
+    const { dharma, id, currentMetamaskAccount } = this.props;
+    let collateralReturnable, isCollateralSeizable, isCollateralSeized = false;
     let userTimezone = moment.tz.guess();
     const api = new Api();
     if (!isRefreshOnly) {
@@ -300,7 +300,7 @@ class Detail extends Component {
             userTimezone,
             isLoading: false,
             loanDetails: loanRequestData,
-            isLoanUser:(debtorAddress == currentMetamaskAccount || creditorAddress == currentMetamaskAccount)
+            isLoanUser: (debtorAddress == currentMetamaskAccount || creditorAddress == currentMetamaskAccount)
           }, () => {
             this.buttonOperations();
           })
@@ -588,10 +588,16 @@ class Detail extends Component {
                 <div>
                   <Overview {...this.state} {...this.props} makeRepayment={this.makeRepayment} unblockCollateral={this.unblockCollateral} seizeCollateral={this.seizeCollateral} />
                 </div>
-
                 <div className="mt-30">
                   <Summary {...this.state} {...this.props} />
                 </div>
+                {
+                  loanScheduleDisplay === true && (
+                    <div className="mt-30">
+                      <Transactions {...this.props} {...this.state} />
+                    </div>
+                  )
+                }
               </Col>
 
               {loanScheduleDisplay === true && (
@@ -600,15 +606,7 @@ class Detail extends Component {
                 </Col>
               )}
             </Row>
-            {
-              loanScheduleDisplay === true && (
-                <Row className="mb-30">
-                  <Col>
-                    <Transactions {...this.props} {...this.state} />
-                  </Col>
-                </Row>
-              )
-            }
+
             <PayModal {...this.props} {...this.state} onCloseModal={this.onCloseModal} handleInputChange={this.handleInputChange} processRepayment={this.processRepayment} unlockToken={this.unlockToken} />
           </div>
         }

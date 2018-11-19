@@ -59,8 +59,7 @@ class Transactions extends Component {
     return (
       <div>
         {transationHistory.length > 0 && (
-          <Row className="mb-30">
-            <Col lg={4} md={4} sm={6} xl={4}>
+         
               <Card className="card-statistics p-4">
                 <CardBody>
                   <CardTitle>Transaction History</CardTitle>
@@ -80,8 +79,6 @@ class Transactions extends Component {
                   )}
                 </CardBody>
               </Card>
-            </Col>
-          </Row>
         )}
       </div>
     );
