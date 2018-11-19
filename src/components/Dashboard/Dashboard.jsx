@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import { Card, CardBody, CardTitle, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
-import './Dashboard.css';
 import classnames from 'classnames';
+import { toast } from 'react-toastify';
+import _ from 'lodash';
 import MyBorrowedLoans from "./MyBorrowedLoans/MyBorrowedLoans";
 import MyFundedLoans from "./MyFundedLoans/MyFundedLoans";
 import MyPortfolio from "./MyPortfolio/MyPortfolio";
@@ -11,7 +12,7 @@ import MyActivities from "./MyActivities/MyActivities";
 import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
 import { convertBigNumber } from "../../utils/Util";
-import _ from 'lodash';
+import './Dashboard.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 class Dashboard extends Component {
 
