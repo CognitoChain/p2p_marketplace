@@ -125,14 +125,41 @@ class MyLoanRequests extends Component {
                 }
             },
             {
+                dataField: "status",
+                text: "Status",
+                formatter: function (cell, row, rowIndex, formatExtraData) {
+                    if (row.loanStatus == "OPEN") {
+                        return (
+                            <div className="text-center">
+                                <label>
+                                    <span className="badge badge-success">Open</span>        
+                                </label>
+                            </div>
+                        )
+                    }
+                    else {
+                        return (
+                            <div className="text-center">
+                                <label>
+                                    <span className="badge badge-danger p-1">Cancelled</span>
+                                </label>
+                            </div>
+                        )
+                    }
+
+                }
+            },
+            {
                 dataField: "fund",
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    if (row.creditorAddress == currentMetamaskAccount) {
+                    if (row.debtor == currentMetamaskAccount && row.loanStatus == "OPEN") {
                         return (
                             <div className="text-center">
-                                    <a href="javascript:;" className="btn btn-outline-danger cognito x-small" onClick={() => alert(row.id)}>Cancel Request</a>
+                                    <a href="javascript:;" className="btn btn-outline-danger cognito x-small" onClick={() => { 
+                                        if (window.confirm('Are you sure you wish to cancel loan request?')) cancelLoanRequest(row) 
+                                    }}>Cancel Request {cancelLoanButtonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</a>
                             </div>
                         )
                     }
@@ -172,5 +199,4 @@ class MyLoanRequests extends Component {
         );
     }
 }
-
 export default MyLoanRequests;
