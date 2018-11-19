@@ -16,20 +16,14 @@ class MyLoanRequests extends Component {
         );
     }
     render() {
-        const { myLoanRequests,myLoansLoading } = this.props;
-        const { currentMetamaskAccount } = this.props;
-
+        const { myLoanRequests,myLoansLoading,currentMetamaskAccount,cancelLoanRequest,cancelLoanButtonLoading } = this.props;
+        
         if (myLoansLoading) {
             return <Loading/>;
         }
-        const rowEvents = {
-            onClick: (e, row, rowIndex) => {
-                this.props.redirect(`/request/${row.id}`);
-            },
-        };
-
+        
         const rowClasses = (row, rowIndex) => {
-            return "loan-request-row1 cursor-pointer";            
+            return "loan-request-row1";            
         };
         const columns = [
             {
@@ -192,7 +186,6 @@ class MyLoanRequests extends Component {
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={ false }
-                    rowEvents={rowEvents}
                     pagination={ pagination }
                 />                
             </div>
