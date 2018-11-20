@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Card, CardBody, CardTitle } from "reactstrap";
+import { Card, CardBody, CardTitle } from "reactstrap";
 import * as moment from "moment-timezone";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
