@@ -536,7 +536,7 @@ class CreateLoan extends Component {
                                                     <InputRange
                                                         className="mt-20"
                                                         maxValue={60}
-                                                        formatLabel={value => `${value} %`}
+                                                        formatLabel={value => `${niceNumberDisplay(value,2)} %`}
                                                         minValue={5}
                                                         value={LTVRatio}
                                                         onChange={value => this.handleLTVChange(value)} />
