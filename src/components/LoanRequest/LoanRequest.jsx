@@ -12,7 +12,7 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import {niceNumberDisplay} from "../../utils/Util";
+import {niceNumberDisplay, getTransactionReceipt} from "../../utils/Util";
 import "./LoanRequest.css";
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
@@ -134,19 +134,22 @@ class LoanRequest extends Component {
 
     async handleFill() {
         const { loanRequest, userLoanAgree } = this.state;
-
+        this.setState({buttonLoading: true});
         if (userLoanAgree === true) {
             try {
                 loanRequest
                     .fillAsCreditor()
                     .then((txHash) => {
-
-                        const { transactions } = this.state;
-                        transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
-
-                        this.setState({
-                            transactions
-                        });
+                        /*let response = await getTransactionReceipt(txHash);*/
+                        if(txHash)
+                        {
+                            const { transactions } = this.state;
+                            transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
+                            this.setState({
+                                transactions,
+                                buttonLoading:false
+                            });
+                        }
                     });
             }
             catch (e) {
@@ -177,15 +180,21 @@ class LoanRequest extends Component {
         const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
         const terms = loanRequest.getTerms();
-
+        this.setState({unlockTokenButtonLoading: true});
         if (typeof owner != 'undefined') {
             const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
-            if (txHash) {
+            let response = await getTransactionReceipt(txHash);
+            if (!_.isUndefined(response)) {
                 transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
                 this.setState({
                     customAlertMsgDisplay: false,
-                    transactions
+                    transactions,
+                    unlockTokenButtonLoading:false
                 });
+            }
+            else
+            {
+                this.setState({unlockTokenButtonLoading: true});
             }
         }
     }
