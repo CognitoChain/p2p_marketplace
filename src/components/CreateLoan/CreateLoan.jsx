@@ -52,7 +52,9 @@ class CreateLoan extends Component {
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
             metaMaskMsg: false,
-            isBottomButtonLoading: true
+            isBottomButtonLoading: true,
+            unlockTokenButtonLoading:false,
+            buttonLoading:false
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -111,6 +113,7 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
+        this.setState({buttonLoading: true});
         if (this.isFormValid()) {
             try {
                 const { dharma } = this.props;
@@ -120,6 +123,7 @@ class CreateLoan extends Component {
                     ...loanRequest.toJSON(),
                     id: loanRequest.getAgreementId(),
                 });
+                this.setState({buttonLoading: false});
                 this.props.onCompletion(loanRequest.getAgreementId());
             } catch (e) {
                 let error = new Error(e);
@@ -129,7 +133,8 @@ class CreateLoan extends Component {
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                    customAlertMsgTitle: error[0]
+                    customAlertMsgTitle: error[0],
+                    buttonLoading:false
                 });
             }
         }
@@ -139,7 +144,7 @@ class CreateLoan extends Component {
                 customAlertMsgStyle: 'danger',
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                 customAlertMsgTitle: "Please complete required fields",
-                disableSubmitBtn: true,
+                buttonLoading:false
             });
         }
     }
@@ -171,7 +176,7 @@ class CreateLoan extends Component {
         const { Token } = Dharma.Types;
         const { collateralTokenSymbol } = this.state;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-
+        this.setState({unlockTokenButtonLoading: true});
         if (typeof currentAccount != 'undefined') {
             try {
                 const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
@@ -197,7 +202,7 @@ class CreateLoan extends Component {
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: error.props.message,
-                    disableSubmitBtn: false,
+                    unlockTokenButtonLoading:false
                 });
             }
         }
@@ -461,7 +466,9 @@ class CreateLoan extends Component {
             customAlertMsgTitle,
             metaMaskMsg,
             isBottomButtonLoading,
-            userLoanAgree
+            userLoanAgree,
+            unlockTokenButtonLoading,
+            buttonLoading
         } = this.state;
 
         let msgDisplay = false;
@@ -679,9 +686,11 @@ class CreateLoan extends Component {
                                                         canTakeAction={hasSufficientAllowance && isFormValid}
                                                         canAuthorize={hasSufficientAllowance}
                                                         onAction={this.createLoanRequest}
-                                                        onAuthorize={this.authorizeCollateralTransfer}>
-                                                        <p>Unlock Tokens</p>
-                                                        <p>Submit Application</p>
+                                                        onAuthorize={this.authorizeCollateralTransfer}
+                                                        buttonLoading={buttonLoading}
+                                                        unlockTokenButtonLoading={unlockTokenButtonLoading}>
+                                                        <p>Unlock Tokens {unlockTokenButtonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
+                                                        <p>Submit Application {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
                                                     </AuthorizableAction>
                                                 }
                                                 {

@@ -47,8 +47,9 @@ class LoanRequest extends Component {
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
             disableSubmitBtn: true,
-            isBottomButtonLoading: true
-
+            isBottomButtonLoading: true,
+            unlockTokenButtonLoading:false,
+            buttonLoading:false
         };
 
         // handlers
@@ -160,6 +161,7 @@ class LoanRequest extends Component {
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: error.props.message,
                     disableSubmitBtn: false,
+                    buttonLoading:false
                 });
             }
         }
@@ -170,6 +172,7 @@ class LoanRequest extends Component {
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                 customAlertMsgTitle: 'Please accept loan agreement terms.',
                 disableSubmitBtn: true,
+                buttonLoading:false
             });
         }
     }
@@ -304,7 +307,9 @@ class LoanRequest extends Component {
             customAlertMsgTitle,
             customAlertMsgDescription,
             disableSubmitBtn,
-            isBottomButtonLoading
+            isBottomButtonLoading,
+            unlockTokenButtonLoading,
+            buttonLoading
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
@@ -459,9 +464,11 @@ class LoanRequest extends Component {
                                                         canAuthorize={hasSufficientAllowance}
                                                         onAction={this.handleFill}
                                                         onAuthorize={this.handleAuthorize}
+                                                        unlockTokenButtonLoading={unlockTokenButtonLoading}
+                                                        buttonLoading={buttonLoading}
                                                     >
-                                                        <p>Unlock Tokens</p>
-                                                        <p>Fund Loan</p>
+                                                        <p>Unlock Tokens {unlockTokenButtonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
+                                                        <p>Fund Loan {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
                                                     </AuthorizableAction>
                                                 }
                                                 {

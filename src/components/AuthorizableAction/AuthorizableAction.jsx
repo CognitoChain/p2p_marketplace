@@ -8,12 +8,14 @@ class AuthorizableAction extends Component {
         callback();
     }
     render() {
-        const { canTakeAction, canAuthorize, onAction, onAuthorize } = this.props;
+        const { canTakeAction, canAuthorize, onAction, onAuthorize, buttonLoading, unlockTokenButtonLoading } = this.props;
+        let unlockButtonDisable = (canAuthorize || unlockTokenButtonLoading) ? true : false;
+        let buttonDisable = (!canTakeAction || buttonLoading) ? true : false;
         return (
             <div className="Actions">
             	<Button
                     onClick={(event) => this.handleClick(event, onAuthorize)}
-                    disabled={canAuthorize}
+                    disabled={unlockButtonDisable}
                     bsStyle="primary"
                     className={`AuthorizableAction-Button unlock-tokens-button btn btn-success cognito ${canAuthorize ? 'd-none' : ''}`}
                     >
@@ -22,10 +24,10 @@ class AuthorizableAction extends Component {
 
                 <Button
                     onClick={(event) => this.handleClick(event, onAction)}
-                    disabled={!canTakeAction}
+                    disabled={buttonDisable}
                     bsStyle="primary"
                     className="AuthorizableAction-Button btn btn-primary cognito">
-                    {this.props.children[1]}
+                    {this.props.children[1]}                    
                 </Button>
             </div>
         );
