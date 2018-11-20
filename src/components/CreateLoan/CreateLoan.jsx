@@ -14,7 +14,7 @@ import Api from "../../services/api";
 import Error from "../Error/Error";
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay } from "../../utils/Util";
+import { niceNumberDisplay, getTransactionReceipt } from "../../utils/Util";
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
 class CreateLoan extends Component {
@@ -179,10 +179,16 @@ class CreateLoan extends Component {
                     collateralTokenSymbol,
                     currentAccount,
                 );
-                this.setState({
-                    customAlertMsgDisplay: false,
-                    txHash
-                });
+                let response = await getTransactionReceipt(txHash);
+                if(!_.isUndefined(response))
+                {
+                    this.props.refreshTokens(false);
+                    this.setState({
+                        customAlertMsgDisplay: false,
+                        txHash,
+                        unlockTokenButtonLoading:false
+                    });    
+                }
             }
             catch (e) {
                 let error = new Error(e);

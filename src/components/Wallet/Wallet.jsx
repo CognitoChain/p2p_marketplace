@@ -12,14 +12,13 @@ import {
 import { Link } from 'react-router-dom';
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import _ from "lodash";
-import { BLOCKCHAIN_API } from "../../common/constants";
 import Switch from "react-switch";
 import Loading from "../Loading/Loading";
 import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import "./Wallet.css";
-import { niceNumberDisplay } from "../../utils/Util";
+import { niceNumberDisplay,getTransactionReceipt } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -86,28 +85,20 @@ class Wallet extends Component {
           );
         }
         else {
-
           txHash = await Token.revokeAllowance(
             dharma,
             symbol,
             currentAccount
           );
         }
-
-
-        if (typeof txHash != "undefined") {
-          await dharma.blockchain.awaitTransactionMinedAsync(
-            txHash,
-            BLOCKCHAIN_API.POLLING_INTERVAL,
-            BLOCKCHAIN_API.TIMEOUT,
-          );
+        let response = await getTransactionReceipt(txHash);
+        if (!_.isUndefined(response)) {
           /*const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);*/
           var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
           tokenlist[tokenKey].hasUnlimitedAllowance = status;
           this.setState({
             tokenlist
           });
-
         }
       } catch (e) {
         console.log(e)

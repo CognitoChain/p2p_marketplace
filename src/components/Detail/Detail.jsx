@@ -12,7 +12,7 @@ import Transactions from "./Transactions/Transactions";
 import RepaymentSchedule from "./RepaymentSchedule/RepaymentSchedule";
 import Api from "../../services/api";
 import LoadingFull from "../LoadingFull/LoadingFull";
-import { niceNumberDisplay, convertBigNumber } from "../../utils/Util";
+import { niceNumberDisplay, convertBigNumber, getTransactionReceipt } from "../../utils/Util";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import "./Detail.css";
 class Detail extends Component {
@@ -333,30 +333,6 @@ class Detail extends Component {
       this.checkTokenAllowance();
     });
   }
-
-  async getTransactionReceipt(hash) {
-    let receipt = null;
-    let data = '';
-    while (receipt === null) {
-      /*we are going to check every second if transation is mined or not, once it is mined we'll leave the loop*/
-      data = await this.getTransactionReceiptPromise(hash);
-      if (!_.isUndefined(data) && data != null && data.blockHash != null && data.blockHash != null && data.from != null && data.from != '' && data.to != null && data.to != '') {
-        receipt = data;
-      }
-      /*can put sleep for one sec*/
-    }
-    return receipt;
-  }
-
-  getTransactionReceiptPromise(hash) {
-    let web3js = window.web3 ? new Web3(window.web3.currentProvider) : '';
-    return new Promise(function (resolve, reject) {
-      web3js.eth.getTransactionReceipt(hash, function (err, data) {
-        if (err !== null) reject(err);
-        else resolve(data);
-      });
-    });
-  }
   timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -375,7 +351,7 @@ class Detail extends Component {
       if (parseFloat(repaymentAmount) <= parseFloat(outstandingAmount) && parseFloat(outstandingAmount) > 0) {
         try {
           const txHash = await debt.makeRepayment(repaymentAmount);
-          let response = await this.getTransactionReceipt(txHash);
+          let response = await getTransactionReceipt(txHash);
           if (response) {
             await this.timeout(3000);
             this.props.refreshTokens();
