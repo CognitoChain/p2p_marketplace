@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Dharma, Web3 } from "@dharmaprotocol/dharma.js";
 
 import DharmaContext from "./DharmaContext";
+import _ from "lodash";
 
 // Get the host from the current environment. If it is not specified, we will assume we
 // are running a testnet or production build and use Metamask.
@@ -63,15 +64,16 @@ class DharmaProvider extends Component {
         });
     }
 
-    getUserTokens() {
+    getUserTokens(flag) {
         const { Token } = Dharma.Types;
-
+        let stateObj = {};
         // Assume the tokens are out of date.
-        this.setState({
-            tokens: [],
-            isTokenLoading:true
-        });
-
+        if(_.isUndefined(flag))
+        {
+            stateObj["tokens"] = [];
+        }
+        stateObj["isTokenLoading"] = true;
+        this.setState(stateObj);
         dharma.blockchain.getAccounts().then((accounts) => {
             const owner = accounts[0];
             if(typeof owner != 'undefined')

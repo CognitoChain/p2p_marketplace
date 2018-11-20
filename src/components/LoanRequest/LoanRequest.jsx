@@ -186,6 +186,7 @@ class LoanRequest extends Component {
             let response = await getTransactionReceipt(txHash);
             if (!_.isUndefined(response)) {
                 transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
+                this.props.refreshTokens(false);
                 this.setState({
                     customAlertMsgDisplay: false,
                     transactions,

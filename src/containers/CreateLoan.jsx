@@ -32,6 +32,7 @@ class CreateLoanContainer extends Component {
                             redirect={this.redirect}
                             onCompletion={this.onCompletion}
                             token={this.props.token}
+                            refreshTokens={dharmaProps.refreshTokens}
                         />
                     );
                 }}

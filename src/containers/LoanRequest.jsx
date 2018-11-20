@@ -28,6 +28,7 @@ class LoanRequestContainer extends Component {
                             id={ id }
                             token={this.props.token}
                             dharma={ dharmaProps.dharma }
+                            refreshTokens={dharmaProps.refreshTokens}
                             onFillComplete={ async () => {
                                 dharmaProps.refreshTokens();
                                 const currentAccount = await dharmaProps.dharma.blockchain.getCurrentAccount();
