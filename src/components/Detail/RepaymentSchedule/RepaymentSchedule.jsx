@@ -3,7 +3,7 @@ import { Card, CardBody, CardTitle } from "reactstrap";
 import * as moment from "moment-timezone";
 import BootstrapTable from "react-bootstrap-table-next";
 import Loading from "../../Loading/Loading";
-
+import { niceNumberDisplay } from "../../../utils/Util";
 class RepaymentSchedule extends Component {
   render() {
     const {
@@ -38,7 +38,7 @@ class RepaymentSchedule extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div className="text-right">
-              <span className="number-highlight">{cell}</span>
+              <span className="number-highlight">{niceNumberDisplay(cell)}</span>
               <br />
               {row.principalSymbol}
             </div>
@@ -52,7 +52,7 @@ class RepaymentSchedule extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div className="text-right">
-              <span className="number-highlight">{cell}</span> <br />
+              <span className="number-highlight">{niceNumberDisplay(cell)}</span> <br />
               {row.principalSymbol}
             </div>
           );
@@ -65,7 +65,7 @@ class RepaymentSchedule extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div className="text-right">
-              <span className="number-highlight">{cell}</span> <br />
+              <span className="number-highlight">{niceNumberDisplay(cell)}</span> <br />
               {row.principalSymbol}
             </div>
           );

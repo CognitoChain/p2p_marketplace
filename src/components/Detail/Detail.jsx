@@ -146,10 +146,10 @@ class Detail extends Component {
             id: i,
             ts: ts,
             createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
-            principalAmount: niceNumberDisplay(installmentPrincipal),
+            principalAmount: installmentPrincipal,
             principalSymbol: principalSymbol,
-            interestAmount: niceNumberDisplay(installmentInterestAmount),
-            totalRepaymentAmount: niceNumberDisplay(expectedRepaidAmount),
+            interestAmount: installmentInterestAmount,
+            totalRepaymentAmount: expectedRepaidAmount,
             status: paidStatus
           });
           i++;
@@ -181,7 +181,7 @@ class Detail extends Component {
       transationHistory.push({
         id: k,
         createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
-        amount: niceNumberDisplay(amount),
+        amount: amount,
         principalSymbol: principalSymbol
       });
       k++;

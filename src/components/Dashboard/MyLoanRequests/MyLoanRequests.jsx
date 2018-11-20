@@ -69,7 +69,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <span className="number-highlight">{cell}</span> %
+                            <span className="number-highlight">{niceNumberDisplay(cell,2)}</span> %
                         </div>
                     )
                 }

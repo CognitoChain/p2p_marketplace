@@ -272,8 +272,8 @@ class CreateLoan extends Component {
         if (interestRate > 0) {
             interestAmount = (principal * interestRate) / 100;
             totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
-            stateObj["interestAmount"] = niceNumberDisplay(interestAmount);
-            stateObj["totalReapaymentAmount"] = niceNumberDisplay(totalReapaymentAmount);
+            stateObj["interestAmount"] = interestAmount;
+            stateObj["totalReapaymentAmount"] = totalReapaymentAmount;
         }
         this.setState(stateObj);
     }
@@ -428,13 +428,11 @@ class CreateLoan extends Component {
                     if (countCollateral.indexOf(name) > -1 && principal > 0 && LTVRatioValue > 0) {
                         let collateralCount = (pricinipalMarketValue / LTVRatioValue) * 100;
                         let collateralPurchasable = parseFloat(collateralCount) / parseFloat(collateralTokenCurrentPrice);
-                        collateralPurchasable = niceNumberDisplay(collateralPurchasable);
                         this.setState({ collateral: collateralPurchasable });
                     }
                     if (name == "collateral" && principal > 0 && collateral > 0) {
                         let collateralMarketValue = parseFloat(collateral) * parseFloat(collateralTokenCurrentPrice);
                         let newLTVRatio = (pricinipalMarketValue / collateralMarketValue) * 100;
-                        newLTVRatio = niceNumberDisplay(newLTVRatio);
                         this.setState({ LTVRatioValue: newLTVRatio });
                     }
                 }
@@ -610,11 +608,11 @@ class CreateLoan extends Component {
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Amount"
-                                                        labelValue={collateral > 0 ? collateral + ' ' + collateralTokenSymbol : '-'}
+                                                        labelValue={collateral > 0 ? niceNumberDisplay(collateral) + ' ' + collateralTokenSymbol : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="LTV"
-                                                        labelValue={LTVRatio > 0 ? LTVRatio + "%" : '-'}
+                                                        labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio,2) + "%" : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Loan Term"
@@ -622,7 +620,7 @@ class CreateLoan extends Component {
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Rate(Per Loan Term)"
-                                                        labelValue={interestRate > 0 ? interestRate + "%" : '-'}
+                                                        labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) + "%" : '-'}
                                                     />
                                                     {/*<SummaryItem 
                                                     labelName = "Expiration"
@@ -630,11 +628,11 @@ class CreateLoan extends Component {
                                                 />*/}
                                                     <SummaryItem
                                                         labelName="Interest Amount"
-                                                        labelValue={interestAmount > 0 ? interestAmount + ' ' + principalTokenSymbol : '-'}
+                                                        labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) + ' ' + principalTokenSymbol : '-'}
                                                     />
                                                     <SummaryItem
                                                         labelName="Total Repayment Amount"
-                                                        labelValue={totalReapaymentAmount > 0 ? totalReapaymentAmount + ' ' + principalTokenSymbol : '-'}
+                                                        labelValue={totalReapaymentAmount > 0 ? niceNumberDisplay(totalReapaymentAmount) + ' ' + principalTokenSymbol : '-'}
                                                     />
                                                     {/*<SummaryItem 
                                                     labelName = "Relayer Fee"

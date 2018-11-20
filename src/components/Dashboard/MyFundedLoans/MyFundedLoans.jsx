@@ -73,7 +73,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-center">
-                            <span className="number-highlight">{cell}</span> %
+                            <span className="number-highlight">{niceNumberDisplay(cell,2)}</span> %
                         </div>
                     )
                 }

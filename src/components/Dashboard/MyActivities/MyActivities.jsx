@@ -133,7 +133,6 @@ class MyActivities extends Component {
                   buttonClassName = 'green';
                 }
                 let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = niceNumberDisplay(amount);
                 investmentsActivities.push({
                   id: "i_" + _.random(999999999),
                   date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
@@ -271,7 +270,7 @@ class MyActivities extends Component {
           return (
             <div>
               <span className={label_color}>
-                {row.amount}
+                {niceNumberDisplay(row.amount)}
               </span>
               <br />
               <div className="currency-text">{row.sybmol}</div>

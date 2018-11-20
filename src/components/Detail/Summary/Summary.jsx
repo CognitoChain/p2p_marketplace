@@ -69,7 +69,7 @@ class Summary extends Component {
               />
               <SummaryItem
                 labelName="Collateral Amount"
-                labelValue={collateral > 0 ? collateral : ' - '}
+                labelValue={collateral > 0 ? niceNumberDisplay(collateral) : ' - '}
                 labelValue2={collateral > 0 ? collateralSymbol : ''}
               />
               <SummaryItem
@@ -89,12 +89,12 @@ class Summary extends Component {
               />
               <SummaryItem
                 labelName="Interest Rate(Per Loan Term)"
-                labelValue={interestRate > 0 ? interestRate : ' - '}
+                labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) : ' - '}
                 labelValue2={interestRate > 0 ? '%' : ''}
               />
               <SummaryItem
                 labelName="Interest Amount"
-                labelValue={interestAmount > 0 ? interestAmount : ' - '}
+                labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) : ' - '}
                 labelValue2={interestAmount > 0 ? principalSymbol : ' - '}
               />
               <SummaryItem

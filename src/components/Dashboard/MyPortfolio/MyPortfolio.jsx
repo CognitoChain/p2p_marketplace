@@ -41,8 +41,6 @@ class MyPortfolio extends Component {
                 });
             }
         }
-        totalAssetAmount = niceNumberDisplay(totalAssetAmount);
-     
         if (myBorrowedRequests.length > 0) {
             myBorrowedRequests.forEach(ml => {
                 let principal = parseFloat(ml.principal);
@@ -54,7 +52,6 @@ class MyPortfolio extends Component {
                 }
             });            
         }
-        totalLiablitiesAmount = niceNumberDisplay(totalLiablitiesAmount);
         this.setState({ totalAssetAmount: totalAssetAmount,totalLiablitiesAmount: totalLiablitiesAmount }, () => {
             this.calculateValues()
         });
@@ -66,7 +63,7 @@ class MyPortfolio extends Component {
             return;
         }
         let assetLiabilitiesPercentage = ((totalAssetAmount-totalLiablitiesAmount)/totalAssetAmount)*100;
-        assetLiabilitiesPercentage = (assetLiabilitiesPercentage < 100) ? niceNumberDisplay(assetLiabilitiesPercentage) : 99.99;
+        assetLiabilitiesPercentage = (assetLiabilitiesPercentage < 100) ? niceNumberDisplay(assetLiabilitiesPercentage,2) : 99.99;
         const data = {
             labels: [
                 'Assets',
@@ -126,13 +123,13 @@ class MyPortfolio extends Component {
                                     <div className="assets-container">
                                         <label>Assets</label>
                                         <Progress value={25} className="mb-10 assets-color" color="success" />
-                                        <label className="statistics-label">${totalAssetAmount}</label>
+                                        <label className="statistics-label">${niceNumberDisplay(totalAssetAmount)}</label>
                                     </div>
 
                                     <div className="liability-container">
                                         <label>Liabilities</label>
                                         <Progress value={50} className="mb-10 liabilities-color" color="warning" />
-                                        <label className="statistics-label">${totalLiablitiesAmount}</label>
+                                        <label className="statistics-label">${niceNumberDisplay(totalLiablitiesAmount)}</label>
                                     </div>
 
                                     <div className="assets-vs-liabilities-container">

@@ -97,15 +97,12 @@ class LoanRequest extends Component {
                     }
                     if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
                         LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
-                        LTVRatioValue = niceNumberDisplay(LTVRatioValue);
                     }
 
-                    collateralCurrentAmount = niceNumberDisplay(collateralCurrentAmount);
-
                     let principal = get_terms.principalAmount;
-                    let interest_rate = get_terms.interestRate;
-                    let interest_amount = (principal * interest_rate) / 100;
-                    let total_reapayment_amount = parseFloat(principal) + parseFloat(interest_amount);
+                    let interestRate = get_terms.interestRate;
+                    let interestAmount = (principal * interestRate) / 100;
+                    let totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
 
                     this.setState({
                         principal: get_terms.principalAmount,
@@ -118,8 +115,8 @@ class LoanRequest extends Component {
                         createdAt: moment(loanRequest.data.createdAt).format("DD/MM/YYYY HH:mm:ss"),
                         createdDate:moment(loanRequest.data.createdAt).format( "DD/MM/YYYY"),
                         createdTime:moment(loanRequest.data.createdAt).format("HH:mm:ss"),
-                        interestAmount: interest_amount,
-                        totalRepaymentAmount: total_reapayment_amount,
+                        interestAmount: interestAmount,
+                        totalRepaymentAmount: totalReapaymentAmount,
                         collateralCurrentAmount: collateralCurrentAmount,
                         LTVRatioValue: LTVRatioValue
                     });
@@ -350,7 +347,7 @@ class LoanRequest extends Component {
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"
-                                                        labelValue={principal > 0 ? principal : ' - '}
+                                                        labelValue={principal > 0 ? niceNumberDisplay(principal) : ' - '}
                                                         labelValue2={principal > 0 ? principalTokenSymbol : ''}
 
                                                     />
@@ -361,18 +358,18 @@ class LoanRequest extends Component {
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Amount"
-                                                        labelValue={collateral > 0 ? collateral  : ' - '}
+                                                        labelValue={collateral > 0 ? niceNumberDisplay(collateral) : ' - '}
                                                         labelValue2={collateral > 0 ? collateralTokenSymbol : ''}
 
                                                     />
                                                     <SummaryItem
                                                         labelName="Collateral Value"
-                                                        labelValue={collateralCurrentAmount > 0 ? collateralCurrentAmount : ' - '}
+                                                        labelValue={collateralCurrentAmount > 0 ? niceNumberDisplay(collateralCurrentAmount) : ' - '}
                                                         labelValue2={collateralCurrentAmount > 0 ? '$' : ''}
                                                     />
                                                     <SummaryItem
                                                         labelName="LTV"
-                                                        labelValue={LTVRatioValue > 0 ? LTVRatioValue : ' - '}
+                                                        labelValue={LTVRatioValue > 0 ? niceNumberDisplay(LTVRatioValue) : ' - '}
                                                         labelValue2={LTVRatioValue > 0 ? '%' : ''}
 
                                                     />
@@ -384,18 +381,18 @@ class LoanRequest extends Component {
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Rate(Per Loan Term)"
-                                                        labelValue={interestRate>0 ? interestRate : ' - '}
+                                                        labelValue={interestRate>0 ? niceNumberDisplay(interestRate,2) : ' - '}
                                                         labelValue2={interestRate>0 ? '%' :''}
 
                                                     />
                                                     <SummaryItem
                                                         labelName="Interest Amount"
-                                                        labelValue={interestAmount > 0 ? interestAmount : ' - '}
+                                                        labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) : ' - '}
                                                         labelValue2={interestAmount > 0 ? principalTokenSymbol : ''}
                                                     />
                                                     <SummaryItem
                                                         labelName="Total Repayment Amount"
-                                                        labelValue={totalRepaymentAmount > 0 ? totalRepaymentAmount : ' - '}
+                                                        labelValue={totalRepaymentAmount > 0 ? niceNumberDisplay(totalRepaymentAmount) : ' - '}
                                                         labelValue2={totalRepaymentAmount > 0 ? principalTokenSymbol : ''}
                                                     />
                                                 </ListGroup>

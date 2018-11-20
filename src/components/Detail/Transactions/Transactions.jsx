@@ -5,7 +5,7 @@ import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import _ from "lodash";
 import Loading from "../../Loading/Loading";
-
+import { niceNumberDisplay } from "../../../utils/Util";
 class Transactions extends Component {
   render() {
     const {
@@ -46,7 +46,7 @@ class Transactions extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           return (
             <div className="text-right">
-              <span className="number-highlight">{cell}</span>
+              <span className="number-highlight">{niceNumberDisplay(cell)}</span>
               <br />
               {row.principalSymbol}
             </div>
