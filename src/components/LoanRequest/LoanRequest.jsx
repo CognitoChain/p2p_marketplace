@@ -137,9 +137,9 @@ class LoanRequest extends Component {
             try {
                 loanRequest
                     .fillAsCreditor()
-                    .then((txHash) => {
-                        /*let response = await getTransactionReceipt(txHash);*/
-                        if(txHash)
+                    .then(async (txHash) => {
+                        let response = await getTransactionReceipt(txHash);
+                        if(response)
                         {
                             const { transactions } = this.state;
                             transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
