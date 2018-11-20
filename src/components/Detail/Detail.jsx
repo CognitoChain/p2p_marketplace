@@ -1,9 +1,8 @@
-import { Dharma, Web3 } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
 import { Link } from 'react-router-dom';
 import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import * as moment from "moment-timezone";
-import { toast } from "react-toastify";
 import _ from "lodash";
 import Summary from "./Summary/Summary";
 import Overview from "./Overview/Overview";
@@ -71,7 +70,6 @@ class Detail extends Component {
     const {
       principalAmount,
       creditorAddress,
-      debtorAddress,
       totalRepaymentAmount,
       repaymentSchedule,
       termLengthAmount,
@@ -191,7 +189,6 @@ class Detail extends Component {
     })
   }
   async buttonOperations() {
-    const { dharma, id } = this.props;
     const { currentMetamaskAccount } = this.props;
     const { loanDetails } = this.state;
     const {
@@ -431,8 +428,6 @@ class Detail extends Component {
   async unblockCollateral(event, callback) {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { loanDetails } = this.state;
-    const { collateralAmount, collateralSymbol } = loanDetails;
     this.setState({
       buttonLoading: true
     });
