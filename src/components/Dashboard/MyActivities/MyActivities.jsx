@@ -4,6 +4,7 @@ import * as moment from "moment";
 import _ from "lodash";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
+import { Link } from 'react-router-dom';
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
@@ -24,14 +25,15 @@ class MyActivities extends Component {
       myFundedRequestsLoading: true,
       metaMaskMsg: false,
       myLoansIsMounted: true,
-      myInvestmensIsMounted: true
+      myInvestmensIsMounted: true,
+      myBorrowRequestProcessing:false
     };
   }
 
   async componentWillReceiveProps(nextProps) {
     const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
     const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
-    const { myLoansIsMounted, myInvestmensIsMounted } = this.state;
+    const { myLoansIsMounted, myInvestmensIsMounted,myBorrowRequestProcessing } = this.state;
 
     let repaymentSchedule;
     let expectedRepaidAmount;
@@ -39,61 +41,151 @@ class MyActivities extends Component {
     let investmentsActivities = [];
     let myBorrowedRequestsLoading = true;
     let myFundedRequestsLoading = true;
-    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount)) {
+    
+    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount) && myBorrowRequestProcessing == false) {
+      console.log(nextBorrowedRequests.length);
+      this.setState({
+        myBorrowRequestProcessing:true        
+      });
       if (nextBorrowedRequests.length > 0) {
         await this.asyncForEach(nextBorrowedRequests, async ts => {
+          let isCollateralSeized = false;
+          let totalRepaidAmount = parseFloat(ts.repaidAmount); 
+          let totalRepaymentAmount = parseFloat(ts.repaymentAmount);
+          let outstandingAmount = totalRepaymentAmount - totalRepaidAmount;
+          if (outstandingAmount > 0) {
+            isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
+                ts.id
+            );
+          }
           repaymentSchedule = ts.repaymentSchedule;
-          console.log(repaymentSchedule)
+          let expectedRepaidAmountDharma = 0;
+          let interestRatePercent = parseFloat(ts.interestRatePercent);
+          let installmentPrincipal = parseFloat(ts.principal) / parseFloat(ts.termLengthAmount);
+          installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
+          let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;  
           let current_timestamp = moment().unix();
           let i = 1;
-          if (!_.isUndefined(repaymentSchedule)) {
-            await this.asyncForEach(repaymentSchedule, async st => {
-              if (st > current_timestamp * 1000 && i == 1) {
+          let missedButtonText = '';
+          let missedButtonClassName = '';
+          let lastExpectedRepaidAmount = 0;
+          let missedRepaymentAmount = 0;
+          let missedSt = '';
+          let missedDate = '';
+          let missedPaymentClass = '';
+
+          if(ts.debtorAddress == currentMetamaskAccount && ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true)
+          {
+            let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
+              ts.id
+            );
+            if(isCollateralReturned == false)
+            {
+              let claimTimestamp = repaymentSchedule.pop();
+              let claimDate = new Date(claimTimestamp);
+              loanRequestsActivities.push({
+                id: "l_" + _.random(999999999),
+                date: moment(claimDate, "DD/MM/YYYY HH:mm:ss", true).format(),
+                type: "claim",
+                agreementId: ts.id,
+                buttonText: 'Claim Collateral',
+                buttonClassName: 'green',
+                amount: ts.collateral,
+                sybmol: ts.collateralSymbol,
+              });  
+            }
+          }
+          else if(isCollateralSeized == false)
+          {
+            if (!_.isUndefined(repaymentSchedule)) {
+              await this.asyncForEach(repaymentSchedule, async st => {
+                let currentTimestamp = moment().unix();
                 let date = new Date(st);
-                st = st / 1000;
-                const principalTokenDecimals = await dharma.token.getNumDecimals(ts.principalSymbol);
-                let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-                  ts.id,
-                  st
-                );
-                expectedRepaidAmount = convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
+                st = st / 1000; 
 
                 let buttonText = '';
                 let buttonClassName = '';
-                if (ts.debtorAddress == currentMetamaskAccount) {
-                  if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
-                    buttonText = 'Pay';
-                    buttonClassName = 'orange';
+                let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
+                expectedRepaidAmountDharma += expectedRepaidAmount;
+                
+                let paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((st < currentTimestamp) ? 'missed' : 'due'));
+                let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
+
+                if (st > current_timestamp * 1000 && i == 1) {
+                  if (ts.debtorAddress == currentMetamaskAccount) {
+                    if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
+                      buttonText = 'Pay';
+                      buttonClassName = 'orange';
+                    }
                   }
-                  else if (ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true) {
-                    buttonText = 'Claim Collateral';
-                    buttonClassName = 'green';
+
+                  if(amount > 0)
+                  {
+                      var now = moment(new Date()); 
+                      var end = moment(date, "YYYY-MM-DD", true).format();
+                      var duration = moment.duration(now.diff(end));
+                      var daysBefore = parseInt(duration.asDays());
+                      var hoursBefore = parseInt(duration.asHours());
+
+                      loanRequestsActivities.push({
+                        id: "l_" + _.random(999999999),
+                        date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                        amount: amount,
+                        type: "minus",
+                        sybmol: ts.principalSymbol,
+                        agreementId: ts.id,
+                        sortTimestamp: st,
+                        buttonText: buttonText,
+                        buttonClassName: buttonClassName,
+                        repaymentText:'due',
+                        daysBefore:daysBefore,
+                        hoursBefore:hoursBefore
+                      });
+                  }
+                  i++;                
+                }
+                else if (st < currentTimestamp && totalRepaidAmount < totalRepaymentAmount) {
+                  missedRepaymentAmount = expectedRepaidAmountDharma - totalRepaidAmount;
+                  missedRepaymentAmount = niceNumberDisplay(missedRepaymentAmount);
+                  missedSt = st;
+                  missedDate = date;
+                  if((paidStatus == 'partial_paid' || paidStatus == 'missed') && ts.debtorAddress == currentMetamaskAccount)
+                  {
+                    missedPaymentClass = (paidStatus == 'partial_paid') ? 'partial_paid' : 'missed';
+                    missedButtonText = 'Pay';
+                    missedButtonClassName = 'orange';
                   }
                 }
-               
-                let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                amount = niceNumberDisplay(amount);
-                console.log(ts.id)
-                console.log(parseFloat(expectedRepaidAmount))
-                console.log(parseFloat(ts.repaidAmount))
-                console.log(amount)
-                if(amount > 0)
-                {
-                  loanRequestsActivities.push({
-                    id: "l_" + _.random(999999999),
-                    date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                    amount: amount,
-                    type: "minus",
-                    sybmol: ts.principalSymbol,
-                    agreementId: ts.id,
-                    sortTimestamp: st,
-                    buttonText: buttonText,
-                    buttonClassName: buttonClassName
-                  });
-                  i++;
+                if (lastExpectedRepaidAmount != expectedRepaidAmountDharma) {
+                  lastExpectedRepaidAmount = expectedRepaidAmountDharma;
                 }
+              });
+
+              if(missedButtonText != '' && missedButtonClassName != '' && missedRepaymentAmount > 0)
+              {
+                var now = moment(new Date()); 
+                var end = moment(missedDate, "YYYY-MM-DD", true).format();
+                var duration = moment.duration(now.diff(end));
+                var daysBefore = parseInt(duration.asDays());
+                var hoursBefore = parseInt(duration.asHours());
+
+                loanRequestsActivities.push({
+                  id: "l_" + _.random(999999999),
+                  date: moment(missedDate, "DD/MM/YYYY HH:mm:ss", true).format(),
+                  amount: missedRepaymentAmount,
+                  type: "minus",
+                  sybmol: ts.principalSymbol,
+                  agreementId: ts.id,
+                  sortTimestamp: missedSt,
+                  buttonText: missedButtonText,
+                  buttonClassName: missedButtonClassName,
+                  repaymentText:'missed',
+                  daysBefore:daysBefore,
+                  hoursBefore:hoursBefore,
+                  missedPaymentClass:missedPaymentClass
+                });
               }
-            });
+            }  
           }
         });
       }
@@ -114,39 +206,54 @@ class MyActivities extends Component {
           let current_timestamp = moment().unix();
           let i = 1;
           repaymentSchedule = ts.repaymentSchedule;
-          if (!_.isUndefined(repaymentSchedule)) {
-            await this.asyncForEach(repaymentSchedule, async schedule_ts => {
-              if (schedule_ts > current_timestamp * 1000 && i == 1) {
-                let date = new Date(schedule_ts);
-                const principalTokenDecimals = await dharma.token.getNumDecimals(ts.principalSymbol);
-                schedule_ts = schedule_ts / 1000;
-                let expectedRepaidAmountBigNumber = await dharma.servicing.getExpectedValueRepaid(
-                  ts.id,
-                  schedule_ts
-                );
-                expectedRepaidAmount = convertBigNumber(expectedRepaidAmountBigNumber, principalTokenDecimals);
-
-                let buttonText = '';
-                let buttonClassName = '';
-                if (ts.creditorAddress == currentMetamaskAccount) {
-                  buttonText = (ts.isCollateralSeizable == true && ts.isRepaid === false) ? 'Seize Collateral' : '';
-                  buttonClassName = 'green';
-                }
-                let amount = parseFloat(expectedRepaidAmount) - parseFloat(ts.repaidAmount);
-                investmentsActivities.push({
-                  id: "i_" + _.random(999999999),
-                  date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                  amount: amount,
-                  type: "plus",
-                  sybmol: ts.principalSymbol,
-                  agreementId: ts.id,
-                  sortTimestamp: schedule_ts,
-                  buttonText: buttonText,
-                  buttonClassName: buttonClassName
-                });
-                i++;
-              }
+          let expectedRepaidAmountDharma = 0;
+          let interestRatePercent = parseFloat(ts.interestRatePercent);
+          let installmentPrincipal = parseFloat(ts.principal) / parseFloat(ts.termLengthAmount);
+          installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
+          let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
+          if(ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable == true && ts.isRepaid === false)
+          {
+            let seizeTimestamp = repaymentSchedule.pop();
+            let seizeDate = new Date(seizeTimestamp);
+            investmentsActivities.push({
+              id: "i_" + _.random(999999999),
+              date: moment(seizeDate, "DD/MM/YYYY HH:mm:ss", true).format(),
+              amount: ts.collateral,
+              type: "plus",
+              sybmol: ts.collateralSymbol,
+              agreementId: ts.id,
+              sortTimestamp: seizeTimestamp,
+              buttonText: 'Seize Collateral',
+              buttonClassName: 'green'
             });
+          }
+          else
+          {
+            if (!_.isUndefined(repaymentSchedule)) {
+              await this.asyncForEach(repaymentSchedule, async schedule_ts => {
+                if (schedule_ts > current_timestamp * 1000 && i == 1) {
+                  let date = new Date(schedule_ts);
+                  let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
+                  expectedRepaidAmountDharma += expectedRepaidAmount;
+                  let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
+                  if(amount > 0)
+                  {
+                    investmentsActivities.push({
+                      id: "i_" + _.random(999999999),
+                      date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                      amount: amount,
+                      type: "plus",
+                      sybmol: ts.principalSymbol,
+                      agreementId: ts.id,
+                      sortTimestamp: schedule_ts,
+                      buttonText: '',
+                      buttonClassName: ''
+                    });  
+                  }
+                  i++;
+                }
+              });
+            }
           }
         });
       }
@@ -217,9 +324,15 @@ class MyActivities extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let text = "";
           if (row.type == "minus") {
-            text = "Repayment due in ";
+            text = "Repayment "; 
+            text += (row.repaymentText == "missed") ? "missed before " : "due in ";
+            text += (row.daysBefore != '' && row.daysBefore > 1) ? row.daysBefore : ((row.hoursBefore != '' && row.hoursBefore > 1) ? row.hoursBefore : ((row.hoursBefore < 1) ? "few" : ""));
+            text += (row.daysBefore != '' && row.daysBefore > 1) ? ' days' : ((row.hoursBefore != '' && row.hoursBefore > 1) ? ' hours' : ((row.hoursBefore < 1) ? " minutes" : ""));
           } else if (row.type == "plus") {
             text = "Earning";
+          }
+          else if(row.type == "claim"){
+            text = "Claim collateral"; 
           }
           return (
             <div>
@@ -233,11 +346,12 @@ class MyActivities extends Component {
         text: "Date",
         formatter: function (cell, row, rowIndex, formatExtraData) {
           var date = moment(cell).format("DD/MM/YYYY");
+          var label = (row.type == "claim") ? 'Date' : 'Due Date';
           return (
             <div>
               <span className="weight-bolder">{date}</span>
               <br />
-              Due Date
+              {label}
             </div>
           );
         }
@@ -250,7 +364,7 @@ class MyActivities extends Component {
           return (
             <div>
               {
-                row.buttonText!='' && <a href={`detail/${row.agreementId}`} className={"btn cognito x-small " + row.buttonClassName}>{row.buttonText}</a>
+                row.buttonText!='' && <Link to={`detail/${row.agreementId}`}><button className={"btn cognito x-small " + row.buttonClassName}>{row.buttonText}</button></Link>
               }
             </div>
           );
