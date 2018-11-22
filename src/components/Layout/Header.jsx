@@ -80,6 +80,12 @@ class Header extends Component {
                         )
                     }
                     
+                    {
+                        currentMetamaskAccount != null && (
+                            <label className="headerEthAddress">{currentMetamaskAccount}</label>
+                        )
+                    }
+
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
                             {
