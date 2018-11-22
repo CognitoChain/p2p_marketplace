@@ -35,14 +35,15 @@ class Summary extends Component {
     let LTVRatioValueDisplay = '';
     let principalCurrentAmount = 0;
     if (!_.isEmpty(priceFeeds)) {
-
-      if(!_.isUndefined(priceFeeds[principalSymbol]))
+      let pricePrincipalSymbol = (principalSymbol == "WETH" && _.isUndefined(priceFeeds[principalSymbol])) ? "ETH" : principalSymbol;
+      let priceCollateralSymbol = (collateralSymbol == "WETH" && _.isUndefined(priceFeeds[collateralSymbol])) ? "ETH" : collateralSymbol;
+      if(!_.isUndefined(priceFeeds[pricePrincipalSymbol]))
       {
-        let principalTokenCurrentPrice = priceFeeds[principalSymbol].USD;
+        let principalTokenCurrentPrice = priceFeeds[pricePrincipalSymbol].USD;
         principalCurrentAmount = parseFloat(principalAmount) * principalTokenCurrentPrice;
       }  
-      if(!_.isUndefined(priceFeeds[collateralSymbol])){
-        let collateralTokenCurrentPrice = priceFeeds[collateralSymbol].USD;
+      if(!_.isUndefined(priceFeeds[priceCollateralSymbol])){
+        let collateralTokenCurrentPrice = priceFeeds[priceCollateralSymbol].USD;
         collateralCurrentAmount = parseFloat(collateralAmount) * collateralTokenCurrentPrice;
         collateralCurrentAmountDisplay = niceNumberDisplay(collateralCurrentAmount);  
       }

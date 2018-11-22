@@ -82,15 +82,19 @@ class LoanRequest extends Component {
 
             await api.setToken(this.props.token).get(`priceFeed`)
                 .then(async priceFeedData => {
+                    let principalTokenSymbol = get_terms.principalTokenSymbol;
+                    principalTokenSymbol = (principalTokenSymbol == "WETH" && _.isUndefined(priceFeedData[principalTokenSymbol])) ? "ETH" : principalTokenSymbol;
 
-                    if (!_.isUndefined(priceFeedData[get_terms.principalTokenSymbol])) {
-                        let principalTokenCurrentPrice = priceFeedData[get_terms.principalTokenSymbol].USD;
+                    let collateralTokenSymbol = get_terms.collateralTokenSymbol;
+                    collateralTokenSymbol = (collateralTokenSymbol == "WETH" && _.isUndefined(priceFeedData[collateralTokenSymbol])) ? "ETH" : collateralTokenSymbol;                        
+
+                    if (!_.isUndefined(priceFeedData[principalTokenSymbol])) {
+                        let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
                         principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
-
                     }
-                    if (!_.isUndefined(priceFeedData[get_terms.collateralTokenSymbol])) {
+                    if (!_.isUndefined(priceFeedData[collateralTokenSymbol])) {
                         let collateralTokenCurrentPrice =
-                            priceFeedData[get_terms.collateralTokenSymbol].USD;
+                            priceFeedData[collateralTokenSymbol].USD;
                         collateralCurrentAmount =
                             parseFloat(get_terms.collateralAmount) *
                             collateralTokenCurrentPrice;

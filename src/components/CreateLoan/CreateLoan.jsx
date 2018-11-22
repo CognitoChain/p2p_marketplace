@@ -408,15 +408,18 @@ class CreateLoan extends Component {
     async countLtv(name) {
         const {
             principal,
-            principalTokenSymbol,
             collateral,
-            collateralTokenSymbol,
             LTVRatioValue
         } = this.state;
+        let principalTokenSymbol = this.state.principalTokenSymbol;
+        let collateralTokenSymbol = this.state.collateralTokenSymbol;
         const api = new Api();
         api.setToken(this.props.token)
             .get(`priceFeed`)
             .then(async priceFeedData => {
+                principalTokenSymbol = (principalTokenSymbol == "WETH" && _.isUndefined(priceFeedData[principalTokenSymbol])) ? "ETH" : principalTokenSymbol;
+                collateralTokenSymbol = (collateralTokenSymbol == "WETH" && _.isUndefined(priceFeedData[collateralTokenSymbol])) ? "ETH" : collateralTokenSymbol;
+
                 if (!_.isUndefined(priceFeedData[principalTokenSymbol]) && !_.isUndefined(priceFeedData[collateralTokenSymbol])) {
                     /*stateObj["hasSufficientAllowance"] = true;*/
                     let principalTokenCurrentPrice =
