@@ -7,32 +7,29 @@ projdir=./
 target=./target
 
 
+if [ -z "$1" ]
+then
+   echo "No target_env parameter supplied"
+   exit 1
+fi
+
+# target_env value should be "alpha" or "prod"
+target_env="$1"
+
 if [ -z "$GIT_COMMIT" ]; 
 then 
     build_file="build.zip"
 else
-    build_file="${BUILD_ID}-${GIT_COMMIT}.zip"
+    build_file="${BUILD_ID}-${GIT_COMMIT}-${target_env}.zip"
 fi
 
-echo "build_file: $build_file"
 
+echo "build_file: $build_file"
 if [ -z "$build_file" ]; 
 then
     exit 1;
 fi
 
-
-# get dependencies
-mkdir -p $target/
-rm -rf ./build
-rm -rf ./node_modules
-
-yarn install
-retVal=$?
-if [ $retVal -ne 0 ]; then
-    echo "yarn install exited with error $retVal"
-    exit 1
-fi
 
 # build the app
 yarn build
@@ -42,8 +39,7 @@ if [ $retVal -ne 0 ]; then
     exit 1
 fi
 
-# create new build.zip in 'cognito/aws' dir
-rm -f $target/*
+# create new build.zip artefact
 zip -r $target/$build_file ./build 
 zip -ru $target/$build_file ./public
 zip -ru $target/$build_file ./scripts
