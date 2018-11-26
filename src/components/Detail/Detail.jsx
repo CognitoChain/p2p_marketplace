@@ -70,6 +70,7 @@ class Detail extends Component {
     const {
       principalAmount,
       creditorAddress,
+      debtorAddress,
       totalRepaymentAmount,
       repaymentSchedule,
       termLengthAmount,
@@ -77,7 +78,8 @@ class Detail extends Component {
       totalRepaidAmount,
       principalSymbol,
       isCollateralSeized,
-      isCollateralReturned
+      isCollateralReturned,
+      isCollateralSeizable
     } = loanDetails;
     let installmentPrincipal = principalAmount / termLengthAmount;
     installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
@@ -113,30 +115,38 @@ class Detail extends Component {
 
           paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((ts < currentTimestamp) ? 'missed' : 'due'));
 
-          if (repaymentBtnDisplay && ts < currentTimestamp) {
-            if (totalRepaidAmount >= expectedRepaidAmountDharma) {
-              overViewBackgroundClass = 'overview-bg-success';
-              overViewButtonBackgroundClass = 'overview-bg-btn-success';
-            }
-            else if (totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) {
-              overViewBackgroundClass = 'overview-bg-orange';
-              overViewButtonBackgroundClass = 'overview-bg-btn-orange';
-            }
-            else {
-              if (ts < currentTimestamp) {
+          if(isCollateralSeizable == true || isCollateralSeized == true)
+          {
+              if(creditorAddress == currentMetamaskAccount || debtorAddress == currentMetamaskAccount)
+              {
                 overViewBackgroundClass = 'overview-bg-error';
                 overViewButtonBackgroundClass = 'overview-bg-btn-error';
               }
+          }
+          else
+          {
+            if (repaymentBtnDisplay && ts < currentTimestamp) {
+              if (totalRepaidAmount >= expectedRepaidAmountDharma) {
+                overViewBackgroundClass = 'overview-bg-success';
+                overViewButtonBackgroundClass = 'overview-bg-btn-success';
+              }
+              else if (totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) {
+                overViewBackgroundClass = 'overview-bg-orange';
+                overViewButtonBackgroundClass = 'overview-bg-btn-orange';
+              }
+              else {
+                if (ts < currentTimestamp) {
+                  overViewBackgroundClass = 'overview-bg-error';
+                  overViewButtonBackgroundClass = 'overview-bg-btn-error';
+                }
+              }
             }
+            else if (collateralBtnDisplay == true || isCollateralReturned) {
+              overViewBackgroundClass = 'overview-bg-success';
+              overViewButtonBackgroundClass = 'overview-bg-btn-success';
+            }  
           }
-          else if (collateralBtnDisplay == true || isCollateralReturned) {
-            overViewBackgroundClass = 'overview-bg-success';
-            overViewButtonBackgroundClass = 'overview-bg-btn-success';
-          } else if ((collateralSeizeBtnDisplay && creditorAddress == currentMetamaskAccount) || isCollateralSeized) {
-            overViewBackgroundClass = 'overview-bg-error';
-            overViewButtonBackgroundClass = 'overview-bg-btn-error';
-          }
-
+          
           if (lastExpectedRepaidAmount != expectedRepaidAmountDharma) {
             lastExpectedRepaidAmount = expectedRepaidAmountDharma;
           }
