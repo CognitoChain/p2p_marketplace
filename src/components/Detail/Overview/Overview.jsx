@@ -59,27 +59,6 @@ class Overview extends Component {
             </Col>
           </Row>
           <Row className="mt-20">
-            <Col>
-
-              <div>
-                <span>Debtor Address</span>
-                <br />
-                <span className="loan-detail-numbers">{debtorAddress}</span>
-              </div>
-            </Col>
-          </Row>
-          <Row className="mt-20">
-            <Col>
-              <div>
-                <span>Creditor Address</span>
-                <br />
-                <span className="loan-detail-numbers">{creditorAddress}</span>
-              </div>
-
-
-            </Col>
-          </Row>
-          <Row className="mt-20">
             <Col lg={5} md={5} sm={6} xl={5}>
               {outstandingAmountDisplay > 0 &&
                 currentMetamaskAccount == debtorAddress && (

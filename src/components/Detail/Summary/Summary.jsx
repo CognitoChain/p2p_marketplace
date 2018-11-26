@@ -18,7 +18,9 @@ class Summary extends Component {
       termLengthUnit,
       principalSymbol,
       interestRatePercent,
-      totalRepaymentAmountDisplay
+      totalRepaymentAmountDisplay,
+      debtorAddress,
+      creditorAddress
     } = loanDetails;
     let createdTime = moment(createdDate).format(
       "HH:mm:ss"
@@ -34,6 +36,8 @@ class Summary extends Component {
     let LTVRatioValue = '';
     let LTVRatioValueDisplay = '';
     let principalCurrentAmount = 0;
+    let debtorAddressDisplay = debtorAddress.substr(0,4)+'....'+debtorAddress.substr(-4);
+    let creditorAddressDisplay = creditorAddress.substr(0,4)+'....'+creditorAddress.substr(-4);
     if (!_.isEmpty(priceFeeds)) {
       let pricePrincipalSymbol = (principalSymbol == "WETH" && _.isUndefined(priceFeeds[principalSymbol])) ? "ETH" : principalSymbol;
       let priceCollateralSymbol = (collateralSymbol == "WETH" && _.isUndefined(priceFeeds[collateralSymbol])) ? "ETH" : collateralSymbol;
@@ -103,6 +107,17 @@ class Summary extends Component {
                 labelValue={totalRepaymentAmountDisplay > 0 ? totalRepaymentAmountDisplay : ' - '}
                 labelValue2={totalRepaymentAmountDisplay > 0 ? principalSymbol : ' - '}
               />
+              <SummaryItem
+                labelName="Debtor Address"
+                labelValue={debtorAddressDisplay}
+                labelValue2=''
+              />
+              <SummaryItem
+                labelName="Creditor Address"
+                labelValue={creditorAddressDisplay}
+                labelValue2=''
+              />
+
             </ListGroup>
           </div>
         </CardBody>
