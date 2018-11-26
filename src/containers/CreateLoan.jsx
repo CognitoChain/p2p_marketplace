@@ -33,6 +33,8 @@ class CreateLoanContainer extends Component {
                             onCompletion={this.onCompletion}
                             token={this.props.token}
                             refreshTokens={dharmaProps.refreshTokens}
+                            wrongMetamaskNetwork={this.props.wrongMetamaskNetwork}
+                            currentMetamaskAccount={this.props.currentMetamaskAccount}
                         />
                     );
                 }}

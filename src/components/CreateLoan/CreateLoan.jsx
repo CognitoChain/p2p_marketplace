@@ -17,6 +17,7 @@ import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import { niceNumberDisplay, getTransactionReceipt } from "../../utils/Util";
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
+import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 class CreateLoan extends Component {
     constructor(props) {
         super(props);
@@ -51,7 +52,6 @@ class CreateLoan extends Component {
             customAlertMsgStyle: '',
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
-            metaMaskMsg: false,
             isBottomButtonLoading: true,
             unlockTokenButtonLoading:false,
             buttonLoading:false
@@ -394,17 +394,6 @@ class CreateLoan extends Component {
         return result;
     }
 
-    async componentWillMount() {
-        const { dharma } = this.props;
-        const currentAccount = await dharma.blockchain.getCurrentAccount();
-
-        if (typeof currentAccount == "undefined") {
-            this.setState({
-                metaMaskMsg: true
-            });
-        }
-    }
-
     async countLtv(name) {
         const {
             principal,
@@ -465,12 +454,13 @@ class CreateLoan extends Component {
             customAlertMsgStyle,
             customAlertMsgClassname,
             customAlertMsgTitle,
-            metaMaskMsg,
             isBottomButtonLoading,
             userLoanAgree,
             unlockTokenButtonLoading,
             buttonLoading
         } = this.state;
+
+        const { wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
 
         let msgDisplay = false;
         if (txHash != '' || hasSufficientAllowance) {
@@ -500,211 +490,221 @@ class CreateLoan extends Component {
                         </Col>
                     </Row>
                 </div>
-                {
-                    metaMaskMsg &&
-                    <Row>
-                        <Col md={12}>
-                            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={["Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured."]} />
-                        </Col>
-                    </Row>
-                }
-                {sortedTokens.length === 0 && !metaMaskMsg && <LoadingFull />}
-                {sortedTokens.length > 0 &&
+
+                {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
                     <div>
-                        <Row className="row-eq-height">
-                            <Col lg={4} md={4} sm={6} xl={4}>
-                                <Card className="card-statistics mb-30 h-100 p-2">
-                                    <CardBody>
-                                        <CardTitle className="card-title-custom">Create New Loan Request </CardTitle>
+                        {sortedTokens.length === 0 && <LoadingFull />}
+                        {sortedTokens.length > 0 &&
+                            <div>
+                                <Row className="row-eq-height">
+                                    <Col lg={4} md={4} sm={6} xl={4}>
+                                        <Card className="card-statistics mb-30 h-100 p-2">
+                                            <CardBody>
+                                                <CardTitle className="card-title-custom">Create New Loan Request </CardTitle>
 
-                                        <Form disabled={disabled} onSubmit={this.createLoanRequest} className="create-loan-form">
-                                            <div className="mt-30">
-                                                <label>Loan Amount<span className="red">*</span></label>
-                                                <TokenSelect
-                                                    name="principal"
-                                                    onChange={this.handleInputChange}
-                                                    defaultValue={principal}
-                                                    dropdownFieldName="principalTokenSymbol"
-                                                    dropdownFieldDefaultValue={principalTokenSymbol}
-                                                    dropdownOpen={principalTokenSymbolDropdownOpen}
-                                                    toggleDropDown={this.toggleDropDown}
-                                                    tokens={sortedTokens}
-                                                    allowedTokens={false}
-                                                />
-                                                {principal && this.displayValidationErrors('principal')}
-                                            </div>
-                                            <div className="mt-30 create-loan-slider">
-                                                <label>LTV (Loan-to-Value Ratio)</label>
-                                                <div className="mb-20">
-                                                    <InputRange
-                                                        className="mt-20"
-                                                        maxValue={60}
-                                                        formatLabel={value => `${niceNumberDisplay(value,2)} %`}
-                                                        minValue={5}
-                                                        value={LTVRatio}
-                                                        onChange={value => this.handleLTVChange(value)} />
+                                                <Form disabled={disabled} onSubmit={this.createLoanRequest} className="create-loan-form">
+                                                    <div className="mt-30">
+                                                        <label>Loan Amount<span className="red">*</span></label>
+                                                        <TokenSelect
+                                                            name="principal"
+                                                            onChange={this.handleInputChange}
+                                                            defaultValue={principal}
+                                                            dropdownFieldName="principalTokenSymbol"
+                                                            dropdownFieldDefaultValue={principalTokenSymbol}
+                                                            dropdownOpen={principalTokenSymbolDropdownOpen}
+                                                            toggleDropDown={this.toggleDropDown}
+                                                            tokens={sortedTokens}
+                                                            allowedTokens={false}
+                                                        />
+                                                        {principal && this.displayValidationErrors('principal')}
+                                                    </div>
+                                                    <div className="mt-30 create-loan-slider">
+                                                        <label>LTV (Loan-to-Value Ratio)</label>
+                                                        <div className="mb-20">
+                                                            <InputRange
+                                                                className="mt-20"
+                                                                maxValue={60}
+                                                                formatLabel={value => `${niceNumberDisplay(value,2)} %`}
+                                                                minValue={5}
+                                                                value={LTVRatio}
+                                                                onChange={value => this.handleLTVChange(value)} />
+                                                        </div>
+                                                        {LTVRatio && this.displayValidationErrors('LTVRatioValue')}
+
+                                                    </div>
+                                                    <div className="mt-30">
+                                                        <label>Collateral Amount<span className="red">*</span></label>
+                                                        <TokenSelect
+                                                            name="collateral"
+                                                            onChange={this.handleInputChange}
+                                                            defaultValue={collateral}
+                                                            dropdownFieldName="collateralTokenSymbol"
+                                                            dropdownFieldDefaultValue={collateralTokenSymbol}
+                                                            dropdownOpen={collateralTokenSymbolDropdownOpen}
+                                                            toggleDropDown={this.toggleDropDown}
+                                                            tokens={sortedTokens}
+                                                            allowedTokens={true}
+                                                            disableValue={principalTokenSymbol}
+                                                        />
+                                                        {collateral && this.displayValidationErrors('collateral')}
+                                                        {this.displayValidationErrors('collateralTokenSymbol')}
+                                                    </div>
+                                                    <div className="mt-30">
+                                                        <label>Loan Term<span className="red">*</span></label>
+                                                        <TimeUnitSelect
+                                                            name="termLength"
+                                                            onChange={this.handleInputChange}
+                                                            defaultValue={termLength}
+                                                            dropdownFieldName="termUnit"
+                                                            dropdownFieldDefaultValue={termUnit}
+                                                            dropdownOpen={termUnitDropdownOpen}
+                                                            toggleDropDown={this.toggleDropDown}
+                                                        />
+                                                        {termLength && this.displayValidationErrors('termLength')}
+                                                    </div>
+                                                    <div className="mt-30">
+                                                        <label>Interest Rate (% Per Loan Term)<span className="red">*</span></label>
+                                                        <InputGroup>
+                                                            <Input onChange={this.handleInputChange}
+                                                                type="number"
+                                                                placeholder="Interest Rate"
+                                                                name="interestRate"
+                                                                value={interestRate} />
+                                                            <InputGroupAddon addonType="append">%</InputGroupAddon>
+                                                        </InputGroup>
+                                                        {interestRate && this.displayValidationErrors('interestRate')}
+                                                    </div>
+                                                </Form>
+
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+
+                                    <Col lg={4} md={4} sm={6} xl={4} className="pl-4">
+
+                                        <Card className="card-statistics mb-30 h-100">
+                                            <CardBody className="pb-0">
+
+                                                <div className="p-2 pb-0">
+
+                                                    <CardTitle className="card-title-custom">Summary </CardTitle>
+                                                    <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+                                                        <ListGroup className="list-unstyled to-do">
+                                                            <SummaryItem
+                                                                labelName="Loan Amount"
+                                                                labelValue={principal > 0 ? niceNumberDisplay(principal) + ' ' + principalTokenSymbol : '-'}
+                                                            />
+                                                            <SummaryItem
+                                                                labelName="Collateral Amount"
+                                                                labelValue={collateral > 0 ? niceNumberDisplay(collateral) + ' ' + collateralTokenSymbol : '-'}
+                                                            />
+                                                            <SummaryItem
+                                                                labelName="LTV"
+                                                                labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio,2) + "%" : '-'}
+                                                            />
+                                                            <SummaryItem
+                                                                labelName="Loan Term"
+                                                                labelValue={termLength > 0 ? termLength + " " + termUnit : '-'}
+                                                            />
+                                                            <SummaryItem
+                                                                labelName="Interest Rate(Per Loan Term)"
+                                                                labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) + "%" : '-'}
+                                                            />
+                                                            {/*<SummaryItem 
+                                                            labelName = "Expiration"
+                                                            labelValue = { expirationLength + " " + expirationUnit }
+                                                        />*/}
+                                                            <SummaryItem
+                                                                labelName="Interest Amount"
+                                                                labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) + ' ' + principalTokenSymbol : '-'}
+                                                            />
+                                                            <SummaryItem
+                                                                labelName="Total Repayment Amount"
+                                                                labelValue={totalReapaymentAmount > 0 ? niceNumberDisplay(totalReapaymentAmount) + ' ' + principalTokenSymbol : '-'}
+                                                            />
+                                                            {/*<SummaryItem 
+                                                            labelName = "Relayer Fee"
+                                                            labelValue = {relayerFeeAmount > 0 ? relayerFeeAmount + ' ' + principalTokenSymbol : '-'}
+                                                        />*/}
+                                                        </ListGroup>
+
+                                                        <hr />
+
+                                                        <div className="agree-loan-check pt-1 mtb-2">
+                                                            <label className="checkbox-container"> <span>I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a></span>
+                                                                <input type="checkbox" id="loanAgreement" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
+                                                                <span className="checkmark"></span>
+                                                            </label>
+                                                            {userLoanAgree && this.displayValidationErrors('userLoanAgree')}
+                                                        </div>
+
+                                                    </div>
+
                                                 </div>
-                                                {LTVRatio && this.displayValidationErrors('LTVRatioValue')}
+                                            </CardBody>
 
-                                            </div>
-                                            <div className="mt-30">
-                                                <label>Collateral Amount<span className="red">*</span></label>
-                                                <TokenSelect
-                                                    name="collateral"
-                                                    onChange={this.handleInputChange}
-                                                    defaultValue={collateral}
-                                                    dropdownFieldName="collateralTokenSymbol"
-                                                    dropdownFieldDefaultValue={collateralTokenSymbol}
-                                                    dropdownOpen={collateralTokenSymbolDropdownOpen}
-                                                    toggleDropDown={this.toggleDropDown}
-                                                    tokens={sortedTokens}
-                                                    allowedTokens={true}
-                                                    disableValue={principalTokenSymbol}
+                                            {!isBottomButtonLoading && msgDisplay === true &&
+                                                <TransactionManager
+                                                    key={txHash}
+                                                    txHash={txHash}
+                                                    dharma={dharma}
+                                                    onSuccess={this.setHasSufficientAllowance}
+                                                    canAuthorize={
+                                                        hasSufficientAllowance
+                                                    }
                                                 />
-                                                {collateral && this.displayValidationErrors('collateral')}
-                                                {this.displayValidationErrors('collateralTokenSymbol')}
-                                            </div>
-                                            <div className="mt-30">
-                                                <label>Loan Term<span className="red">*</span></label>
-                                                <TimeUnitSelect
-                                                    name="termLength"
-                                                    onChange={this.handleInputChange}
-                                                    defaultValue={termLength}
-                                                    dropdownFieldName="termUnit"
-                                                    dropdownFieldDefaultValue={termUnit}
-                                                    dropdownOpen={termUnitDropdownOpen}
-                                                    toggleDropDown={this.toggleDropDown}
-                                                />
-                                                {termLength && this.displayValidationErrors('termLength')}
-                                            </div>
-                                            <div className="mt-30">
-                                                <label>Interest Rate (% Per Loan Term)<span className="red">*</span></label>
-                                                <InputGroup>
-                                                    <Input onChange={this.handleInputChange}
-                                                        type="number"
-                                                        placeholder="Interest Rate"
-                                                        name="interestRate"
-                                                        value={interestRate} />
-                                                    <InputGroupAddon addonType="append">%</InputGroupAddon>
-                                                </InputGroup>
-                                                {interestRate && this.displayValidationErrors('interestRate')}
-                                            </div>
-                                        </Form>
-
-                                    </CardBody>
-                                </Card>
-                            </Col>
-
-                            <Col lg={4} md={4} sm={6} xl={4} className="pl-4">
-
-                                <Card className="card-statistics mb-30 h-100">
-                                    <CardBody className="pb-0">
-
-                                        <div className="p-2 pb-0">
-
-                                            <CardTitle className="card-title-custom">Summary </CardTitle>
-                                            <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
-                                                <ListGroup className="list-unstyled to-do">
-                                                    <SummaryItem
-                                                        labelName="Loan Amount"
-                                                        labelValue={principal > 0 ? niceNumberDisplay(principal) + ' ' + principalTokenSymbol : '-'}
-                                                    />
-                                                    <SummaryItem
-                                                        labelName="Collateral Amount"
-                                                        labelValue={collateral > 0 ? niceNumberDisplay(collateral) + ' ' + collateralTokenSymbol : '-'}
-                                                    />
-                                                    <SummaryItem
-                                                        labelName="LTV"
-                                                        labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio,2) + "%" : '-'}
-                                                    />
-                                                    <SummaryItem
-                                                        labelName="Loan Term"
-                                                        labelValue={termLength > 0 ? termLength + " " + termUnit : '-'}
-                                                    />
-                                                    <SummaryItem
-                                                        labelName="Interest Rate(Per Loan Term)"
-                                                        labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) + "%" : '-'}
-                                                    />
-                                                    {/*<SummaryItem 
-                                                    labelName = "Expiration"
-                                                    labelValue = { expirationLength + " " + expirationUnit }
-                                                />*/}
-                                                    <SummaryItem
-                                                        labelName="Interest Amount"
-                                                        labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) + ' ' + principalTokenSymbol : '-'}
-                                                    />
-                                                    <SummaryItem
-                                                        labelName="Total Repayment Amount"
-                                                        labelValue={totalReapaymentAmount > 0 ? niceNumberDisplay(totalReapaymentAmount) + ' ' + principalTokenSymbol : '-'}
-                                                    />
-                                                    {/*<SummaryItem 
-                                                    labelName = "Relayer Fee"
-                                                    labelValue = {relayerFeeAmount > 0 ? relayerFeeAmount + ' ' + principalTokenSymbol : '-'}
-                                                />*/}
-                                                </ListGroup>
-
-                                                <hr />
-
-                                                <div className="agree-loan-check pt-1 mtb-2">
-                                                    <label className="checkbox-container"> <span>I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a></span>
-                                                        <input type="checkbox" id="loanAgreement" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
-                                                        <span className="checkmark"></span>
-                                                    </label>
-                                                    {userLoanAgree && this.displayValidationErrors('userLoanAgree')}
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-                                    </CardBody>
-
-                                    {!isBottomButtonLoading && msgDisplay === true &&
-                                        <TransactionManager
-                                            key={txHash}
-                                            txHash={txHash}
-                                            dharma={dharma}
-                                            onSuccess={this.setHasSufficientAllowance}
-                                            canAuthorize={
-                                                hasSufficientAllowance
                                             }
-                                        />
-                                    }
 
-                                    {customAlertMsgDisplay === true &&
-                                        <CustomAlertMsg
-                                            bsStyle={customAlertMsgStyle}
-                                            className={customAlertMsgClassname}
-                                            title={customAlertMsgTitle}
-                                        />
-                                    }
+                                            {customAlertMsgDisplay === true &&
+                                                <CustomAlertMsg
+                                                    bsStyle={customAlertMsgStyle}
+                                                    className={customAlertMsgClassname}
+                                                    title={customAlertMsgTitle}
+                                                />
+                                            }
 
-                                    <CardBody className="pl-4 pt-1 mtb-2 mt-10">
-                                        <div>
-                                            <div className="create-loan-buttons-container text-center">
-                                                {
-                                                    !isBottomButtonLoading &&
-                                                    <AuthorizableAction
-                                                        canTakeAction={hasSufficientAllowance && isFormValid}
-                                                        canAuthorize={hasSufficientAllowance}
-                                                        onAction={this.createLoanRequest}
-                                                        onAuthorize={this.authorizeCollateralTransfer}
-                                                        buttonLoading={buttonLoading}
-                                                        unlockTokenButtonLoading={unlockTokenButtonLoading}>
-                                                        <p>Unlock Tokens {unlockTokenButtonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
-                                                        <p>Submit Application {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
-                                                    </AuthorizableAction>
-                                                }
-                                                {
-                                                    isBottomButtonLoading && <i className="btn btn-sm fa-spin fa fa-spinner"></i>
-                                                }
-                                            </div>
-                                        </div>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                        </Row>
+                                            <CardBody className="pl-4 pt-1 mtb-2 mt-10">
+                                                <div>
+                                                    <div className="create-loan-buttons-container text-center">
+                                                        {
+                                                            !isBottomButtonLoading &&
+                                                            <AuthorizableAction
+                                                                canTakeAction={hasSufficientAllowance && isFormValid}
+                                                                canAuthorize={hasSufficientAllowance}
+                                                                onAction={this.createLoanRequest}
+                                                                onAuthorize={this.authorizeCollateralTransfer}
+                                                                buttonLoading={buttonLoading}
+                                                                unlockTokenButtonLoading={unlockTokenButtonLoading}>
+                                                                <p>Unlock Tokens {unlockTokenButtonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
+                                                                <p>Submit Application {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}</p>
+                                                            </AuthorizableAction>
+                                                        }
+                                                        {
+                                                            isBottomButtonLoading && <i className="btn btn-sm fa-spin fa fa-spinner"></i>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </CardBody>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                            </div>
+                        }
                     </div>
                 }
+                
+                {(wrongMetamaskNetwork == true || currentMetamaskAccount == null || currentMetamaskAccount == '') &&
+                    <div>
+                        <Row className="mb-30">
+                            <Col md={3}></Col>
+                            <Col md={6}>
+                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error"/>
+                            </Col>
+                            <Col md={3}></Col>
+                        </Row>
+                    </div>
+                }    
+
             </div>
         );
     }
