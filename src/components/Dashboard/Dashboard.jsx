@@ -260,7 +260,7 @@ class Dashboard extends Component {
                 {
                     this.getMyLoanRequests();
                     this.setState({ cancelLoanButtonLoading: false },()=>{
-                        toast.success("We're processing your cancellation request. We'll notify you, Once payment is confirmed.");
+                        toast.success("We're processing your cancellation request.");
                     });
                 }
             });
