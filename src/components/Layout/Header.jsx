@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
-import logoImg from "../../assets/images/logo.svg";
+import logoImg from "../../assets/images/logo.svg?v1";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Avatar from 'react-avatar';
 class Header extends Component {
@@ -117,9 +117,8 @@ class Header extends Component {
                             {
                                 this.props.authenticated === false && (
                                     <div className="header-links">
-                                        <a className="btn btn-link cognito" href="/login">Login / Register</a>
+                                        <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                     </div>
-
                                 )
                             }
                         </li>
