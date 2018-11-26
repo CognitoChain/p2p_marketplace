@@ -1,19 +1,15 @@
 import React from 'react';
 import _ from 'lodash';
-import { Link } from 'react-router-dom';
-import { Container, Row, Col } from 'reactstrap';
 import { toast } from 'react-toastify';
-import Api from "../../services/api";
-import validators from '../../validators';
-import CustomAlertMsg from '../CustomAlertMsg/CustomAlertMsg';
-const login_innner_bg = require("../../assets/images/login-inner-bg.png");
-const login_bg = require("../../assets/images/login-bg.png")
-const logo_full = require("../../assets/images/logo-full.svg")
-class EmailVerify extends React.Component {
+import Api from "../../../services/api";
+import validators from '../../../validators';
+import CustomAlertMsg from '../../CustomAlertMsg/CustomAlertMsg';
+
+class EmailVerifyForm extends React.Component {
   constructor(props) {
     super(props);
-    let locationState = this.props.location.state ;
-    let token = this.props.match.params.token;
+    let locationState = this.props.locationState;
+    let token = this.props.token;
     let errorMessage = '';
     let isEmailVerifiedFailed = false;
     let email = '';
@@ -42,8 +38,8 @@ class EmailVerify extends React.Component {
     this.updateValidators = this.updateValidators.bind(this);
     this.resendVerificationEmail = this.resendVerificationEmail.bind(this);
     this.validators = validators;
-
   }
+
   componentWillMount() {
     if(this.state.token){
       this.emailVerify()
@@ -52,7 +48,7 @@ class EmailVerify extends React.Component {
   componentDidMount(){
     const {locationState} = this.state;
     if(!_.isUndefined(locationState)){
-      this.props.history.push({
+      this.props.historyPush.push({
         pathname: '/email-verify',
         state: { }
       });
@@ -65,13 +61,13 @@ class EmailVerify extends React.Component {
     });
 
     if (response.status == "SUCCESS") {
-      this.props.history.push({
+      this.props.historyPush.push({
         pathname: '/login',
         state: { message: "EMAIL_VERIFICATION_SUCCESS" }
       });
     }
     else {
-      this.props.history.push({
+      this.props.historyPush.push({
         pathname: '/email-verify',
         state: { message: "EMAIL_VERIFICATION_FAILED" }
       });
@@ -120,7 +116,7 @@ class EmailVerify extends React.Component {
         return <span className="error" key={index}>* {info}<br /></span>
       });
       return (
-        <div className="col s12 row">
+        <div className="col s12 row text-left mt-1">
           {errors}
         </div>
       );
@@ -155,66 +151,44 @@ class EmailVerify extends React.Component {
       }
     }
   }
+
   render() {
     const {  errorMessage, successMessage,token,buttonLoading } = this.state;
     if (!token) {
       return (
-        <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: `url(${login_bg})` }}>
-          <Container>
-            <Row className="justify-content-center no-gutters vertical-align row">
-              <Col lg={4} md={6} className="login-fancy-bg bg" style={{ backgroundImage: `url(${login_innner_bg})` }}>
-                <div className="login-fancy login-left">
-                  <h2 className="text-white mb-20 text-center">
-                    <a href="/"><img src={logo_full} alt="Cognito Chain" width="200" /></a>
-                  </h2>
-                  <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
-                  <ul className="list-unstyled  pos-bot pb-30">
-                    <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use | </a> </li>
-                    <li className="list-inline-item"><a className="text-white" href="privacy" target="_blank"> Privacy Policy</a></li>
-                  </ul>
-                </div>
-              </Col>
-              <Col lg={4} md={6} className="bg-white">
-                <div className="login-fancy pb-40 clearfix">
-                  <h3 className="mb-30">Email Verification</h3>
-                  {
-                    errorMessage && <CustomAlertMsg
-                      bsStyle={"danger"}
-                      title={errorMessage}
-                    />
-                  }
-                  {
-                    successMessage && <CustomAlertMsg
-                      bsStyle={"success"}
-                      title={successMessage}
-                    />
-                  }
+        <div>
+              <h3 className="mt-20 mb-20 login-label text-left">Email Verification</h3>
+              {
+                errorMessage && <CustomAlertMsg
+                  bsStyle={"danger"}
+                  title={errorMessage}
+                />
+              }
+              {
+                successMessage && <CustomAlertMsg
+                  bsStyle={"success"}
+                  title={successMessage}
+                />
+              }
 
-                  <div className="section-field mb-20">
-                    <label className="mb-10" htmlFor="name">Email </label>
-                    <input id="email" className="web form-control" type="text" placeholder="Email" value={this.state.email} name="email" onChange={this.onchange} />
-                    {this.displayValidationErrors('email')}
-                  </div>
-
-
-                  <div>
-                    <a onClick={this.resendVerificationEmail} className={`btn cognito btn-theme ${this.isFormValid() ? '' : 'disabled'}`}>
-                      <span className="text-white">Send verification link</span>
-                      {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
-                    </a>
-                  </div>
-                  <p className="mt-20 mb-0 remember-checkbox">After Verification  <Link to="/login"> Login here</Link></p>
-                </div>
-              </Col>
-            </Row>
-          </Container>
-        </section>
-      )
+              <div className="section-field mb-20">
+                <label className="mb-10 text-left" htmlFor="name">Email<span className="red">*</span> </label>
+                <input id="email" className="web form-control" type="text" placeholder="Email" value={this.state.email} name="email" onChange={this.onchange} />
+                {this.displayValidationErrors('email')}
+              </div>
+              <div className="text-left">
+                <a onClick={this.resendVerificationEmail} className={`btn cognito btn-theme ${this.isFormValid() ? '' : 'disabled'}`}>
+                  <span className="text-white">Send verification link</span>
+                  {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
+                </a>
+              </div>
+              <p className="mt-20 mb-0 remember-checkbox text-left">After Verification <a href="Javascript:void(0)" onClick={() => this.props.updateUrlPathProp('login')}>Login here</a></p>
+        </div>      
+      );
     }
     else {
       return <div></div>;
     }
-
   }
 }
-export default EmailVerify;
+export default EmailVerifyForm;

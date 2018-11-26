@@ -1,302 +1,267 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col } from 'reactstrap';
-import { toast } from 'react-toastify';
+import { Row, Col } from 'reactstrap';
 import _ from 'lodash';
-import GoogleLogin from "react-google-login";
-import validators from '../../../validators';
-import Api from "../../../services/api";
-import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
+import logoImg from "../../../assets/images/logo.svg";
+import cognitoImg from "../../../assets/images/cognito_logo.svg";
+import etherImg from "../../../assets/images/eth-image.png";
+import dharmaImg from "../../../assets/images/dharma-logo.png";
+import loanImg from "../../../assets/images/loans.jpg";
+import loanBaselogoImg from "../../../assets/images/loanbase.svg";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
+import ForgotForm from "./ForgotForm";
+import ResetForm from "./ResetForm";
+import EmailVerifyForm from "./EmailVerifyForm";
+import Unsubscribe from "./Unsubscribe";
 
 import './Login.css';
 class Login extends React.Component {
   constructor(props) {
     super(props);
+    let urlPath = (this.props.urlpath != '' && this.props.urlpath != null) ? this.props.urlpath : '';   
     this.state = {
-      email: '',
-      password: '',
-      error: null,
-      processing: false,
-      buttonLoading:false,
-      locationState: this.props.location.state || {}
+      urlPath:urlPath
     };
-    this.socialSignup = this.socialSignup.bind(this);
-    this.validators = validators;
-    this.onchange = this.onchange.bind(this);
-    this.login = this.login.bind(this);
-    this.resendVerificationEmail = this.resendVerificationEmail.bind(this);
-    this.renderMessage = this.renderMessage.bind(this);
-    this.displayValidationErrors = this.displayValidationErrors.bind(this);
-    this.updateValidators = this.updateValidators.bind(this);
-  }
-  componentDidMount() {
-    const { locationState } = this.state;
-    if (!_.isUndefined(locationState)) {
-      this.props.history.push({
-        pathname: '/login',
-        state: {}
-      });
-    }
-  }
-  async googleSignIn(token) {
-    const api = new Api();
-    return new Promise((resolve) => {
-      api.create("goauthlogin", { token: token }).then((response) => {
-        resolve(response);
-      });
-    });
+    this.updateUrlPathProp = this.updateUrlPathProp.bind(this);
   }
 
-  socialSignup(res, type) {
-    if (typeof res.tokenId != "undefined") {
-      this.googleSignIn(res.tokenId).then((result)=> {
-        try{
-          const response =  result[0];
-          const headers = result[1];
-          const authorization = headers.get('Authorization');
-          if (authorization && authorization != null) {
-            localStorage.setItem('socialLogin', "yes");
-            localStorage.setItem('token', authorization);
-            localStorage.setItem('userEmail', response.email);
-            this.props.history.push("/");
-          }
-          else {
-            toast.error("Please try again later..");
-          }
-        }
-        catch(e){
-          toast.error("Please try again later..");
-        }
-      });
+  updateUrlPathProp(urlPathValue){
+    if(!_.isUndefined(urlPathValue))
+    {
+      this.setState({urlPath: urlPathValue});
+      this.props.history.push('/'+urlPathValue);
     }
   }
 
-  onchange(event) {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
-  }
-  updateValidators(fieldName, value) {
-    this.validators[fieldName].errors = [];
-    this.validators[fieldName].state = value;
-    this.validators[fieldName].valid = true;
-    this.validators[fieldName].rules.forEach((rule) => {
-      if (rule.test instanceof RegExp) {
-        if (!rule.test.test(value)) {
-          this.validators[fieldName].errors.push(rule.message);
-          this.validators[fieldName].valid = false;
-        }
-      } else if (typeof rule.test === 'function') {
-        if (!rule.test(value)) {
-          this.validators[fieldName].errors.push(rule.message);
-          this.validators[fieldName].valid = false;
-        }
-      }
-    });
-  }
-  isFormValid() {
-    let status = true;
-    const validationFields = ["email", "password"];
-    validationFields.forEach((field) => {
-      this.updateValidators(field, this.state[field]);
-      if (!this.validators[field].valid) {
-        status = false;
-      }
-    });
-    return status;
-  }
-  displayValidationErrors(fieldName) {
-    const validator = this.validators[fieldName];
-    const result = '';
-    if (validator && !validator.valid) {
-      const errors = validator.errors.map((info, index) => {
-        return <span className="error" key={index}>* {info}<br /></span>
-      });
-      return (
-        <div className="row">
-          <div className="col">
-            <div className="s12 ">
-              {errors}
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return result;
-  }
-  async login(event) {
-    event.preventDefault();
-    const {
-      email,
-      password,
-    } = this.state;
-    this.setState({
-      buttonLoading:true
-    })
-    const api = new Api();
-    const response = await api.create("login", {
-      email: email,
-      password: password
-    });
-    this.setState({
-      buttonLoading:false
-    })
-    //const authorization = response.headers.get('Authorization');
-    const authorization = response.headers.get('Authorization');
-
-    if (authorization && authorization != null) {
-      localStorage.setItem('socialLogin', "no");
-      localStorage.setItem('token', authorization);
-      localStorage.setItem('userEmail', email);
-      this.props.history.push("/");
-    }
-    else {
-      const json = await response.json();
-      if (json.ERROR == "USER_DISABLED") {
-        this.props.history.push({
-          pathname: '/email-verify',
-          state: { message: "USER_DISABLED", email }
-        });
-      }
-      else {
-        toast.error("Invalid email or password.");
-      }
-    }
-  }
-  async resendVerificationEmail() {
-
-    const { locationState } = this.state;
-    if (!_.isUndefined(this.state.locationState.message)) {
-      const email = locationState.email;
-      if (email != "") {
-        const api = new Api();
-        this.setState({ processing: true })
-        const response = await api.create("email/send", {
-          email: email
-        }).catch((error) => {
-          if (error.status && error.status === 403) {
-            // this.props.redirect(`/login`);
-            // return;
-          }
-        });
-        if (response.status == "SUCCESS") {
-          this.setState({ processing: false })
-          //toast.error("Something went wrong. Please try again later.");
-        }
-        else {
-          this.setState({ processing: false })
-          toast.error("Something went wrong. Please try again later.");
-        }
-      }
-    }
-  }
-  renderMessage() {
-    const { locationState, processing } = this.state;
-    if (locationState.message == "REGISTER_SUCCESS") {
-      const email = locationState.email;
-      return (
-        <div>
-          <p>
-            We have sent you an email with an activation link to <b>{email}</b>. It may take a minute to arrive.
-            <br />
-            <b>Still no email?</b>
-            {!processing && <a onClick={this.resendVerificationEmail} className="btn btn-sm btn-link">Click here to Resend it</a>}
-            {processing && <i className="btn btn-sm fa-spin fa fa-spinner"></i>}
-          </p>
-        </div>
-      )
-    }
-    else if (locationState.message == "EMAIL_VERIFICATION_SUCCESS" || locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") {
-      let flag = (locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") ? true : false; 
-      return (
-        <div>
-          {locationState.message == "EMAIL_VERIFICATION_SUCCESS" &&
-          <p>
-            Your account is successfully verified. You can login now.
-          </p>
-          }
-          {flag === true &&
-          <p>
-             Password changed successfully.Please login using new passowrd.
-          </p>
-          }
-        </div>
-      )
-    }
-    return;
-  }
   render() {
+    let { urlPath } = this.state;
+    let formTemplate = <LoginForm updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
-    const responseGoogle = response => {
-      this.socialSignup(response, "google");
-    };
-
-    const { email, password,buttonLoading } = this.state;
-    const isFormValid = this.isFormValid();
-
+    if(urlPath == "register")
+    {
+      formTemplate = <RegisterForm updateUrlPathProp={this.updateUrlPathProp} />;      
+    }
+    else if(urlPath == "forgot")
+    {
+      formTemplate = <ForgotForm updateUrlPathProp={this.updateUrlPathProp} />;      
+    }
+    else if(urlPath == "password-reset"){
+      formTemplate = <ResetForm updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} />;      
+    }
+    else if(urlPath == "email-verify"){
+      formTemplate = <EmailVerifyForm updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;      
+    }
+    else if(urlPath == "email-unsubscribe"){
+      formTemplate = <Unsubscribe updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;      
+    }
+    
     return (
-      <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: 'url(assets/images/login-bg.png)' }}>
-        <Container>
-          <Row className="justify-content-center no-gutters vertical-align row">
-            <Col lg={4} md={6} className="login-fancy-bg bg" style={{ backgroundImage: 'url(assets/images/login-inner-bg.png)' }}>
-              <div className="login-fancy login-left">
-                <h2 className="text-white mb-20 text-center">
-                  <a href="/"><img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" /></a>
-                </h2>
-                <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
-                <ul className="list-unstyled  pos-bot pb-30">
-                  <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use | </a> </li>
-                  <li className="list-inline-item"><a className="text-white" href="privacy" target="_blank"> Privacy Policy</a></li>
-                </ul>
+      <div className="login-container">
+        <section className="header">
+            <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+                <div className="text-left navbar-brand-wrapper">
+                    <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
+                    <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
+                </div>
+            </nav>
+        </section>
+
+        <section>
+          <div className="login-bg-image">
+              <div className="image" style={{ backgroundImage: "url('"+loanImg+"')" }}></div>
+              <div className="login-bg-overlay"></div>
+
+              <div className="container-fluid">
+                  <div className="login-bg-content">
+                    <div className="outer-container">
+                        <div className="inner-container">
+                            <div className="centered-content">
+                                  <div className="row mt-70 how-it-works mb-70">
+                                      <div className="col-md-8">
+                                        <div className="header-image-content text-left">
+                                          <div className="row">
+                                              <div className="col-md-1"></div>
+                                              <div className="col-md-10">
+                                                  <h1>Tokenized P2P Debt Market Place</h1>
+                                                  <h4>Leverage your digital assets without losing your position.</h4>
+                                                  <p className="mt-30 header-image-p">
+                                                      Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
+                                                  </p>
+                                                  <p className="mt-30 header-image-p">
+                                                      Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
+                                                  </p>
+                                                  <p className="mt-30 header-image-p">
+                                                      Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
+                                                  </p>
+                                              </div>
+                                              <div className="col-md-1"></div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="col-md-4">
+                                          <div className="login-form p-4 mr-30">
+                                              { formTemplate } 
+                                          </div>
+                                      </div>
+                                 </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
-            </Col>
-            <Col lg={4} md={6} className="bg-white">
-              <div className="login-fancy pb-40 clearfix">
-                <h3 className="mb-30">Sign In</h3>
-                {
-                  console.log(this.state.locationState)}
-                {
-                  !_.isUndefined(this.state.locationState.message) && <CustomAlertMsg
-                    bsStyle={"success"}
-                    title={this.renderMessage()}
-                  />
-                }
-                <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="name">Email </label>
-                  <input id="email" className="web form-control" type="text" placeholder="Email" value={this.state.email} name="email" onChange={this.onchange} />
-                  {email && this.displayValidationErrors('email')}
-                </div>
-                <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="Password">Password* </label>
-                  <input id="password" className="Password form-control" type="password" placeholder="Password" value={this.state.password} name="password" onChange={this.onchange} />
-                  {password && this.displayValidationErrors('password')}
-                </div>
+          </div>
+        </section>
 
-                <p className="mb-3 remember-checkbox text-right"><Link to="/forgot" > Forgot Password? </Link></p>
-
-                <div className="d-block">
-                  <a onClick={this.login} className={`btn cognito btn-theme ${isFormValid ? '' : 'disabled'}`}>
-                    <span className="text-white">Log in</span>
-                    {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
-                  </a>
-
-                  <span className="login-buttons-seperator"></span>
-
-                  <GoogleLogin
-                    clientId="166486140124-jglmk5i5fu0bvk6fh8q2hl25351pfst0.apps.googleusercontent.com"
-                    buttonText="Login with Google"
-                    onSuccess={responseGoogle}
-                    onFailure={responseGoogle}
-                    className="btn cognito btn-danger pull-md-right"
-                  />
-
-                </div>
-                <p className="mt-20 mb-0 remember-checkbox">Don't have an account? <Link to="/register" > Create one here </Link></p>
+        <section className="loanbase-container">
+          <div className="pt-50 pb-50 container">
+              <h3 className="text-center mb-30">Why Loanbase?</h3>
+              <div className="row">
+                  <div className="col-md-4 text-center row-eq-height">
+                      <div className="loanbase-step-container pt-3 pb-5 pl-5 pr-5">
+                          <span className="color-circle"></span>
+                          <h6>Transparency</h6>
+                          <p>All transactions are broadcasted to ethereum blockchain, Hence highly transparent and instantly auditable.</p>
+                      </div>
+                  </div>
+                  <div className="col-md-4 text-center row-eq-height">
+                      <div className="loanbase-step-container pt-3 pb-5 pl-5 pr-5">
+                          <span className="color-circle"></span>
+                          <h6>Asset Backed</h6>
+                          <p>Loans are secured against collateral held by smart contracts.</p>
+                      </div>
+                  </div>
+                  <div className="col-md-4 text-center row-eq-height">
+                      <div className="loanbase-step-container pt-3 pb-5 pl-5 pr-5">
+                          <span className="color-circle"></span>
+                          <h6>Easy</h6>
+                          <p>Relax! Our Personalised Dashboard gives you instant access to your loan portfolio. We will send notification for repayments and alert you if the loan is defaulted.</p>
+                      </div>
+                  </div>
               </div>
-            </Col>
-          </Row>
-        </Container>
-      </section>
+          </div>
+        </section>
+
+        <section className="how-it-works-container">
+          <div className="pt-50 pb-50 container">
+              <div className="mb-20">
+                <h3 className="text-center color-white">How it works?</h3>
+              </div>
+
+              <div className="login-bg-content">
+                  <h5 className="text-left color-white">Borrower</h5>
+                  <div className="row mt-20 how-it-works">
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 1</h5>
+                              <p>Login to Cognitochain Marketplace</p>
+                              <h6>Create Loan Request</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 2</h5>
+                              <p>Authorize Smart Contract</p>
+                              <h6>Unlock Collateral</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 3</h5>
+                              <p>Publish in Cognitochain Marketplace</p>
+                              <h6>Get Funded</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 4</h5>
+                              <p>Repay Loan</p>
+                              <h6>Get Collateral back in full</h6>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div className="login-bg-content">
+                  <h5 className="text-left color-white">Lender</h5>
+                  <div className="row mt-20 how-it-works">
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 1</h5>
+                              <p>Login to Cognitochain Marketplace</p>
+                              <h6>Create Loan Request</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 2</h5>
+                              <p>Authorize Smart Contract</p>
+                              <h6>Unlock Collateral</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 3</h5>
+                              <p>Publish in Cognitochain Marketplace</p>
+                              <h6>Get Funded</h6>
+                          </div>
+                      </div>
+                      <div className="col-md-3">
+                          <div className="step-container p-1">
+                              <h5 className="text-muted">Step 4</h5>
+                              <p>Repay Loan</p>
+                              <h6>Get Collateral back in full</h6>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </section>
+
+        <section className="powered-by-container">
+            <div className="container pt-50 pb-50">
+              <div className="row text-center h-100 justify-content-center align-items-center">
+                  <div className="col-md-3">
+                      <h2>Powered By</h2>
+                  </div>
+                  <div className="col-md-3">
+                    <img src={cognitoImg} alt="" />
+                  </div>
+                  <div className="col-md-3">
+                    <img src={etherImg} alt="" />
+                  </div>
+                  <div className="col-md-3">
+                    <img src={dharmaImg} alt="" />
+                  </div>
+              </div>        
+            </div>  
+        </section>
+
+        <section className="loanbase-logo-container">
+            <div className="container pt-20 pb-20 text-center">
+                <img src={loanBaselogoImg} alt="Loan Base" height={150} />
+            </div>
+        </section>
+
+        <section className="bg-white">
+           <footer className="p-4 container-fluid">
+              <Row>
+                <Col md={6}>
+                  <div className="text-center text-md-left">
+                    <p className="mb-0"> © Copyright <span id="copyright"> 2018</span>.Cognitochain All Rights Reserved. </p>
+                  </div>
+                </Col>
+                <Col md={6}>
+                  <ul className="text-center text-md-right">
+                    <li className="list-inline-item"><a href="terms" target="_blank">Terms &amp; Conditions | </a> </li>
+                    <li className="list-inline-item"><a href="privacy" target="_blank">Privacy Policy </a> </li>
+                  </ul>
+                </Col>
+              </Row>
+          </footer>
+        </section>
+      </div>
     );
   }
 }

@@ -1,16 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Col, Container } from 'reactstrap';
 import { toast } from 'react-toastify';
 import _ from "lodash";
 import GoogleLogin from "react-google-login";
 import validators from '../../../validators';
 import Api from "../../../services/api";
-import './Register.css';
-
-
-
-class Register extends React.Component {
+class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -28,6 +22,7 @@ class Register extends React.Component {
     this.displayValidationErrors = this.displayValidationErrors.bind(this);
     this.updateValidators = this.updateValidators.bind(this);
   }
+
   async googleSignIn(token) {
     const api = new Api();
     return new Promise((resolve) => {
@@ -112,7 +107,7 @@ class Register extends React.Component {
       });
 
       return (
-        <div className="row">
+        <div className="row text-left mt-1">
           <div className="col">
             <div className="s12 ">
               {errors}
@@ -162,44 +157,25 @@ class Register extends React.Component {
     const { email, password, confirmPassword,buttonLoading } = this.state;
     const isFormValid = this.isFormValid();
     return (
-      <section className="height-100vh d-flex align-items-center page-section-ptb login" style={{ backgroundImage: 'url(assets/images/register-bg.png)' }}>
-        <Container>
-          <Row className="justify-content-center no-gutters vertical-align row">
-            <Col lg={4} md={6} className="login-fancy-bg bg parallax" style={{ backgroundImage: 'url(assets/images/register-inner-bg.png)' }}>
-              <div className="login-fancy login-left">
-                <h2 className="text-white mb-20 text-center">
-                  <a href="/">
-                    <img src="assets/images/logo-full.svg" alt="Cognito Chain" width="200" />
-                  </a>
-                </h2>
-                <p className="mb-20 text-white">Cognitochain provides access to peer-to-peer digital asset lending on the Ethereum blockchain. We make it easy to get crypto asset-backed loans without selling your favourite crypto holdings.</p>
-                <ul className="list-unstyled pos-bot pb-30">
-                  <li className="list-inline-item"><a className="text-white" href="terms" target="_blank"> Terms of Use | </a> </li>
-                  <li className="list-inline-item"><a className="text-white" href="privacy" target="_blank"> Privacy Policy</a></li>
-                </ul>
-              </div>
-            </Col>
-
-            <Col lg={4} md={6} className=" bg-white">
-              <div className="login-fancy pb-40 clearfix">
-                <h3 className="mb-30">Signup</h3>
-                <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="email">Email<span className="red">*</span> </label>
+      <div>
+          <h3 className="mt-20 mb-20 login-label text-left">Signup</h3>
+          <div className="section-field mb-20">
+                  <label className="mb-10 text-left" htmlFor="email">Email<span className="red">*</span> </label>
                   <input type="email" value={this.state.email} placeholder="Email" id="email" className="form-control" name="email" onChange={this.onchange} />
                   {email && this.displayValidationErrors('email')}
                 </div>
                 <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="password">Password<span className="red">*</span> </label>
+                  <label className="mb-10 text-left" htmlFor="password">Password<span className="red">*</span> </label>
                   <input className="Password form-control" value={this.state.password} id="password" type="password" placeholder="Password" name="password" onChange={this.onchange} />
                   {password && this.displayValidationErrors('password')}
                 </div>
                 <div className="section-field mb-20">
-                  <label className="mb-10" htmlFor="password">Confirm Password<span className="red">*</span> </label>
+                  <label className="mb-10 text-left" htmlFor="password">Confirm Password<span className="red">*</span> </label>
                   <input className="Password form-control" value={this.state.confirmPassword} id="confirmPassword" type="password" placeholder="Confirm Password" name="confirmPassword" onChange={this.onchange} />
                   {confirmPassword && this.displayValidationErrors('confirmPassword')}
                 </div>
 
-                <div className="d-inline-block">
+                <div className="d-block text-left">
                   {
                     <a onClick={this.register} className={`btn cognito btn-theme pull-md-left  ${isFormValid ? '' : 'disabled'}`}>
                       <span className="text-white">Signup</span>
@@ -213,17 +189,13 @@ class Register extends React.Component {
                     buttonText="Signup with Google"
                     onSuccess={responseGoogle}
                     onFailure={responseGoogle}
-                    className="btn cognito btn-danger pull-md-right"
+                    className="btn cognito btn-danger"
                   />
                 </div>
 
-                <p className="mt-20 mb-0 remember-checkbox">You have an account? <Link to="login"> Login here</Link></p>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      </section>
+                <p className="mt-20 mb-0 remember-checkbox text-left">You have an account? <a href="Javascript:void(0)" onClick={() => this.props.updateUrlPathProp('login')}>Login here</a></p>
+      </div>      
     );
   }
 }
-export default Register;
+export default RegisterForm;

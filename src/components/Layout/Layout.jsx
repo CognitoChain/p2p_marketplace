@@ -6,9 +6,6 @@ import {Switch, Route, Redirect} from "react-router-dom";
 import Basepages from './Basepages';
 import Base from './Base';
 import Login from '../Authentication/Login/Login';
-import EmailVerify from '../EmailVerify/EmailVerify';
-import Unsubscribe from '../Unsubscribe/Unsubscribe';
-import Register from '../Authentication/Register/Register';
 
 import Market from '../Market/Market';
 /*import Wallet from '../Wallet/Wallet';*/
@@ -28,8 +25,6 @@ import LoanRequestContainer from "../../containers/LoanRequest";
 import InvestmentsContainer from "../../containers/Investments";
 import DetailContainer from "../../containers/Detail";
 import FundContainer from '../../containers/Fund';
-import ForgotPassword from '../ForgotPassword/ForgotPassword';
-import ResetPassword from '../ResetPassword/ResetPassword';
 import ChangePassword from '../ChangePassword/ChangePassword';
 import _ from "lodash";
 import Api from "../../services/api";
@@ -125,19 +120,19 @@ class Layout extends Component {
         if(path.indexOf(location) > -1){
               return (
                 <Basepages>
-                    <PublicRoute authenticated={authenticated} path="/login" exact={true} component={Login} /> 
-                    <PublicRoute authenticated={authenticated} path="/email-verify/" exact={true} component={EmailVerify} />
-                    <PublicRoute authenticated={authenticated} path="/email-verify/:token" exact={true} component={EmailVerify} />
-                    <PublicRoute authenticated={authenticated} path="/register" component={Register} />
-                    <PublicRoute authenticated={authenticated} path="/forgot" component={ForgotPassword} />
-                    <PublicRoute authenticated={authenticated} path="/password-reset/:token" exact={true} component={ResetPassword} />                                    
+                    <PublicRoute authenticated={authenticated} path="/login" exact={true} component={Login} urlpath={location} /> 
+                    <PublicRoute authenticated={authenticated} path="/email-verify/" exact={true} component={Login} urlpath={location} />
+                    <PublicRoute authenticated={authenticated} path="/email-verify/:token" exact={true} component={Login} urlpath={location} />
+                    <PublicRoute authenticated={authenticated} path="/register" component={Login} urlpath={location} /> 
+                    <PublicRoute authenticated={authenticated} path="/forgot" component={Login} urlpath={location} /> 
+                    <PublicRoute authenticated={authenticated} path="/password-reset/:token" exact={true} component={Login} urlpath={location} />                                
                 </Basepages>
             );
         }
         else if(location ==='email-unsubscribe'){
             return (
               <Basepages>
-                  <PublicRoute authenticated={authenticated} path="/email-unsubscribe/:token" exact={true} component={Unsubscribe} />
+                  <PublicRoute authenticated={authenticated} path="/email-unsubscribe/:token" exact={true} component={Login} urlpath={location} />
               </Basepages>
           );
         }
