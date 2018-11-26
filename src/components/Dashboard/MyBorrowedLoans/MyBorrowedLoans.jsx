@@ -127,18 +127,14 @@ class MyBorrowedLoans extends Component {
                     let buttonText = '';
                     let buttonClassName = '';
                     if (row.debtorAddress == currentMetamaskAccount) {
-                        if (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false) {
+                        if (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false && row.isCollateralSeized == false) {
                             buttonText = 'Pay';
                             buttonClassName = 'orange';
                         }
-                        else if (row.repaidAmount == row.repaymentAmount && row.isRepaid == true) {
+                        else if (row.isCollateralReturnable == true && row.isRepaid == true && row.isCollateralReturned == false) {
                             buttonText = 'Claim Collateral';
                             buttonClassName = 'green';
                         }
-                    }
-                    else if (row.creditorAddress == currentMetamaskAccount && row.isCollateralSeizable === true && row.isRepaid === false) {
-                        buttonText = 'Seize Collateral';
-                        buttonClassName = 'btn-danger';
                     }
                     return (
                         <div className="text-center">

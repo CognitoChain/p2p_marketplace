@@ -133,7 +133,7 @@ class MyFundedLoans extends Component {
                 text: "Actions",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     let buttonText = '';
-                    if (row.creditorAddress == currentMetamaskAccount) {
+                    if (row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount && row.isCollateralSeized == false) {
                         buttonText = (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isCollateralSeizable == true) ? 'Seize Collateral' : '';
                     }
                     return (
