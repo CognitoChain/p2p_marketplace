@@ -90,8 +90,8 @@ class Detail extends Component {
       let expectedRepaidAmountDharma = 0;
       let nextRepaymentAmount, repaymentAmount = 0;
       let nextRepaymentDate = '';
-      let overViewBackgroundClass = 'overview-bg-success';
-      let overViewButtonBackgroundClass = 'overview-bg-btn-success';
+      let overViewBackgroundClass = '';
+      let overViewButtonBackgroundClass = '';
       let i = 1;
       let j = 1;
       if ((!_.isUndefined(repaymentSchedule) && repaymentSchedule.length > 0) && isLoanUser) {
@@ -115,38 +115,48 @@ class Detail extends Component {
 
           paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((ts < currentTimestamp) ? 'missed' : 'due'));
 
-          if(isCollateralSeizable == true || isCollateralSeized == true)
+          if(creditorAddress == currentMetamaskAccount || debtorAddress == currentMetamaskAccount)
           {
-              if(creditorAddress == currentMetamaskAccount || debtorAddress == currentMetamaskAccount)
-              {
-                overViewBackgroundClass = 'overview-bg-error';
-                overViewButtonBackgroundClass = 'overview-bg-btn-error';
-              }
+            if(isCollateralSeizable == true || isCollateralSeized == true)
+            {
+              overViewBackgroundClass = 'overview-bg-error';
+              overViewButtonBackgroundClass = 'overview-bg-btn-error';
+            }
+            else if(isCollateralReturned || collateralReturnable){
+              overViewBackgroundClass = 'overview-bg-success';
+              overViewButtonBackgroundClass = 'overview-bg-btn-success';
+            }
+            else
+            {
+              if (ts < currentTimestamp || (overViewBackgroundClass == '' && overViewButtonBackgroundClass == '')) {
+                if (totalRepaidAmount >= expectedRepaidAmountDharma) {
+                  overViewBackgroundClass = 'overview-bg-success';
+                  overViewButtonBackgroundClass = 'overview-bg-btn-success';
+                }
+                else if (totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) {
+                  overViewBackgroundClass = 'overview-bg-orange';
+                  overViewButtonBackgroundClass = 'overview-bg-btn-orange';
+                }
+                else {
+                  if (ts < currentTimestamp) {
+                    overViewBackgroundClass = 'overview-bg-error';
+                    overViewButtonBackgroundClass = 'overview-bg-btn-error';
+                  }
+                  else
+                  {
+                    overViewBackgroundClass = 'overview-bg-success';
+                    overViewButtonBackgroundClass = 'overview-bg-btn-success';
+                  }
+                }
+              } 
+            }  
           }
           else
           {
-            if (repaymentBtnDisplay && ts < currentTimestamp) {
-              if (totalRepaidAmount >= expectedRepaidAmountDharma) {
-                overViewBackgroundClass = 'overview-bg-success';
-                overViewButtonBackgroundClass = 'overview-bg-btn-success';
-              }
-              else if (totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) {
-                overViewBackgroundClass = 'overview-bg-orange';
-                overViewButtonBackgroundClass = 'overview-bg-btn-orange';
-              }
-              else {
-                if (ts < currentTimestamp) {
-                  overViewBackgroundClass = 'overview-bg-error';
-                  overViewButtonBackgroundClass = 'overview-bg-btn-error';
-                }
-              }
-            }
-            else if (collateralBtnDisplay == true || isCollateralReturned) {
-              overViewBackgroundClass = 'overview-bg-success';
-              overViewButtonBackgroundClass = 'overview-bg-btn-success';
-            }  
+            overViewBackgroundClass = 'overview-bg-success';
+            overViewButtonBackgroundClass = 'overview-bg-btn-success';
           }
-          
+
           if (lastExpectedRepaidAmount != expectedRepaidAmountDharma) {
             lastExpectedRepaidAmount = expectedRepaidAmountDharma;
           }
