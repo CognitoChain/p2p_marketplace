@@ -7,8 +7,8 @@ import walletsidebarImg from "../../assets/images/menu-wallet.png";
 import dashboardsidebarImg from "../../assets/images/menu-dashboard.png";
 class Sidebar extends Component {
   getSelectedClass(linkName){
-    const { location } = this.props;
-    return ((linkName == location) || (linkName=="market" && (location=="/" || location=="")))?"active":"";
+    const { currentLocation } = this.props;
+    return ((linkName == currentLocation) || (linkName=="market" && (currentLocation=="/" || currentLocation=="")))?"active":"";
   }
   render() {
     return (
