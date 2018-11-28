@@ -5,6 +5,7 @@ import Footer from './Footer';
 import Header from './Header';
 
 import Sidebar from './Sidebar';
+import ModalMessage from './ModalMessage';
 import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 
 class Base extends Component {
@@ -31,17 +32,9 @@ class Base extends Component {
                         return (
                             <Header
                                 updateParent={this.updateValue}
-                                logout={this.props.logout}
-                                authenticated={this.props.authenticated}
                                 dharma={dharmaProps.dharma}
-                                token={this.props.token}
-                                userEmail={this.props.userEmail}
-                                currentMetamaskAccount={this.props.currentMetamaskAccount}
-                                wrongMetamskNetworkMsg={this.props.wrongMetamskNetworkMsg}
-                                wrongMetamaskNetwork={this.props.wrongMetamaskNetwork}
-                                updateMetamaskAccount={this.props.updateMetamaskAccount}
                                 refreshTokens={dharmaProps.refreshTokens}
-                                socialLogin = {this.props.socialLogin}
+                                {...this.props}
                             />
                         );
                     }}
@@ -55,6 +48,7 @@ class Base extends Component {
                         </div>
                     </div>
                 </div>
+                <ModalMessage {...this.props}/>
             </div>
         );
     }

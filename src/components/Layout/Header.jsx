@@ -11,7 +11,7 @@ class Header extends Component {
         this.interval = '';
         this.state = {
             toggleactive: false,
-            defaultValue: 1                    
+            defaultValue: 1
         };
         this.togglebutton = this.togglebutton.bind(this);
     }
@@ -20,11 +20,13 @@ class Header extends Component {
     };
     async componentWillMount() {
         const { dharma } = this.props;
+    
         let currentAccount = await dharma.blockchain.getCurrentAccount();
+
         if (_.isUndefined(currentAccount)) {
             currentAccount = '';
         }
-        this.props.updateMetamaskAccount(currentAccount,false);   
+        this.props.updateMetamaskAccount(currentAccount, false);
         this.interval = setInterval(
             () => {
                 this.checkAccount()
@@ -39,11 +41,12 @@ class Header extends Component {
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         if ((currentMetamaskAccount == null && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) && typeof currentMetamaskAccount != "undefined" && currentMetamaskAccount != null)) {
             this.props.refreshTokens();
-            this.props.updateMetamaskAccount(currentAccount,true);
+            this.props.updateMetamaskAccount(currentAccount, true);
         }
     }
     render() {
-        const { userEmail,wrongMetamskNetworkMsg,wrongMetamaskNetwork,currentMetamaskAccount,socialLogin } = this.props;
+
+        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, isUserMetaMaskPermission, authenticated, isUserMetaMaskPermissionLoading,iscurrentMetamaskAccountLoading } = this.props;
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -69,27 +72,24 @@ class Header extends Component {
                             />
                         )
                     }
-
                     {
-                        (wrongMetamaskNetwork==false && (currentMetamaskAccount == '' || currentMetamaskAccount == null || _.isUndefined(currentMetamaskAccount))) && (
+                        authenticated === true && wrongMetamaskNetwork == false && !isUserMetaMaskPermission && (
                             <CustomAlertMsg
                                 bsStyle='danger'
                                 extraClass="d-inline-block header-notice mb-0"
-                                title="Please log in to Metamask."
+                                title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
                             />
                         )
                     }
-                    
                     {
-                        currentMetamaskAccount != null && (
+                        authenticated === true && wrongMetamaskNetwork == false &&  isUserMetaMaskPermission && currentMetamaskAccount != null && (
                             <label className="headerEthAddress">{currentMetamaskAccount}</label>
                         )
                     }
-
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
                             {
-                                this.props.authenticated === true && (
+                                authenticated === true && (
                                     <div>
                                         <div className="nav-link nav-pill user-avatar btn btn-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                             <Avatar name={userEmail} size="30px" round={true} />
@@ -105,8 +105,8 @@ class Header extends Component {
                                                     </div>
                                                 </div>
                                                 <div className="dropdown-divider"></div>
-                                                { 
-                                                    socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link> 
+                                                {
+                                                    socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
                                                 }
                                                 <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
@@ -115,7 +115,7 @@ class Header extends Component {
                                 )
                             }
                             {
-                                this.props.authenticated === false && (
+                                authenticated === false && (
                                     <div className="header-links">
                                         <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                     </div>
