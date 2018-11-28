@@ -11,12 +11,10 @@ class DetailContainer extends Component {
                     return (
                         <Detail
                             id={ id }
-                            token={this.props.token}
+                            {...this.props}
                             dharma={ dharmaProps.dharma }
                             refreshTokens={ dharmaProps.refreshTokens }
-                            reloadDetails={this.props.reloadDetails}
                             isTokenLoading={ dharmaProps.isTokenLoading }
-                            currentMetamaskAccount = {this.props.currentMetamaskAccount}
                         />
                     )
                 } }

@@ -3,7 +3,7 @@ import Dashboard from "../components/Dashboard/Dashboard";
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class DashboardContainer extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.redirect = this.redirect.bind(this);
     }
@@ -14,7 +14,13 @@ class DashboardContainer extends Component {
         return (
             <DharmaConsumer>
                 {(dharmaProps) => {
-                    return <Dashboard token = {this.props.token} isTokenLoading= {dharmaProps.isTokenLoading}  tokens={dharmaProps.tokens} dharma={dharmaProps.dharma} redirect={this.redirect} currentMetamaskAccount={this.props.currentMetamaskAccount} wrongMetamaskNetwork={this.props.wrongMetamaskNetwork} />;
+                    return (
+                        <Dashboard
+                            {...this.props}
+                            isTokenLoading={dharmaProps.isTokenLoading}
+                            tokens={dharmaProps.tokens} dharma={dharmaProps.dharma}
+                            redirect={this.redirect} />
+                    );
                 }}
             </DharmaConsumer>
         );

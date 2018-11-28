@@ -4,11 +4,17 @@ import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class WalletContainer extends Component {
     render() {
-    	const currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         return (
             <DharmaConsumer>
                 {(dharmaProps) => {
-                    return <Wallet isTokenLoading= {dharmaProps.isTokenLoading} tokens={dharmaProps.tokens} dharma={dharmaProps.dharma} currentMetamaskAccount={currentMetamaskAccount} wrongMetamaskNetwork={this.props.wrongMetamaskNetwork} />;
+                    return (
+                        <Wallet
+                            isTokenLoading={dharmaProps.isTokenLoading}
+                            {...this.props}
+                            tokens={dharmaProps.tokens}
+                            dharma={dharmaProps.dharma}
+                        />
+                    );
                 }}
             </DharmaConsumer>
         );

@@ -26,7 +26,7 @@ class LoanRequestContainer extends Component {
                     return (
                         <LoanRequest
                             id={ id }
-                            token={this.props.token}
+                            {...this.props}
                             dharma={ dharmaProps.dharma }
                             refreshTokens={dharmaProps.refreshTokens}
                             onFillComplete={ async () => {
