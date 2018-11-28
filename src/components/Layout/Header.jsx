@@ -14,6 +14,7 @@ class Header extends Component {
             defaultValue: 1
         };
         this.togglebutton = this.togglebutton.bind(this);
+        this.connectMetaMask = this.connectMetaMask.bind(this);
     }
     togglebutton(toggleactive) {
         this.props.updateParent();
@@ -35,19 +36,24 @@ class Header extends Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
+    async connectMetaMask(){
+        await this.props.metamaskPermission();
+    }
     async checkAccount() {
-        const { dharma } = this.props;
+        const { dharma} = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
-        if ((currentMetamaskAccount == '' && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
+        currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
+        if ((currentMetamaskAccount == '' && currentAccount!='') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
             this.props.refreshTokens();
             this.props.updateMetamaskAccount(currentAccount, true);
         }
     }
     render() {
 
-        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, isUserMetaMaskPermission, authenticated, isUserMetaMaskPermissionLoading,iscurrentMetamaskAccountLoading } = this.props;
+        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, isUserMetaMaskPermission, authenticated, isUserMetaMaskPermissionAsked,iscurrentMetamaskAccountLoading } = this.props;
+       console.log(isUserMetaMaskPermission)
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -74,16 +80,18 @@ class Header extends Component {
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false && !isUserMetaMaskPermission && (
-                            <CustomAlertMsg
-                                bsStyle='danger'
-                                extraClass="d-inline-block header-notice mb-0"
-                                title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
-                            />
+                        authenticated === true && wrongMetamaskNetwork == false && (!isUserMetaMaskPermission || isUserMetaMaskPermissionAsked) && (
+                            // <CustomAlertMsg
+                            //     bsStyle='danger'
+                            //     extraClass="d-inline-block header-notice mb-0"
+                            //     title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
+                            // />
+                            <button className="btn orange cognito d-inline-block x-small" onClick={()=>{this.connectMetaMask()}}>Connect your MetaMask</button>
+
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false &&  isUserMetaMaskPermission && currentMetamaskAccount != null && (
+                        authenticated === true && wrongMetamaskNetwork == false && isUserMetaMaskPermission && !isUserMetaMaskPermissionAsked && currentMetamaskAccount != null && (
                             <label className="headerEthAddress">{currentMetamaskAccount}</label>
                         )
                     }

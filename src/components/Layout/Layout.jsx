@@ -64,6 +64,7 @@ class Layout extends Component {
       isModalMessageOpen: false,
       isWeb3Enabled,
       isUserMetaMaskPermission: false,
+      isUserMetaMaskPermissionAsked:false,
       token,
       userEmail,
       socialLogin,
@@ -75,6 +76,7 @@ class Layout extends Component {
     this.logout = this.logout.bind(this);
     this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
     this.updateMetaMaskLoading = this.updateMetaMaskLoading.bind(this);
+    this.metamaskPermission = this.metamaskPermission.bind(this);
   }
   logout() {
     localStorage.removeItem('token');
@@ -103,14 +105,17 @@ class Layout extends Component {
   }
   async updateMetamaskAccountData(newMetamaskAccount, reloadDetails) {
     let { token, currentMetamaskAccount, isUserMetaMaskPermission } = this.state;
+    console.log("updateMetamaskAccountData")
+    // if (newMetamaskAccount == '') {
+    //   this.setState({ isUserMetaMaskPermission: false })
+      
+    // }
+    // else {
+    //   isUserMetaMaskPermission = true;
+    // }
     console.log(newMetamaskAccount)
-    if (newMetamaskAccount == '') {
-          await this.metamaskPermission();
-    }
-    else {
-      isUserMetaMaskPermission = true;
-    }
     if (newMetamaskAccount) {
+      isUserMetaMaskPermission = true;
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
       if (this.state.currentMetamaskAccount != newMetamaskAccount) {
         const api = new Api();
@@ -120,6 +125,7 @@ class Layout extends Component {
       }
     }
     else {
+      isUserMetaMaskPermission = false;
       localStorage.removeItem('currentMetamaskAccount');
     }
     
@@ -131,18 +137,18 @@ class Layout extends Component {
     if (!authenticated) {
       return;
     }
-    this.setState({ isUserMetaMaskPermission: false })
+    this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:true })
     if (window.ethereum) {
       try {
         await window.ethereum.enable();
-        this.setState({ isUserMetaMaskPermission: true })
+        this.setState({ isUserMetaMaskPermission: true ,isUserMetaMaskPermissionAsked:false})
       } catch (error) {
-        this.setState({ isUserMetaMaskPermission: false })
+        this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:false })
         console.log("User denied account access...");
       }
     }
     else if (window.web3) {
-      this.setState({ isUserMetaMaskPermission: true })
+      this.setState({ isUserMetaMaskPermission: true,isUserMetaMaskPermissionAsked:false })
     }
   }
   checkNetworkId() {
@@ -184,7 +190,7 @@ class Layout extends Component {
   renderAuthenitcatedRoute() {
     const { authenticated, socialLogin } = this.state;
     return (
-      <Base logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
+      <Base metamaskPermission = {this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
         <Switch>
           <Route path='/market'
             render={() =>
