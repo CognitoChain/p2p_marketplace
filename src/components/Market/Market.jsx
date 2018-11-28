@@ -5,6 +5,7 @@ import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import LoanRequests from "./LoanRequests/LoanRequests";
 import FundedLoans from "./FundedLoans/FundedLoans";
 import './Market.css';
+import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 class Market extends Component {
     constructor(props) {
         super(props);
@@ -36,7 +37,7 @@ class Market extends Component {
     }
     render() {
         const highlightRow = this.parseQueryParams();
-
+        const { wrongMetamaskNetwork } = this.props;
         return (
             <div className="content-with-market-bg">
                 <div className="market-bg-image">
@@ -76,6 +77,7 @@ class Market extends Component {
                         </div>
                     </div>
                 </div>
+
                 <div className="page-title">
                     <Row>
                         <Col sm={6}>
@@ -87,53 +89,66 @@ class Market extends Component {
                         </Col>
                     </Row>
                 </div>
-                {/* <!-- widgets --> */}
-                <Row className="open-request-table">
+                {!wrongMetamaskNetwork &&
+                    <Row className="open-request-table">
 
-                    <Col md={12} className="mb-30">
-                        <Card className="card-statistics h-100 p-3">
-                            <CardBody>
-                                <div className="d-block d-md-flex justify-content-between" style={{ position: "relative" }}>
-                                    <div className="d-block w-100">
-                                        <CardTitle>Open Requests</CardTitle>
+                        <Col md={12} className="mb-30">
+                            <Card className="card-statistics h-100 p-3">
+                                <CardBody>
+                                    <div className="d-block d-md-flex justify-content-between" style={{ position: "relative" }}>
+                                        <div className="d-block w-100">
+                                            <CardTitle>Open Requests</CardTitle>
+                                        </div>
                                     </div>
-                                </div>
-                                <DharmaConsumer>
-                                    {(dharmaProps) => (
-                                        <LoanRequests
-                                            authenticated={this.props.authenticated}
-                                            token={this.props.token}
-                                            dharma={dharmaProps.dharma}
-                                            redirect={this.redirect}
-                                            highlightRow={highlightRow}
-                                            currentMetamaskAccount={this.props.currentMetamaskAccount}
-                                            isTokenLoading={ dharmaProps.isTokenLoading }
-                                            reloadDetails={this.props.reloadDetails}
-                                        />
-                                    )}
-                                </DharmaConsumer>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Row className="recent-funded-loans-table">
-                    <Col md={12} className="mb-30">
-                        <Card className="card-statistics h-100 p-3">
-                            <CardBody>
-                                <CardTitle>Recent Funded Loans</CardTitle>
-                                <DharmaConsumer>
-                                    {(dharmaProps) => {
-                                        return <FundedLoans
-                                            dharma={dharmaProps.dharma}
-                                            redirect={this.redirect}
-                                        />
-                                    }}
-                                </DharmaConsumer>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
+                                    <DharmaConsumer>
+                                        {(dharmaProps) => (
+                                            <LoanRequests
+                                                authenticated={this.props.authenticated}
+                                                token={this.props.token}
+                                                dharma={dharmaProps.dharma}
+                                                redirect={this.redirect}
+                                                highlightRow={highlightRow}
+                                                currentMetamaskAccount={this.props.currentMetamaskAccount}
+                                                isTokenLoading={dharmaProps.isTokenLoading}
+                                                reloadDetails={this.props.reloadDetails}
+                                            />
+                                        )}
+                                    </DharmaConsumer>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                }
+                {!wrongMetamaskNetwork &&
+                    <Row className="recent-funded-loans-table">
+                        <Col md={12} className="mb-30">
+                            <Card className="card-statistics h-100 p-3">
+                                <CardBody>
+                                    <CardTitle>Recent Funded Loans</CardTitle>
+                                    <DharmaConsumer>
+                                        {(dharmaProps) => {
+                                            return <FundedLoans
+                                                dharma={dharmaProps.dharma}
+                                                redirect={this.redirect}
+                                            />
+                                        }}
+                                    </DharmaConsumer>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                }
+                {wrongMetamaskNetwork &&
+                    <div>
+                        <Row className="mb-30">
+                            <Col md={3}></Col>
+                            <Col md={6}>
+                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Connection Error" />
+                            </Col>
+                            <Col md={3}></Col>
+                        </Row>
+                    </div>
+                }
             </div>
 
         );
