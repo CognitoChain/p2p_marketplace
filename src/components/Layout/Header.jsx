@@ -52,8 +52,8 @@ class Header extends Component {
     }
     render() {
 
-        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, isUserMetaMaskPermission, authenticated, isUserMetaMaskPermissionAsked,iscurrentMetamaskAccountLoading } = this.props;
-       console.log(isUserMetaMaskPermission)
+        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated,isMetaMaskAuthRised } = this.props;
+     
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -80,18 +80,18 @@ class Header extends Component {
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false && (!isUserMetaMaskPermission || isUserMetaMaskPermissionAsked) && (
+                        authenticated === true && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
                             // <CustomAlertMsg
                             //     bsStyle='danger'
                             //     extraClass="d-inline-block header-notice mb-0"
                             //     title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
                             // />
-                            <button className="btn orange cognito d-inline-block x-small" onClick={()=>{this.connectMetaMask()}}>Connect your MetaMask</button>
+                            <button className="btn orange cognito d-inline-block small" onClick={()=>{this.connectMetaMask()}}>Connect your MetaMask</button>
 
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false && isUserMetaMaskPermission && !isUserMetaMaskPermissionAsked && currentMetamaskAccount != null && (
+                        authenticated === true && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
                             <label className="headerEthAddress">{currentMetamaskAccount}</label>
                         )
                     }
