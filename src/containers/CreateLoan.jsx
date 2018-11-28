@@ -28,6 +28,7 @@ class CreateLoanContainer extends Component {
                     return (
                         <CreateLoan
                             dharma={dharmaProps.dharma}
+                            refreshTokens={dharmaProps.refreshTokens}
                             tokens={dharmaProps.tokens}
                             redirect={this.redirect}
                             onCompletion={this.onCompletion}
