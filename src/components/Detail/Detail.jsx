@@ -79,7 +79,8 @@ class Detail extends Component {
       principalSymbol,
       isCollateralSeized,
       isCollateralReturned,
-      isCollateralSeizable
+      isCollateralSeizable,
+      collateralReturnable
     } = loanDetails;
     let installmentPrincipal = principalAmount / termLengthAmount;
     installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
@@ -256,8 +257,7 @@ class Detail extends Component {
     this.setState({ priceFeeds })
   }
   async getDetailData(isRefreshOnly = false) {
-    const { dharma, id, currentMetamaskAccount } = this.props;
-    let collateralReturnable, isCollateralSeizable, isCollateralSeized = false;
+    const { id, currentMetamaskAccount } = this.props;
     let userTimezone = moment.tz.guess();
     const api = new Api();
     if (!isRefreshOnly) {
@@ -290,29 +290,7 @@ class Detail extends Component {
           loanRequestData.totalRepaymentAmountDisplay = niceNumberDisplay(loanRequestData.totalRepaymentAmount)
           loanRequestData.totalRepaidAmountDisplay = niceNumberDisplay(loanRequestData.totalRepaidAmount)
           loanRequestData.outstandingAmountDisplay = niceNumberDisplay(loanRequestData.outstandingAmount)
-
-          if (loanRequestData.outstandingAmount == 0) {
-            collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
-              id
-            );
-          }
-          loanRequestData.collateralReturnable = collateralReturnable;
-          isCollateralSeizable = await dharma.adapters.collateralizedSimpleInterestLoan.canSeizeCollateral(
-            id
-          );;
-          loanRequestData.isCollateralSeizable = isCollateralSeizable;
-          if (loanRequestData.outstandingAmount > 0) {
-            isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
-              id
-            );
-          }
-          loanRequestData.isCollateralSeized = isCollateralSeized;
-
-          let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
-            id
-          );
-          loanRequestData.isCollateralReturned = isCollateralReturned;
-          console.log(loanRequestData)
+          loanRequestData.collateralReturnable = loanRequestData.isCollateralReturnable;
           this.setState({
             userTimezone,
             isLoading: false,
