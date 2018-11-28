@@ -1,7 +1,6 @@
 // External libraries
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-import { Web3 } from "@dharmaprotocol/dharma.js";
 // Components
 import Basepages from './Basepages';
 import Base from './Base';
@@ -64,6 +63,7 @@ class Layout extends Component {
       isModalMessageOpen: false,
       isWeb3Enabled,
       isUserMetaMaskPermission: false,
+      isMetaMaskAuthRised :false,
       isUserMetaMaskPermissionAsked:false,
       token,
       userEmail,
@@ -77,14 +77,29 @@ class Layout extends Component {
     this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
     this.updateMetaMaskLoading = this.updateMetaMaskLoading.bind(this);
     this.metamaskPermission = this.metamaskPermission.bind(this);
+    this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
+    this.setLoginData = this.setLoginData.bind(this);
   }
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
     this.updateMetamaskAccount('', false);
+    this.setLoginData();
     this.props.history.push("/login");
   }
-  async componentDidMount() {
+  setLoginData(){
+    const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem('userEmail');
+    const socialLogin = localStorage.getItem('socialLogin');
+    const authenticated = ((token && token !== null) ? true : false);
+    this.setState({
+      token,
+      userEmail,
+      socialLogin,
+      authenticated
+    })
+  }
+  componentDidMount() {
     this.checkNetworkId();
   }
   componentDidUpdate() {
@@ -104,16 +119,8 @@ class Layout extends Component {
     this.updateMetamaskAccountData(newMetamaskAccount, reloadDetails)
   }
   async updateMetamaskAccountData(newMetamaskAccount, reloadDetails) {
-    let { token, currentMetamaskAccount, isUserMetaMaskPermission } = this.state;
+    let { token, isUserMetaMaskPermission } = this.state;
     console.log("updateMetamaskAccountData")
-    // if (newMetamaskAccount == '') {
-    //   this.setState({ isUserMetaMaskPermission: false })
-      
-    // }
-    // else {
-    //   isUserMetaMaskPermission = true;
-    // }
-    console.log(newMetamaskAccount)
     if (newMetamaskAccount) {
       isUserMetaMaskPermission = true;
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
@@ -128,27 +135,43 @@ class Layout extends Component {
       isUserMetaMaskPermission = false;
       localStorage.removeItem('currentMetamaskAccount');
     }
+    this.setState({ currentMetamaskAccount: newMetamaskAccount, reloadDetails, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
+      this.updateMetaMaskAuthorized();
+     });
     
-    this.setState({ currentMetamaskAccount: newMetamaskAccount, reloadDetails, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => { });
-    
+  }
+  updateMetaMaskAuthorized(){
+    const { isUserMetaMaskPermission,isUserMetaMaskPermissionAsked } = this.state;
+    const isMetaMaskAuthRised = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked==false);
+    this.setState({
+      isMetaMaskAuthRised
+    })
   }
   async metamaskPermission() {
     const { authenticated } = this.state;
     if (!authenticated) {
       return;
     }
-    this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:true })
+    this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:true }, () => {
+      this.updateMetaMaskAuthorized();
+     })
     if (window.ethereum) {
       try {
         await window.ethereum.enable();
-        this.setState({ isUserMetaMaskPermission: true ,isUserMetaMaskPermissionAsked:false})
+        this.setState({ isUserMetaMaskPermission: true ,isUserMetaMaskPermissionAsked:false}, () => {
+          this.updateMetaMaskAuthorized();
+         })
       } catch (error) {
-        this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:false })
+        this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:false }, () => {
+          this.updateMetaMaskAuthorized();
+         })
         console.log("User denied account access...");
       }
     }
     else if (window.web3) {
-      this.setState({ isUserMetaMaskPermission: true,isUserMetaMaskPermissionAsked:false })
+      this.setState({ isUserMetaMaskPermission: true,isUserMetaMaskPermissionAsked:false }, () => {
+        this.updateMetaMaskAuthorized();
+       })
     }
   }
   checkNetworkId() {
@@ -174,13 +197,12 @@ class Layout extends Component {
     })
   }
   renderAuthenticationRoute() {
-    const { authenticated, socialLogin } = this.state;
     return (
       <Basepages {...this.state}>
-        <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} />
+        <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} setLoginData={this.setLoginData} />
         <PublicRoute {...this.state} path="/email-verify/" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-verify/:token" exact={true} component={Login} urlpath={currentLocation} />
-        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} />
+        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} setLoginData={this.setLoginData}/>
         <PublicRoute {...this.state} path="/forgot" component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/password-reset/:token" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-unsubscribe/:token" exact={true} component={Login} urlpath={currentLocation} />
@@ -226,7 +248,6 @@ class Layout extends Component {
     )
   }
   renderHomeRoute() {
-    const { authenticated, socialLogin } = this.state;
     return (
       <Basepages {...this.state}>
         <Route exact={true} path='/'
@@ -240,9 +261,7 @@ class Layout extends Component {
   render() {
     const urlString = this.props.location.pathname.substr(1);
     const urlStringArr = urlString.split("/");
-
     currentLocation = urlStringArr[0];
-    const { authenticated, socialLogin } = this.state;
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
     return (
       <div>
