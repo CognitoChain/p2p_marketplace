@@ -103,6 +103,13 @@ class Layout extends Component {
   }
   async updateMetamaskAccountData(newMetamaskAccount, reloadDetails) {
     let { token, currentMetamaskAccount, isUserMetaMaskPermission } = this.state;
+    console.log(newMetamaskAccount)
+    if (newMetamaskAccount == '') {
+          await this.metamaskPermission();
+    }
+    else {
+      isUserMetaMaskPermission = true;
+    }
     if (newMetamaskAccount) {
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
       if (this.state.currentMetamaskAccount != newMetamaskAccount) {
@@ -115,13 +122,9 @@ class Layout extends Component {
     else {
       localStorage.removeItem('currentMetamaskAccount');
     }
-    if (newMetamaskAccount == '') {
-      await this.metamaskPermission();
-    }
-    else {
-      isUserMetaMaskPermission = true;
-    }
+    
     this.setState({ currentMetamaskAccount: newMetamaskAccount, reloadDetails, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => { });
+    
   }
   async metamaskPermission() {
     const { authenticated } = this.state;

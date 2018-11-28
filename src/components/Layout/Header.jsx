@@ -39,7 +39,8 @@ class Header extends Component {
         const { dharma } = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
-        if ((currentMetamaskAccount == null && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) && typeof currentMetamaskAccount != "undefined" && currentMetamaskAccount != null)) {
+        currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
+        if ((currentMetamaskAccount == '' && !_.isUndefined(currentAccount)) || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
             this.props.refreshTokens();
             this.props.updateMetamaskAccount(currentAccount, true);
         }
