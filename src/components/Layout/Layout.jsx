@@ -55,8 +55,8 @@ class Layout extends Component {
     const socialLogin = localStorage.getItem('socialLogin');
     const authenticated = ((token && token !== null) ? true : false);
     let isWeb3Enabled = true;
-    if (!window.web3 || !window.web3.currentProvider.isMetaMask) {
-      isWeb3Enabled: false
+    if (!window.web3) {
+      isWeb3Enabled = false
     }
     this.state = {
       currentMetamaskAccount: currentMetamaskAccount,
@@ -130,7 +130,6 @@ class Layout extends Component {
     }
     this.setState({ isUserMetaMaskPermission: false })
     if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum);
       try {
         await window.ethereum.enable();
         this.setState({ isUserMetaMaskPermission: true })
@@ -140,13 +139,12 @@ class Layout extends Component {
       }
     }
     else if (window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider);
       this.setState({ isUserMetaMaskPermission: true })
     }
   }
   checkNetworkId() {
     const { isWeb3Enabled } = this.state;
-    let networkId = window.web3.version.network;
+    let networkId = isWeb3Enabled ? window.web3.version.network : null;
     let wrongMetamskNetworkMsg = '';
     let wrongMetamaskNetwork = false;
     if (isWeb3Enabled) {

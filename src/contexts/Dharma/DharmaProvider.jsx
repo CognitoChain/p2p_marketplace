@@ -30,9 +30,7 @@ function getWeb3Provider() {
         return false;
     }
 }
-
 const dharma = new Dharma(getWeb3Provider());
-
 /**
  * Allows any children of this provider to have access to an instance of Dharma.js that is
  * connected to a blockchain.
@@ -44,7 +42,7 @@ class DharmaProvider extends Component {
         this.state = {
             // The tokens that the user has in their wallet.
             tokens: [],
-            isTokenLoading:true,
+            isTokenLoading: true,
             dharma: null,
             // The tokens available for lending on Dharma Protocol.
             supportedTokens: [],
@@ -54,8 +52,10 @@ class DharmaProvider extends Component {
     }
 
     componentDidMount() {
-        this.getUserTokens();
-        this.getSupportedTokens();
+        if (window.web3){
+            this.getUserTokens();
+            this.getSupportedTokens();
+        }
     }
 
     getSupportedTokens() {
@@ -68,30 +68,27 @@ class DharmaProvider extends Component {
         const { Token } = Dharma.Types;
         let stateObj = {};
         // Assume the tokens are out of date.
-        if(_.isUndefined(flag))
-        {
+        if (_.isUndefined(flag)) {
             stateObj["tokens"] = [];
         }
         stateObj["isTokenLoading"] = true;
         this.setState(stateObj);
         dharma.blockchain.getAccounts().then((accounts) => {
             const owner = accounts[0];
-            if(typeof owner != 'undefined')
-            {
+            if (typeof owner != 'undefined') {
                 Token.all(dharma, owner).then((tokenData) => {
                     this.setState({
                         tokens: tokenData,
-                        isTokenLoading:false
+                        isTokenLoading: false
                     });
-                });    
-            } 
-            else
-            {
+                });
+            }
+            else {
                 this.setState({
                     tokens: [],
-                    isTokenLoading:false
+                    isTokenLoading: false
                 });
-            }           
+            }
         });
     }
 
@@ -99,7 +96,7 @@ class DharmaProvider extends Component {
         const dharmaProps = {
             dharma: dharma,
             tokens: this.state.tokens,
-            isTokenLoading:this.state.isTokenLoading,
+            isTokenLoading: this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
             refreshTokens: this.getUserTokens,
         };
