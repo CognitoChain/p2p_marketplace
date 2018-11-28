@@ -460,7 +460,7 @@ class CreateLoan extends Component {
             buttonLoading
         } = this.state;
 
-        const { wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
+        const { wrongMetamaskNetwork, isMetaMaskAuthRised } = this.props;
 
         let msgDisplay = false;
         if (txHash != '' || hasSufficientAllowance) {
@@ -491,7 +491,7 @@ class CreateLoan extends Component {
                     </Row>
                 </div>
 
-                {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
+                {isMetaMaskAuthRised && wrongMetamaskNetwork == false &&
                     <div>
                         {sortedTokens.length === 0 && <LoadingFull />}
                         {sortedTokens.length > 0 &&
@@ -693,7 +693,7 @@ class CreateLoan extends Component {
                     </div>
                 }
                 
-                {(wrongMetamaskNetwork == true || currentMetamaskAccount == null || currentMetamaskAccount == '') &&
+                {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
                     <div>
                         <Row className="mb-30">
                             <Col md={3}></Col>
