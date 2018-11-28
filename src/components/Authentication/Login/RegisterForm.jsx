@@ -43,7 +43,8 @@ class RegisterForm extends React.Component {
             localStorage.setItem('socialLogin', "yes");
             localStorage.setItem('token', authorization);
             localStorage.setItem('userEmail', response.email);
-            this.props.history.push("/");
+            this.props.setLoginData();
+            this.props.history.push("/market");
           }
           else {
             toast.error("Please try again later..");
@@ -136,7 +137,7 @@ class RegisterForm extends React.Component {
       buttonLoading:false
     })
     if (response.status === "SUCCESS") {
-      this.props.history.push({
+      this.props.historyPush.push({
         pathname: '/login',
         state: { message: "REGISTER_SUCCESS", email }
       });

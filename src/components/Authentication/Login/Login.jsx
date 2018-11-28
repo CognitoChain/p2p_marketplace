@@ -36,22 +36,22 @@ class Login extends React.Component {
     render() {
         let { urlPath } = this.state;
         const { authenticated } = this.props;
-        let formTemplate = <LoginForm updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
+        let formTemplate = <LoginForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
         if (urlPath == "register") {
-            formTemplate = <RegisterForm updateUrlPathProp={this.updateUrlPathProp} />;
+            formTemplate = <RegisterForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} historyPush={this.props.history}/>;
         }
         else if (urlPath == "forgot") {
-            formTemplate = <ForgotForm updateUrlPathProp={this.updateUrlPathProp} />;
+            formTemplate = <ForgotForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} historyPush={this.props.history}/>;
         }
         else if (urlPath == "password-reset") {
-            formTemplate = <ResetForm updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} />;
+            formTemplate = <ResetForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} />;
         }
         else if (urlPath == "email-verify") {
-            formTemplate = <EmailVerifyForm updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;
+            formTemplate = <EmailVerifyForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;
         }
         else if (urlPath == "email-unsubscribe") {
-            formTemplate = <Unsubscribe updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;
+            formTemplate = <Unsubscribe {...this.props} updateUrlPathProp={this.updateUrlPathProp} token={this.props.match.params.token} historyPush={this.props.history} locationState={this.props.location.state} />;
         }
 
         return (
@@ -75,7 +75,7 @@ class Login extends React.Component {
                                 <div className="outer-container">
                                     <div className="inner-container">
                                         <div className="centered-content">
-                                            <div className="row mt-70 how-it-works mb-70">
+                                            <div className="row mt-70 mb-70">
                                                 <div className={authenticated ?"col-md-12":"col-md-8"}>
                                                     <div className="header-image-content text-left">
                                                         <div className="row">

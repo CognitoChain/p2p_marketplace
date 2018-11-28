@@ -56,7 +56,8 @@ class LoginForm extends React.Component {
             localStorage.setItem('socialLogin', "yes");
             localStorage.setItem('token', authorization);
             localStorage.setItem('userEmail', response.email);
-            this.props.historyPush.push("/");
+            this.props.setLoginData();
+            this.props.historyPush.push("/market");
           }
           else {
             toast.error("Please try again later..");
@@ -146,11 +147,13 @@ class LoginForm extends React.Component {
       localStorage.setItem('socialLogin', "no");
       localStorage.setItem('token', authorization);
       localStorage.setItem('userEmail', email);
+      this.props.setLoginData();
       this.props.historyPush.push("/market");
     }
     else {
       const json = await response.json();
       if (json.ERROR == "USER_DISABLED") {
+      
         this.props.historyPush.push({
           pathname: '/email-verify',
           state: { message: "USER_DISABLED", email }
