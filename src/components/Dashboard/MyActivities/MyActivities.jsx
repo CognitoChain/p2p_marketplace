@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay,convertBigNumber } from "../../../utils/Util";
+import { niceNumberDisplay,convertBigNumber,tooltipNumberDisplay } from "../../../utils/Util";
 
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
@@ -377,13 +377,13 @@ class MyActivities extends Component {
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let label_color = "";
           if (row.type == "minus") {
-            label_color = "number-highlight color-orange number-bold";
+            label_color = "number-highlight color-orange number-bold custom-tooltip";
           } else if (row.type == "plus") {
-            label_color = "number-highlight color-green number-bold";
+            label_color = "number-highlight color-green number-bold custom-tooltip";
           }
           return (
             <div>
-              <span className={label_color}>
+              <span className={label_color} tooltip-title={tooltipNumberDisplay(row.amount,row.sybmol)}>
                 {niceNumberDisplay(row.amount)}
               </span>
               <br />

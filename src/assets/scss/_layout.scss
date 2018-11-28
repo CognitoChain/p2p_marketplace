@@ -1227,3 +1227,34 @@ textarea.form-control {
 .note-popover.popover {
   display: none;
 }
+.headerEthAddress{
+  font-size:16px !important;
+  color:#122e44 !important;
+}
+
+.custom-tooltip{
+  display: inline;
+  position: relative;
+}
+.custom-tooltip:hover:after{
+    background: #000;
+    background: rgba(0,0,0,.8);
+    border-radius: 5px;
+    bottom: 26px;
+    color: #fff;
+    content: attr(tooltip-title);
+    left: 20%;
+    padding: .25rem .5rem;
+    position: absolute;
+    z-index: 98;
+}
+.custom-tooltip:hover:before{
+    border: solid;
+    border-color: #333 transparent;
+    border-width: 6px 6px 0 6px;
+    bottom: 20px;
+    content: "";
+    left: 50%;
+    position: absolute;
+    z-index: 99;
+}

@@ -6,7 +6,7 @@ import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
 import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorrowedLoansRequestsEmpty";
-import { amortizationUnitToFrequency, niceNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyBorrowedLoans.css";
 class MyBorrowedLoans extends Component {
     renderShowsTotal(start, to, total) {
@@ -56,7 +56,7 @@ class MyBorrowedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}
                         </div>
                     )
                 },
@@ -78,7 +78,7 @@ class MyBorrowedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-center">
-                            <span className="number-highlight">{niceNumberDisplay(cell,2)}</span> %
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,"%")}>{niceNumberDisplay(cell,2)}</span> %
                         </div>
                     )
                 }
@@ -90,7 +90,7 @@ class MyBorrowedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralSymbol}
                         </div>
                     )
                 }
@@ -102,7 +102,7 @@ class MyBorrowedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}
                         </div>
                     )
                 }

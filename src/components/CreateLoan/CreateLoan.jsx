@@ -14,7 +14,7 @@ import Api from "../../services/api";
 import Error from "../Error/Error";
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay, getTransactionReceipt } from "../../utils/Util";
+import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "../../utils/Util";
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
@@ -588,19 +588,22 @@ class CreateLoan extends Component {
                                                 <div className="p-2 pb-0">
 
                                                     <CardTitle className="card-title-custom">Summary </CardTitle>
-                                                    <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+                                                    <div>
                                                         <ListGroup className="list-unstyled to-do">
                                                             <SummaryItem
                                                                 labelName="Loan Amount"
                                                                 labelValue={principal > 0 ? niceNumberDisplay(principal) + ' ' + principalTokenSymbol : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(principal,principalTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Collateral Amount"
                                                                 labelValue={collateral > 0 ? niceNumberDisplay(collateral) + ' ' + collateralTokenSymbol : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(collateral,collateralTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="LTV"
                                                                 labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio,2) + "%" : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(LTVRatio,"%")}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Loan Term"
@@ -609,6 +612,7 @@ class CreateLoan extends Component {
                                                             <SummaryItem
                                                                 labelName="Interest Rate(Per Loan Term)"
                                                                 labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) + "%" : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(interestRate,"%")}
                                                             />
                                                             {/*<SummaryItem 
                                                             labelName = "Expiration"
@@ -617,10 +621,12 @@ class CreateLoan extends Component {
                                                             <SummaryItem
                                                                 labelName="Interest Amount"
                                                                 labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) + ' ' + principalTokenSymbol : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(interestAmount,principalTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Total Repayment Amount"
                                                                 labelValue={totalReapaymentAmount > 0 ? niceNumberDisplay(totalReapaymentAmount) + ' ' + principalTokenSymbol : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(totalReapaymentAmount,principalTokenSymbol)}
                                                             />
                                                             {/*<SummaryItem 
                                                             labelName = "Relayer Fee"

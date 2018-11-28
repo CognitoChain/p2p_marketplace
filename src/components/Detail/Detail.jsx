@@ -105,12 +105,12 @@ class Detail extends Component {
           if (ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmountDharma) {
             nextRepaymentAmount = expectedRepaidAmountDharma - totalRepaidAmount;
             nextRepaymentDate = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
-            nextRepaymentAmount = repaymentAmount = niceNumberDisplay(nextRepaymentAmount);
+            repaymentAmount = niceNumberDisplay(nextRepaymentAmount);
             j++;
           }
           else if (ts < currentTimestamp && totalRepaidAmount < totalRepaymentAmount) {
             nextRepaymentAmount = expectedRepaidAmountDharma - totalRepaidAmount;
-            nextRepaymentAmount = repaymentAmount = niceNumberDisplay(nextRepaymentAmount);
+            repaymentAmount = niceNumberDisplay(nextRepaymentAmount);
           }
           let paidStatus = '-'
 
@@ -281,7 +281,7 @@ class Detail extends Component {
           } = loanRequestData;
           loanRequestData.principalAmount = convertBigNumber(principalAmount, principalNumDecimals);
           loanRequestData.collateralAmount = convertBigNumber(collateralAmount, collateralNumDecimals);
-          loanRequestData.principal = niceNumberDisplay(loanRequestData.principalAmount);
+          loanRequestData.principal = loanRequestData.principalAmount;
           loanRequestData.collateral = niceNumberDisplay(loanRequestData.collateralAmount)
           loanRequestData.totalRepaymentAmount = convertBigNumber(totalExpectedRepayment, principalNumDecimals);
           loanRequestData.totalRepaidAmount = convertBigNumber(repaidAmount, principalNumDecimals);

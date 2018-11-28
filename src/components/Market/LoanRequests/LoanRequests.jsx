@@ -9,7 +9,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-import { amortizationUnitToFrequency, niceNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./LoanRequests.css";
 class LoanRequests extends Component {
     constructor(props) {
@@ -160,7 +160,7 @@ class LoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 },
@@ -194,7 +194,7 @@ class LoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                         </div>
                     )
                 }
@@ -209,7 +209,7 @@ class LoanRequests extends Component {
                     let repayment_amount = row.principalAmount + interest_amount;
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalTokenSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 }

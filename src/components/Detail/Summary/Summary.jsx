@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Card, CardBody, CardTitle, ListGroup } from "reactstrap";
 import * as moment from "moment-timezone";
 import _ from "lodash";
-import { niceNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import SummaryItem from "../SummaryItem/SummaryItem";
 
 class Summary extends Component {
@@ -18,9 +18,9 @@ class Summary extends Component {
       termLengthUnit,
       principalSymbol,
       interestRatePercent,
-      totalRepaymentAmountDisplay,
       debtorAddress,
-      creditorAddress
+      creditorAddress,
+      totalRepaymentAmount
     } = loanDetails;
     let createdTime = moment(createdDate).format(
       "HH:mm:ss"
@@ -32,9 +32,7 @@ class Summary extends Component {
     let interestRate = parseFloat(interestRatePercent);
     let interestAmount = (principalAmount * parseFloat(interestRate)) / 100;
     let collateralCurrentAmount = 0;
-    let collateralCurrentAmountDisplay = "";
     let LTVRatioValue = '';
-    let LTVRatioValueDisplay = '';
     let principalCurrentAmount = 0;
     let debtorAddressDisplay = debtorAddress.substr(0,4)+'....'+debtorAddress.substr(-4);
     let creditorAddressDisplay = creditorAddress.substr(0,4)+'....'+creditorAddress.substr(-4);
@@ -49,12 +47,10 @@ class Summary extends Component {
       if(!_.isUndefined(priceFeeds[priceCollateralSymbol])){
         let collateralTokenCurrentPrice = priceFeeds[priceCollateralSymbol].USD;
         collateralCurrentAmount = parseFloat(collateralAmount) * collateralTokenCurrentPrice;
-        collateralCurrentAmountDisplay = niceNumberDisplay(collateralCurrentAmount);  
       }
       
       if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
         LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
-        LTVRatioValueDisplay = niceNumberDisplay(LTVRatioValue);
       }
     }
     return (
@@ -76,16 +72,19 @@ class Summary extends Component {
                 labelName="Collateral Amount"
                 labelValue={collateral > 0 ? niceNumberDisplay(collateral) : ' - '}
                 labelValue2={collateral > 0 ? collateralSymbol : ''}
+                tooltipValue={tooltipNumberDisplay(collateral,collateralSymbol)}
               />
               <SummaryItem
                 labelName="Collateral Value"
-                labelValue={collateralCurrentAmountDisplay > 0 ? collateralCurrentAmountDisplay : ' - '}
-                labelValue2={collateralCurrentAmountDisplay > 0 ? '$' : ''}
+                labelValue={collateralCurrentAmount > 0 ? niceNumberDisplay(collateralCurrentAmount) : ' - '}
+                labelValue2={collateralCurrentAmount > 0 ? '$' : ''}
+                tooltipValue={tooltipNumberDisplay(collateralCurrentAmount,"$","prepend")}
               />
               <SummaryItem
                 labelName="LTV"
-                labelValue={LTVRatioValueDisplay > 0 ? LTVRatioValueDisplay : ' - '}
-                labelValue2={LTVRatioValueDisplay > 0 ? '%' : ''}
+                labelValue={LTVRatioValue > 0 ? niceNumberDisplay(LTVRatioValue) : ' - '}
+                labelValue2={LTVRatioValue > 0 ? '%' : ''}
+                tooltipValue={tooltipNumberDisplay(LTVRatioValue,"%")}
               />
               <SummaryItem
                 labelName="Loan Term"
@@ -96,16 +95,19 @@ class Summary extends Component {
                 labelName="Interest Rate(Per Loan Term)"
                 labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) : ' - '}
                 labelValue2={interestRate > 0 ? '%' : ''}
+                tooltipValue={tooltipNumberDisplay(interestRate)}
               />
               <SummaryItem
                 labelName="Interest Amount"
                 labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) : ' - '}
                 labelValue2={interestAmount > 0 ? principalSymbol : ' - '}
+                tooltipValue={tooltipNumberDisplay(interestAmount,principalSymbol)}
               />
               <SummaryItem
                 labelName="Total Repayment Amount"
-                labelValue={totalRepaymentAmountDisplay > 0 ? totalRepaymentAmountDisplay : ' - '}
-                labelValue2={totalRepaymentAmountDisplay > 0 ? principalSymbol : ' - '}
+                labelValue={totalRepaymentAmount > 0 ? niceNumberDisplay(totalRepaymentAmount) : ' - '}
+                labelValue2={totalRepaymentAmount > 0 ? principalSymbol : ' - '}
+                tooltipValue={tooltipNumberDisplay(totalRepaymentAmount,principalSymbol)}
               />
               <SummaryItem
                 labelName="Debtor Address"

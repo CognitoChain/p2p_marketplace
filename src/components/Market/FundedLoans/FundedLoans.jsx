@@ -7,7 +7,7 @@ import _ from 'lodash';
 import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
-import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 import "./FundedLoans.css";
 const columns = [
     {
@@ -31,7 +31,7 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-right">
-                    <span className="number-highlight">{niceNumberDisplay(cell)}</span> <br />{row.principalTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalTokenSymbol)}>{niceNumberDisplay(cell)}</span> <br />{row.principalTokenSymbol}
                 </div>
             )
         }
@@ -65,7 +65,7 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-right">
-                    <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell)}>{niceNumberDisplay(cell,row.collateralTokenSymbol)}</span><br />{row.collateralTokenSymbol}
                 </div>
             )
         }
@@ -80,7 +80,7 @@ const columns = [
             let repayment_amount = row.principalAmount + interest_amount;
             return (
                 <div className="text-right">
-                    <span className="number-highlight">{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalTokenSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
                 </div>
             )
         }

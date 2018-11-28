@@ -4,7 +4,7 @@ import _ from "lodash";
 import { Doughnut } from 'react-chartjs-2';
 import Loading from "../../Loading/Loading";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyPortfolio.css";
 class MyPortfolio extends Component {
     constructor(props) {
@@ -123,13 +123,13 @@ class MyPortfolio extends Component {
                                     <div className="assets-container">
                                         <label>Assets</label>
                                         <Progress value={25} className="mb-10 assets-color" color="success" />
-                                        <label className="statistics-label">${niceNumberDisplay(totalAssetAmount)}</label>
+                                        <label className="statistics-label custom-tooltip" tooltip-title={tooltipNumberDisplay(totalAssetAmount,"$","prepend")}>${niceNumberDisplay(totalAssetAmount)}</label>
                                     </div>
 
                                     <div className="liability-container">
                                         <label>Liabilities</label>
                                         <Progress value={50} className="mb-10 liabilities-color" color="warning" />
-                                        <label className="statistics-label">${niceNumberDisplay(totalLiablitiesAmount)}</label>
+                                        <label className="statistics-label custom-tooltip" tooltip-title={tooltipNumberDisplay(totalLiablitiesAmount,"$","prepend")}>${niceNumberDisplay(totalLiablitiesAmount)}</label>
                                     </div>
 
                                     <div className="assets-vs-liabilities-container">

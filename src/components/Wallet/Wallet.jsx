@@ -18,7 +18,7 @@ import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import "./Wallet.css";
-import { niceNumberDisplay,getTransactionReceipt } from "../../utils/Util";
+import { niceNumberDisplay,getTransactionReceipt,tooltipNumberDisplay } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -157,7 +157,7 @@ class Wallet extends Component {
                           </div>
                           <div className="float-right text-right">
                             <p className="card-text text-dark">
-                              <span className="wallet-token-balance">
+                              <span className="wallet-token-balance custom-tooltip" tooltip-title={tooltipNumberDisplay(token.balance,token.symbol)}>
                                 {niceNumberDisplay(token.balance)}
                               </span>{" "}
                               {token.symbol}

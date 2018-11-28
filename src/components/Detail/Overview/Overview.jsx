@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardTitle, Row, Col } from "reactstrap";
-
+import { niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 class Overview extends Component {
   render() {
     const {
@@ -26,7 +26,8 @@ class Overview extends Component {
       debtorAddress,
       creditorAddress,
       isCollateralSeized,
-      isCollateralReturned
+      isCollateralReturned,
+      outstandingAmount
     } = loanDetails;
 
     return (
@@ -38,8 +39,8 @@ class Overview extends Component {
               <div className="pull-left">
                 <span>Loan Amount</span>
                 <br />
-                <span className="loan-detail-numbers">
-                  {principal > 0 ? principal : " - "}
+                <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(principal,principalSymbol)}>
+                  {principal > 0 ? niceNumberDisplay(principal) : " - "}
                 </span>{" "}
                 {principal > 0 && principalSymbol}
               </div>
@@ -50,7 +51,7 @@ class Overview extends Component {
                 <div className="">
                   <span>Outstanding Amount</span>
                   <br />
-                  <span className="loan-detail-numbers">
+                  <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(outstandingAmount,principalSymbol)}>
                     {outstandingAmountDisplay}
                   </span>{" "}
                   {principalSymbol}
@@ -66,9 +67,9 @@ class Overview extends Component {
                   <div className="pull-left">
                     <span>Next Repayment</span>
                     <br />
-                    <span className="loan-detail-numbers">
+                    <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(nextRepaymentAmount,principalSymbol)}>
                       {nextRepaymentAmount > 0
-                        ? nextRepaymentAmount
+                        ? niceNumberDisplay(nextRepaymentAmount)
                         : " - x"}
                     </span>{" "}
                     {outstandingAmountDisplay > 0 ? principalSymbol : ""}

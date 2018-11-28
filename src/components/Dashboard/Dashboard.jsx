@@ -348,7 +348,7 @@ class Dashboard extends Component {
                                                 </div>
                                             </div>
                                             <TabContent activeTab={this.state.activeTab}>
-                                                <TabPane tabId="1" title="Borrowed Loans">
+                                                <TabPane tabId="1">
 
                                                     <MyBorrowedLoans
                                                         token={token}
@@ -362,7 +362,7 @@ class Dashboard extends Component {
 
                                                 </TabPane>
 
-                                                <TabPane tabId="2" title="Funded Loans">
+                                                <TabPane tabId="2">
 
                                                     <MyFundedLoans
                                                         token={token}
@@ -375,7 +375,7 @@ class Dashboard extends Component {
 
                                                 </TabPane>
 
-                                                <TabPane tabId="3" title="My loan requests">
+                                                <TabPane tabId="3">
 
                                                     <MyLoanRequests
                                                         token={token}

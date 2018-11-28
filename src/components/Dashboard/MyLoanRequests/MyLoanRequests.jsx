@@ -5,7 +5,7 @@ import paginationFactory from 'react-bootstrap-table2-paginator';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
 import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
-import { amortizationUnitToFrequency,niceNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyLoanRequests.css";
 class MyLoanRequests extends Component {
     renderShowsTotal(start, to, total) {
@@ -47,7 +47,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell)}>{niceNumberDisplay(cell,row.principalTokenSymbol)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 },
@@ -69,7 +69,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div>
-                            <span className="number-highlight">{niceNumberDisplay(cell,2)}</span> %
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,"%")}>{niceNumberDisplay(cell,2)}</span> %
                         </div>
                     )
                 }
@@ -81,7 +81,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                         </div>
                     )
                 }
@@ -101,7 +101,7 @@ class MyLoanRequests extends Component {
 
                     return (
                         <div className="text-right">
-                            <span className="number-highlight">{niceNumberDisplay(totalRepaymentAmount)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaymentAmount,row.principalTokenSymbol)}>{niceNumberDisplay(totalRepaymentAmount)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 }
