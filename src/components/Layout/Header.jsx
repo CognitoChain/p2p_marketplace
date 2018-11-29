@@ -21,7 +21,7 @@ class Header extends Component {
     };
     async componentWillMount() {
         const { dharma } = this.props;
-    
+
         let currentAccount = await dharma.blockchain.getCurrentAccount();
 
         if (_.isUndefined(currentAccount)) {
@@ -36,24 +36,24 @@ class Header extends Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
-    async connectMetaMask(){
+    async connectMetaMask() {
         await this.props.metamaskPermission();
     }
     async checkAccount() {
-        const { dharma} = this.props;
+        const { dharma } = this.props;
         let currentAccount = await dharma.blockchain.getCurrentAccount();
         let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
         currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
         currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
-        if ((currentMetamaskAccount == '' && currentAccount!='') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
+        if ((currentMetamaskAccount == '' && currentAccount != '') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
             this.props.refreshTokens();
             this.props.updateMetamaskAccount(currentAccount, true);
         }
     }
     render() {
 
-        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated,isMetaMaskAuthRised,currentLocation } = this.props;
-     
+        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated, isMetaMaskAuthRised, currentLocation } = this.props;
+
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -78,7 +78,7 @@ class Header extends Component {
                             //     extraClass="d-inline-block header-notice mb-0"
                             //     title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
                             // />
-                            <button className="btn orange cognito d-inline-block small" onClick={()=>{this.connectMetaMask()}}>Connect your MetaMask</button>
+                            <button className="btn orange cognito d-inline-block small" onClick={() => { this.connectMetaMask() }}>Connect your MetaMask</button>
 
                         )
                     }
@@ -89,7 +89,7 @@ class Header extends Component {
                     }
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
-                        {console.log(authenticated)}
+                            {console.log(authenticated)}
                             {
                                 authenticated === true && (
                                     <div>
@@ -117,7 +117,7 @@ class Header extends Component {
                                 )
                             }
                             {
-                                authenticated === false && currentLocation!="login" && currentLocation!='' (
+                                authenticated === false && currentLocation != "login" && currentLocation != "" && (
                                     <div className="header-links">
                                         <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                     </div>
