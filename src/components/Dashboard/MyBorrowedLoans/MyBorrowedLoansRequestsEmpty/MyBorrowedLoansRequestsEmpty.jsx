@@ -12,7 +12,7 @@ import "./MyBorrowedLoansRequestsEmpty.css";
 class MyBorrowedLoansRequestsEmpty extends React.Component {
     render() {
         return (
-            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={['There are no loan requests yet. Add one from the ', <Link to="/create" className="btn btn-sm btn-link" style={{padding:0}}>Create Loan Request</Link>,' page.']} />
+            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={['There are no loan requests filled yet. Review your loans under My Loan Requests tab.']} />
         );
     }
 }
