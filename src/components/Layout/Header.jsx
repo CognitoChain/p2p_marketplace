@@ -52,7 +52,7 @@ class Header extends Component {
     }
     render() {
 
-        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated,isMetaMaskAuthRised } = this.props;
+        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated,isMetaMaskAuthRised,currentLocation } = this.props;
      
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -117,7 +117,7 @@ class Header extends Component {
                                 )
                             }
                             {
-                                authenticated === false && (
+                                authenticated === false && currentLocation!="login" && currentLocation!='' (
                                     <div className="header-links">
                                         <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                     </div>
