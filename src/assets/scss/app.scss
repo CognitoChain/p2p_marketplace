@@ -153,6 +153,10 @@ body{
   bottom: 0;
   padding: 1rem;
 }
+.footer-full-width{
+  left:0;
+  right:0;
+}
 .main-content-container{
   padding-bottom:60px
 }
@@ -413,4 +417,18 @@ body{
 }
 .continue-guest-bnt-container{
   border-top :1px solid #dee2e6;
+}
+.max-width-14 {
+  max-width: 7rem;
+}
+.sidebar-bottom-section a{
+  color:rgba(255, 255, 255, 0.7)
+}
+@media (min-width: 992px) {
+  .min-height-85vh--lg {
+    min-height: 85vh;
+  }
+  .h-100-lg{
+    height: 100%;
+  }
 }

@@ -23,10 +23,11 @@
 }
 .login-bg-image{
 	position: relative !important;
-	left: 0;
+	display: inline-grid;
+	/* left: 0;
 	right: 0;
 	top: 0;
-	height: 630px !important;
+	height: 630px !important; */
 }
 .login-bg-image .image{
 	position: absolute;
@@ -45,7 +46,7 @@
 }
 .login-bg-content{
 	position: relative;
-	padding: 2rem 0rem;
+	/* padding: 2rem 0rem; */
 	text-align: center;
 	color:#fff!important;
 }
@@ -54,9 +55,17 @@
 	font-weight: 600;
 	font-size: 24px;
 }
-.login-bg-content .how-it-works h5,.login-bg-content .how-it-works p,.login-bg-content .how-it-works h6{
-	color: #dee2e6!important;
+.login-bg-content .how-it-works h5{
+	background:#fff;
+	color:#f19b1e;
 	font-size: 1.1em;
+	padding:0.7rem;
+}
+.login-bg-content .how-it-works p,.login-bg-content .how-it-works h6{
+	background: #f19b1e;
+	color:#fff;
+	font-size: 1.1em;
+	padding:0.7rem;
 }
 .login-bg-content .how-it-works h6{
 	color:#fff!important;
@@ -66,7 +75,7 @@
 	font-size: 1.8em!important;
 }
 .login-form{
-	background: #0E0E0E !important;
+	background:rgba(8, 22, 53, 0.77) !important;
 	height: auto !important;
 }
 .login-label,.header-image-content h4,.header-image-content p,.color-white{
@@ -77,27 +86,14 @@
 	font-size: 1.65rem !important;
 }
 
-.login-form label{
+.login-form label,.login-form p.remember-checkbox{
 	display: inherit !important;
+	color: #fff;
 }
 .header-image-content h1{
 	color: #3298DE!important;	
 	font-weight: 650;
 	font-size: 2.8rem;
-}
-.outer-container {
-	position : absolute;
-	display: table;
-	width: 100%;
-	height: 100%;
-}
-.inner-container {
-	display: table-cell;
-	vertical-align: middle;
-}
-.centered-content {
-	display: inline-block;
-	padding : 20px;
 }
 .header-image-p{
 	font-size: 1.2rem !important;
@@ -107,18 +103,19 @@
 	background: white !important;
 }
 .loanbase-step-container{
-	border: 1px solid #bcbcbc !important;
-	border-radius: 5px !important;
-	-webkit-box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important;
-	-moz-box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important;
-	box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important;
-	margin-right: 10px !important;
+	    /* border: 1px solid #bcbcbc !important; */
+		border-radius: 5px !important;
+		/* -webkit-box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important; */
+		/* box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important; */
+		margin-right: 10px !important;
+		text-align: left;
+		overflow: hidden;
 }
 .loanbase-step-container h5,.loanbase-step-container p,.loanbase-step-container h6{
 	margin: 0 !important;
 }
-.loanbase-container h6{
-	color:#F09335 !important;
+.loanbase-container h6,.loanbase-container h5,.loanbase-container h4,.loanbase-container h3,.loanbase-container h2,.loanbase-container h1{
+	color:#081635 !important;
 }
 .color-circle{
 	border-radius: 50%;
@@ -128,18 +125,16 @@
 	display: inline-block !important;
 }
 .loanbase-step-container p{
-	text-align: justify !important;
-	padding-top: 15px !important;
+	min-height: 60px;
 }
 .how-it-works-container{
-	color: #163955 !important;
-	background: #163955 !important;	
+	background: #081635 !important;
 }
 .powered-by-container{
 	background: white !important;
 }
 .loanbase-logo-container{
-	background: #E0E0E0 !important;
+	background: #f6f7f8 !important;
 }
 .login-bg-content .custom-alert-msg.alert-success h6{
 	color: black !important;
@@ -147,6 +142,27 @@
 
 .login-bg-content .custom-alert-msg.alert-danger h6{
 	color: red !important;
+}
+.loan-base-title{
+	position: relative;
+}
+.loan-base-border-left{
+	border-left:2px solid #f19b1e;
+	padding-left:0.5rem;
+}
+.loan-base-title:after{
+	display: block;
+    content: "";
+    position: absolute;
+    height: 3px;
+    background: #f19b1e;
+    width: 5%;
+    /* top: 3px; */
+    bottom: -10px;
+    margin: 0 auto;
+    left: 0;
+	right: 0;
+	border-radius: 5em;
 }
 @media screen and (min-width: 320px) and (max-width: 480px){
     .loanbase-container .row-eq-height,.how-it-works .step-container,.powered-by-container img{

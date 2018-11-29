@@ -61,14 +61,6 @@ class Header extends Component {
                     <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
                     <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
                 </div>
-                {/* <!-- Top bar left --> */}
-                {/*<ul className="nav navbar-nav mr-auto">
-                         <li className="nav-item">
-                            <a className="button-toggle-nav inline-block ml-20 pull-left"  onClick={this.togglebutton} href="javascript:void(0);"  ><i className="zmdi zmdi-menu ti-align-right"></i></a>
-                        </li>
-                    </ul>*/}
-
-                {/* <!-- top bar right --> */}
                 <div className="ml-auto header-right-block">
                     {
                         wrongMetamaskNetwork === true && (
@@ -97,6 +89,7 @@ class Header extends Component {
                     }
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
+                        {console.log(authenticated)}
                             {
                                 authenticated === true && (
                                     <div>

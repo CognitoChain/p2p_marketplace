@@ -198,11 +198,11 @@ class Layout extends Component {
   }
   renderAuthenticationRoute() {
     return (
-      <Basepages {...this.state}>
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} setLoginData={this.setLoginData} />
         <PublicRoute {...this.state} path="/email-verify/" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-verify/:token" exact={true} component={Login} urlpath={currentLocation} />
-        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} setLoginData={this.setLoginData}/>
+        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} setLoginData={this.setLoginData} />
         <PublicRoute {...this.state} path="/forgot" component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/password-reset/:token" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-unsubscribe/:token" exact={true} component={Login} urlpath={currentLocation} />
@@ -230,16 +230,6 @@ class Layout extends Component {
           <PrivateRoute {...this.state} path="/investments" component={InvestmentsContainer} />
           <PrivateRoute {...this.state} path="/success" component={Success} />
           <PrivateRoute {...this.state} path="/fund/:id" component={FundContainer} />
-          <Route exact={true} path='/privacy'
-            render={() =>
-              <Privacy {...this.props} {...this.state} />
-            }
-          />
-          <Route exact={true} path='/terms'
-            render={() =>
-              <TermsConditions {...this.props} {...this.state} />
-            }
-          />
           {
             <PrivateRoute authenticated={authenticated && socialLogin == "no"} path="/change-password" component={ChangePassword} />
           }
@@ -249,10 +239,20 @@ class Layout extends Component {
   }
   renderHomeRoute() {
     return (
-      <Basepages {...this.state}>
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <Route exact={true} path='/'
           render={() =>
             <Login {...this.props} {...this.state} urlpath={currentLocation} />
+          }
+        />
+        <Route exact={true} path='/privacy'
+          render={() =>
+            <Privacy {...this.props} {...this.state} />
+          }
+        />
+        <Route exact={true} path='/terms'
+          render={() =>
+            <TermsConditions {...this.props} {...this.state} />
           }
         />
       </Basepages>
@@ -263,11 +263,12 @@ class Layout extends Component {
     const urlStringArr = urlString.split("/");
     currentLocation = urlStringArr[0];
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
+    let homeRoutes = ["privacy", "terms"];
     return (
       <div>
         {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}
-        {currentLocation == '' && this.renderHomeRoute()}
-        {path.indexOf(currentLocation) === -1 && currentLocation != '' && this.renderAuthenitcatedRoute()}
+        {(currentLocation == '' || homeRoutes.indexOf(currentLocation) > -1) && this.renderHomeRoute()}
+        {path.indexOf(currentLocation) === -1 && currentLocation != '' && homeRoutes.indexOf(currentLocation) == -1 && this.renderAuthenitcatedRoute()}
 
       </div>
     )

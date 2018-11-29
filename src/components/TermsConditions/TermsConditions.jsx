@@ -5,7 +5,7 @@ class TermsConditions extends Component {
   
   render() {
     return (
-      <div>
+      <div className="p-5">
         <div className="page-title">
           <Row className="mt-4 mb-4">
               <Col>
