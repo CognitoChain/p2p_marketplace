@@ -27,30 +27,36 @@ export const amortizationUnitToFrequency = (unit) => {
 };
 
 export const niceNumberDisplay = (value, decimalPoint) => {
-  let niceNumber = parseFloat(value);
-  let decimal = (!_.isUndefined(decimalPoint)) ? decimalPoint : 3;
-  let numberAsString = value.toString();
-  if(numberAsString.indexOf('.') === -1) {
-    niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
-  }
-  else
+  let niceNumber = 0;
+  if(!_.isUndefined(value))
   {
-    niceNumber = (niceNumber > 0) ? niceNumber.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;  
-  }
+    niceNumber = parseFloat(value);
+    let decimal = (!_.isUndefined(decimalPoint)) ? decimalPoint : 3;
+    let numberAsString = value.toString();
+    if(numberAsString.indexOf('.') === -1) {
+      niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
+    }
+    else
+    {
+      niceNumber = (niceNumber > 0) ? niceNumber.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;  
+    }
+  }  
   return niceNumber;
 }
 export const tooltipNumberDisplay = (value, symbol, action = "append") => {
-  let niceNumber = parseFloat(value);
-  let numberAsString = value.toString();
-  niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
   let finalNumber = '';
-  if(!_.isUndefined(symbol))
-  {
-    finalNumber = action == "append" ? niceNumber + " " + symbol : symbol + " " + niceNumber;  
-  }
-  else
-  {
-    finalNumber = niceNumber;
+  if(!_.isUndefined(value)){
+    let niceNumber = parseFloat(value);
+    let numberAsString = value.toString();
+    niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
+    if(!_.isUndefined(symbol))
+    {
+      finalNumber = action == "append" ? niceNumber + " " + symbol : symbol + " " + niceNumber;  
+    }
+    else
+    {
+      finalNumber = niceNumber;
+    }
   }
   return finalNumber;
 }
