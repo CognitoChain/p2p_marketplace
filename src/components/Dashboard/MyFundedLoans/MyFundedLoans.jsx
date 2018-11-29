@@ -110,7 +110,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell)}>{niceNumberDisplay(cell,row.principalSymbol)}</span> <br /> {row.principalSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalSymbol)}>{niceNumberDisplay(cell)}</span> <br /> {row.principalSymbol}
                         </div>
                     )
                 }

@@ -65,7 +65,7 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-right">
-                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell)}>{niceNumberDisplay(cell,row.collateralTokenSymbol)}</span><br />{row.collateralTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
                 </div>
             )
         }

@@ -47,7 +47,7 @@ class MyLoanRequests extends Component {
                 formatter:function(cell,row,rowIndex,formatExtraData){
                     return (
                         <div className="text-right">
-                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell)}>{niceNumberDisplay(cell,row.principalTokenSymbol)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
                         </div>
                     )
                 },
