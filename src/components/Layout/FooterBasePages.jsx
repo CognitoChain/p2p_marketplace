@@ -10,7 +10,7 @@ class FooterBasePages extends Component{
                         <Row>
                             <Col md={6}>
                                 <div className="text-center text-md-left">
-                                    <p className="mb-0"> © Copyright <span id="copyright"> 2018</span>.Cognitochain All Rights Reserved. </p>
+                                    <p className="mb-0"> © Copyright <span id="copyright"> 2018</span>.Loanbase All Rights Reserved. </p>
                                 </div>
                             </Col>
                             <Col md={6}>
