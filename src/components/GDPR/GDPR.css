@@ -1,0 +1,14 @@
+.privacy-policy-container p{
+	margin-top: 15px;
+	line-height: 25px;
+	font-size: 14px;
+}
+.privacy-policy-container ul{
+	margin-left: 15px !important;
+}
+.contact-mail{
+	color: #f29c1f !important; 	
+}
+.privacy-header{
+	color: #F29C1F !important;
+}

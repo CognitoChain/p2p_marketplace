@@ -49,6 +49,9 @@ class Sidebar extends Component {
                   <a href="/privacy" target="_blank">Privacy Policy</a>
                 </li>
                 <li>
+                  <a href="/gdpr" target="_blank">GDPR</a>
+                </li>
+                <li>
                   <a href="terms" target="_blank">Terms and Conditions</a>
                 </li>
               </ul>
