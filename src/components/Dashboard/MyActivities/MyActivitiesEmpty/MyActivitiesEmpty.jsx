@@ -12,7 +12,7 @@ import "./MyActivitiesEmpty.css";
 class MyActivitiesEmpty extends React.Component {
     render() {
         return (
-            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={['There are no activities yet. Add a loan from the ', <Link to="/create" className="btn btn-sm btn-link" style={{padding:0}}>Create Loan Request</Link>,' page OR Fund a loan from ', <Link to="/market" className="btn btn-sm btn-link" style={{padding:0}}>Market</Link> ,' page.']} />
+            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={['There are no activities yet. Create a ', <Link to="/create" className="btn btn-sm btn-link" style={{padding:0}}>Loan Request</Link>,' OR ', <Link to="/market" className="btn btn-sm btn-link" style={{padding:0}}>Fund</Link> ,' a loan.']} />
         );
     }
 }
