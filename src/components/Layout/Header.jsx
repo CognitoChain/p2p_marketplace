@@ -110,7 +110,7 @@ class Header extends Component {
                                                 {
                                                     socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
                                                 }
-                                                <a className="dropdown-item" onClick={this.props.logout} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
+                                                <a className="dropdown-item" onClick={() => { this.props.logout()}} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
                                         </div>
                                     </div>

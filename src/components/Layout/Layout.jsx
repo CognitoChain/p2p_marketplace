@@ -81,9 +81,18 @@ class Layout extends Component {
     this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
     this.setLoginData = this.setLoginData.bind(this);
   }
+  shouldComponentUpdate(nextProps, nextState){
+    if(this.state.authenticated != nextState.authenticated){
+      return false
+    }
+    else{
+      return true;
+    }
+  }
   logout(msg) {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('socialLogin');
     this.updateMetamaskAccount('', false);
     this.setLoginData();
     if(!_.isUndefined(msg))
