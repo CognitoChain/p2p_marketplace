@@ -252,7 +252,7 @@ class Layout extends Component {
       <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <Route exact={true} path='/'
           render={() =>
-            <Login {...this.props} {...this.state} urlpath={currentLocation} />
+            <Login {...this.props} {...this.state} urlpath={currentLocation} setLoginData={this.setLoginData}/>
           }
         />
         <Route exact={true} path='/privacy'
