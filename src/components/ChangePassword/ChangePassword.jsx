@@ -113,13 +113,7 @@ class ChangePassword extends Component {
                 buttonLoading: false
             })
             if (!_.isUndefined(response) && response.status == "SUCCESS") {
-                localStorage.removeItem('token');
-                localStorage.removeItem('currentMetamaskAccount');
-                localStorage.removeItem('userEmail');
-                this.props.history.push({
-                    pathname: '/login',
-                    state: { message: "PASSWORD_CHANGED_SUCCESSFULLY" }
-                });
+                this.props.logout("PASSWORD_CHANGED_SUCCESSFULLY");
             }
             else {
                 this.setState({

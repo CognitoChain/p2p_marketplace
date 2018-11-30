@@ -80,12 +80,21 @@ class Layout extends Component {
     this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
     this.setLoginData = this.setLoginData.bind(this);
   }
-  logout() {
+  logout(msg) {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
     this.updateMetamaskAccount('', false);
     this.setLoginData();
-    this.props.history.push("/login");
+    if(!_.isUndefined(msg))
+    {
+      this.props.history.push({
+        pathname: '/login',
+        state: { message: msg }
+      });
+    }
+    else{
+      this.props.history.push("/login");
+    }
   }
   setLoginData(){
     const token = localStorage.getItem('token');
@@ -231,7 +240,7 @@ class Layout extends Component {
           <PrivateRoute {...this.state} path="/success" component={Success} />
           <PrivateRoute {...this.state} path="/fund/:id" component={FundContainer} />
           {
-            <PrivateRoute authenticated={authenticated && socialLogin == "no"} path="/change-password" component={ChangePassword} />
+            <PrivateRoute {...this.state} authenticated={authenticated && socialLogin == "no"} path="/change-password" component={ChangePassword} logout={this.logout} />
           }
         </Switch>
       </Base>
