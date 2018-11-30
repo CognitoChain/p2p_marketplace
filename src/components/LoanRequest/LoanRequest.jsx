@@ -347,7 +347,7 @@ class LoanRequest extends Component {
                                     <CardBody className="pb-0">
                                         <div className="p-4 pb-0">
                                             <CardTitle>Summary </CardTitle>
-                                            <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+                                            <div tabIndex={2}>
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"

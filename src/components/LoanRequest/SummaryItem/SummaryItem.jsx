@@ -7,7 +7,7 @@ class SummaryItem extends Component {
             <ListGroupItem className="p-0 mt-1" style={{ border: 'none' }}>
                 <div>
                     <label className="pull-left" htmlFor="one">{labelName}</label>
-                    <label className="pull-right text-right"><span className="custom-tooltip" tooltip-title={tooltipValue}><b>{labelValue}</b></span> <br /><span className="detail-sumary-second-label">{labelValue2}</span></label>
+                    <label className="pull-right text-right"><span className={(tooltipValue ? 'custom-tooltip' : '')} tooltip-title={tooltipValue}><b>{labelValue}</b></span> <br /><span className="detail-sumary-second-label">{labelValue2}</span></label>
 
                 </div>
             </ListGroupItem>
