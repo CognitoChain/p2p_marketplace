@@ -113,8 +113,9 @@ class CreateLoan extends Component {
 
     async createLoanRequest() {
         const api = new Api();
+        let { LTVRatioValue } = this.state;
         this.setState({buttonLoading: true});
-        if (this.isFormValid()) {
+        if (this.isFormValid() && LTVRatioValue <= 60) {
             try {
                 const { dharma } = this.props;
                 const currentAccount = await dharma.blockchain.getCurrentAccount();
@@ -143,7 +144,7 @@ class CreateLoan extends Component {
                 customAlertMsgDisplay: true,
                 customAlertMsgStyle: 'danger',
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                customAlertMsgTitle: "Please complete required fields",
+                customAlertMsgTitle: (LTVRatioValue > 60) ? "LTV ratio can not be greater then 60." : "Please complete required fields",
                 buttonLoading:false
             });
         }
