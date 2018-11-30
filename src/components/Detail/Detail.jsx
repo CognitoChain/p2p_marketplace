@@ -352,7 +352,7 @@ class Detail extends Component {
             this.props.refreshTokens();
             await this.getDetailData(true);
             alertMessageDisplay = 'success';
-            alertMessage = "We're processing your repayment of " + repaymentAmountDisplay + " " + principalSymbol + ". We'll notify you, Once payment is confirmed."
+            alertMessage = "Your repayment of " + repaymentAmountDisplay + " " + principalSymbol + " is under process. You will be notified once payment is confirmed."
           }
         }
         catch (e) {
@@ -442,7 +442,7 @@ class Detail extends Component {
             this.props.refreshTokens();
             this.getDetailData(true);
             alertMessageDisplay = 'success';
-            alertMessage = "We're processing your request to claim your collateral. We'll notify you, Once request is completed."
+            alertMessage = "Your request to claim your collateral is under process. You will be notified once the request is completed."
           }
         } catch (e) {
           alertMessageDisplay = 'danger';
@@ -481,7 +481,7 @@ class Detail extends Component {
             this.props.refreshTokens();
             await this.getDetailData(true);
             alertMessageDisplay = 'success';
-            alertMessage = "We're processing your request to seize your collateral. We'll notify you, Once request is completed."
+            alertMessage = "Your request to seize your collateral is under process. You will be notified once the request is completed."
           } else {
             alertMessageDisplay = 'danger';
             alertMessage = "Please try again."
