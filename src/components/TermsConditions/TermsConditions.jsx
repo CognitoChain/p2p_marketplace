@@ -110,10 +110,10 @@ class TermsConditions extends Component {
                         <b>About Us</b>
                       </p>
                       <p>
-                        Cognito Technologies Ltd is a company incorporated in UK, under license number 11487694 and whose registered office and principal place of business is at 86-90 Paul Street, London, England, EC2A 4NE
+                        Cognito Technologies Ltd is a company incorporated in UK, under license number 11487694 and whose registered office and principal place of business is at <br/>86-90 Paul Street,<br/> London,<br/> England,<br/> EC2A 4NE
                       </p>
                       <p>
-                        <b>Contacting Us*</b>
+                        <b>Contacting Us</b>
                       </p>
                       <p>
                         Should you have any question about these Terms, or wish to contact us for any reason whatsoever, please do so by sending us an email at <a href="mailto:support@Loanbase.io" rel="noopener noreferrer" className="contact-mail">support@Loanbase.io</a>
