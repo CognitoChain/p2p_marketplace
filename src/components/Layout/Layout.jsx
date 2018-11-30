@@ -23,6 +23,7 @@ import FundContainer from '../../containers/Fund';
 import ChangePassword from '../ChangePassword/ChangePassword';
 import _ from "lodash";
 import Api from "../../services/api";
+import GDPR from "../GDPR/GDPR";
 const PrivateRoute = ({ component: Component, authenticated, ...rest }) => {
   return (
     <Route
@@ -63,8 +64,8 @@ class Layout extends Component {
       isModalMessageOpen: false,
       isWeb3Enabled,
       isUserMetaMaskPermission: false,
-      isMetaMaskAuthRised :false,
-      isUserMetaMaskPermissionAsked:false,
+      isMetaMaskAuthRised: false,
+      isUserMetaMaskPermissionAsked: false,
       token,
       userEmail,
       socialLogin,
@@ -96,7 +97,7 @@ class Layout extends Component {
       this.props.history.push("/login");
     }
   }
-  setLoginData(){
+  setLoginData() {
     const token = localStorage.getItem('token');
     const userEmail = localStorage.getItem('userEmail');
     const socialLogin = localStorage.getItem('socialLogin');
@@ -146,12 +147,12 @@ class Layout extends Component {
     }
     this.setState({ currentMetamaskAccount: newMetamaskAccount, reloadDetails, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
       this.updateMetaMaskAuthorized();
-     });
-    
+    });
+
   }
-  updateMetaMaskAuthorized(){
-    const { isUserMetaMaskPermission,isUserMetaMaskPermissionAsked } = this.state;
-    const isMetaMaskAuthRised = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked==false);
+  updateMetaMaskAuthorized() {
+    const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked } = this.state;
+    const isMetaMaskAuthRised = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked == false);
     this.setState({
       isMetaMaskAuthRised
     })
@@ -161,26 +162,26 @@ class Layout extends Component {
     if (!authenticated) {
       return;
     }
-    this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:true }, () => {
+    this.setState({ isUserMetaMaskPermission: false, isUserMetaMaskPermissionAsked: true }, () => {
       this.updateMetaMaskAuthorized();
-     })
+    })
     if (window.ethereum) {
       try {
         await window.ethereum.enable();
-        this.setState({ isUserMetaMaskPermission: true ,isUserMetaMaskPermissionAsked:false}, () => {
+        this.setState({ isUserMetaMaskPermission: true, isUserMetaMaskPermissionAsked: false }, () => {
           this.updateMetaMaskAuthorized();
-         })
+        })
       } catch (error) {
-        this.setState({ isUserMetaMaskPermission: false,isUserMetaMaskPermissionAsked:false }, () => {
+        this.setState({ isUserMetaMaskPermission: false, isUserMetaMaskPermissionAsked: false }, () => {
           this.updateMetaMaskAuthorized();
-         })
+        })
         console.log("User denied account access...");
       }
     }
     else if (window.web3) {
-      this.setState({ isUserMetaMaskPermission: true,isUserMetaMaskPermissionAsked:false }, () => {
+      this.setState({ isUserMetaMaskPermission: true, isUserMetaMaskPermissionAsked: false }, () => {
         this.updateMetaMaskAuthorized();
-       })
+      })
     }
   }
   checkNetworkId() {
@@ -221,7 +222,7 @@ class Layout extends Component {
   renderAuthenitcatedRoute() {
     const { authenticated, socialLogin } = this.state;
     return (
-      <Base metamaskPermission = {this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
+      <Base metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
         <Switch>
           <Route path='/market'
             render={() =>
@@ -259,6 +260,11 @@ class Layout extends Component {
             <Privacy {...this.props} {...this.state} />
           }
         />
+        <Route exact={true} path='/gdpr'
+               render={() =>
+                   <GDPR {...this.props} {...this.state} />
+               }
+        />
         <Route exact={true} path='/terms'
           render={() =>
             <TermsConditions {...this.props} {...this.state} />
@@ -272,7 +278,7 @@ class Layout extends Component {
     const urlStringArr = urlString.split("/");
     currentLocation = urlStringArr[0];
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
-    let homeRoutes = ["privacy", "terms"];
+    let homeRoutes = ["privacy","gdpr", "terms"];
     return (
       <div>
         {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}

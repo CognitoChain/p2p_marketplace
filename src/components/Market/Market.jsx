@@ -49,7 +49,7 @@ class Market extends Component {
                             <div className="col-md-3 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 1</h5>
-                                    <p>Login to Cognitochain Marketplace</p>
+                                    <p>Login to Loanbase Marketplace</p>
                                     <h6>Create Loan Request</h6>
                                 </div>
                             </div>
@@ -63,7 +63,7 @@ class Market extends Component {
                             <div className="col-md-3 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 3</h5>
-                                    <p>Publish in Cognitochain Marketplace</p>
+                                    <p>Publish in Loanbase Marketplace</p>
                                     <h6>Get Funded</h6>
                                 </div>
                             </div>

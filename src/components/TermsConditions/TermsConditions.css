@@ -22,6 +22,6 @@
 	font-size: 16px;
 }
 .weblink{
-	font-weight: bold !important;
-	cursor: pointer !important;		
+	cursor: pointer !important;
+	color: #0f3b56 ;
 }

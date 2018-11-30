@@ -10,7 +10,7 @@ class Privacy extends Component {
         <div className="page-title">
           <Row className="mt-4 mb-4">
               <Col>
-                  <h3 className="privacy-header">General Information Regarding GDPR Policies and Data Protection</h3>
+                  <h3 className="privacy-header">PRIVACY POLICY</h3>
               </Col>
           </Row>
         </div>  
@@ -19,103 +19,145 @@ class Privacy extends Component {
             <Col md={12}>
                 <Card className="card-statistics h-100 privacy-policy-container">
                     <CardBody>
+
                         <p>
-                            In relation to the GDPR provisions, the personal data is the personal information of our clients that we gather for the purpose of our lawful business activities and legitimate interests in connection to the operation of the platform and our relevant AML and KYC policies.
+                          <b>Introduction</b>
                         </p>
 
                         <p>
-                          <b>We gather and process the following information:</b>
+                            Loanbase and its affiliates (hereinafter, “Loanbase”, “the dapp”, "the Company", "we", "us" or "our") are committed to protecting and respecting your privacy. In addition, we recognize that persons who use Loanbase value their privacy. This Privacy Policy together with our Terms of Service governs our collection, processing and use of your Personal Information. By accessing Loanbase, you are consenting to the information collection and use practices described in this Privacy Policy.
                         </p>
-
-                        <ul>
-                            <li>Identification data of our Clients, including name, email id, etc.</li>
-                            <li>Personal information of individuals acting as representatives of legal persons.</li>
-                            <li>Other personal data that is required for the operation of the platform.</li>
-                          </ul>
-
                         <p>
-                            For the purpose of data control, we’ve appointed a Data Controller within the structure of the company. You may contact Data Controller at <a href="mailto:contact@cognitochain.io" className="contact-mail">contact@cognitochain.io</a>.Data Controller shall provide information only to the data subject or his legal representative and may demand information and documentation that allow to identify the data subject prior to disclosure of information or providing access to the information.
+                            If you reside within the European Union (EU), European Economic Area (EEA), or Switzerland, Cognito Technologies Ltd will be the data controller responsible for processing Your Information. See the Contact section of this Privacy Policy for details.
+                        </p>
+                        <p>
+                            This Privacy Policy applies to the operations of Loanbase in the European Economic Area (EEA). It gives you rights by operation of the EU GDPR. If you live outside the EEA, Loanbase will undertake best efforts to give you a similar degree of control over your privacy.
                         </p>
 
                         <p>
-                          <b>Data Controller gathers and processes data for the following purposes:</b>
-                          
+                          <b>Purpose of Privacy Policy</b>
                         </p>
-
-                        <ul>
-                            <li>The execution of the AML and KYC policies in accordance with the money laundering prevention legislation, including the procedure of risk assessment for the purpose of money laundering prevention.</li>
-                            <li>Conclusion of an agreement with the Client.</li>
-                            <li>Regular control of the provided information.</li>
-                            <li>Marketing purposes.</li>
-                          </ul>
-
                         <p>
-                          <b>Processing shall be lawful only if and to the extent that at least one of the following applies:</b>
-                          
-                        </p>
-
-                        <ul>
-                            <li>The data subject has given consent to the processing of his or her personal data for one or more specific purposes;</li>
-                            <li>Processing is necessary for the performance of a contract to which the data subject is party or in order to take steps at the request of the data subject prior to entering into a contract.</li>
-                            <li>Processing is necessary for compliance with a legal obligation to which the controller is subject</li>
-                            <li>Processing is necessary in order to protect the vital interests of the data subject or of another physical person.</li>
-                            <li>Processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the controller</li>
-                            <li>Processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party, except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject which require protection of personal data, in particular where the data subject is a child.</li>
-                          </ul>
-
-                        <p>
-                          <b>For the fulfilment of the data collection purposes the gathered data may be provided to the following data recipients:</b>
-
-                           
-
+                            "Personal Information" is information which identifies you personally or by which your identity can reasonably be ascertained. This may include but is not limited to:
                         </p>
 
                          <ul>
-                            <li>Our partners and affiliates, for the purpose of marketing or data processing. We ensure that our partners and affiliates have the valid Privacy Policies drawn up in accordance with the GDPR.</li>
-                            <li>State regulatory authorities, including the Financial Inspection of Estonia and the Estonian Police and Customs board.</li>
-                            </ul>
+                            <li>Full legal name, address for service, e-mail address, phone number, date of birth, photographic identification, government issued identification and other contact details.</li>
+                            <li>Your blockchain wallet addresses.</li>
+                             <li>Ethereum network information related to transactions.</li>
+                             <li>We may receive Ethereum network information from you as a result of your interaction with Loanbase.</li>
+                             <li>Loanbase requires the highest level of browser permissions that could potentially lead to procurement of more Personal Information than enclosed in the definition of Personal Information.</li>
+                             <li>Loanbase may require the use of MetaMask and may obtain additional information from MetaMask related to Ethereum address and transactions.</li>
+                             <li>Loanbase uses Google Analytics for purposes of monitoring web traffic. Any identifying information collected via Google Analytics is controlled by Google.</li>
+                             <li>Ethereum blockchain and other public blockchains provide transparency into transactions and Loanbase is not responsible for preventing or managing information broadcasted on a blockchain.</li>
+                         </ul>
 
                         <p>
-                          The gathered data is processed for the period that is reasonably necessary for the set purpose for which it was initially obtained. The overall processing period is determined by the length of the relationship with the Clients, the specifics of the provided data, the presence of any specific circumstance or obligations or whether the relation with the client is possible in light of the applicable legislation.
-
-                          NB! Any persons, whose data was gathered and processed has the right to request access to their personal data, the right for rectification, erasure or restriction of processing of such data, the right to object to data processing in the events and cases as stated by GDPR and the right to form and present a complaint to the state supervisory authority.
-
-                          
-
+                            <b>Purpose of Personal Information Collection</b>
                         </p>
-
                         <p>
-                          Any client understands, that should he demand the restriction of his personal data processing, Data Controller may terminate any cooperation with the agreement if such a demand makes it impossible for Data Controller to carry out its legal obligations, including obligations in the field of money laundering prevention.
-
-                          Any client who gave his consent to data gathering and processing may withdraw his consent at any time by sending the message with the withdrawal at <a href="mailto:contact@cognitochain.io" rel="noopener noreferrer" className="contact-mail">contact@cognitochain.io</a>.
-                          Any data processing that was carried out prior to the withdrawal shall be deemed lawful.
-                        </p>
-
-                        <h3 className="mt-20">What is GDPR?</h3>
-
-                        <p>
-                          GDPR is the EU General Data Protection Regulation that replaces the old Data protection directive 95/46/EC. GDPR came into force 25.05.2018.
-
-                          <b>The GDPR introduces the following obligations for the companies that gather and process personal data:</b>
+                            Personal Information is collected in order to:
                         </p>
 
                         <ul>
-                            <li>Implement measure to ensure the compliance with GDPR.</li>
-                            <li>Implement the necessary security measures to protect the rights of the data subjects when gathering and processing data.</li>
-                            <li>Conduct data protection impact assessments of high risk processing activities.</li>
-                            <li>Implement privacy by default design.</li>
-                            <li>Implement the valid data breach notification.</li>
+                            <li>Provide our services efficiently and effectively.</li>
+                            <li>Inform you about lending and financing features.</li>
+                            <li>Develop, enhance, market and deliver products and services to you.</li>
+                            <li>Understand your needs and your eligibility for products and services.</li>
+                            <li>Provide information to you about developments and new products, including changes and enhancements to the Site.</li>
+                            <li>Process billing and collection of any fees.</li>
+                            <li>Conduct surveys and get feedback from you.</li>
+                            <li>Establish and maintain a responsible commercial relationship with you.</li>
+                            <li>Provide you with news and other matters of general interest to you as Loanbase customer; and,</li>
+                            <li>Meet Loanbase’s legal and regulatory requirements (eg, information required to verify your identity).</li>
                         </ul>
 
                         <p>
-                          Data Controller implements the up to date Privacy Policy and compliance procedures to ensure that the personal data is kept safe and is processed in accordance with the applicable laws.
-
-                          The company employees and other personnel receive the necessary training. All processed data is under review.
-
-                          Implementation of GDPR may require changes to the existing agreements and policies. Should that take place, the clients shall be promptly notified and their consent requested.
-
+                            <b>Security, Protection and Use of Personal Information</b>
                         </p>
 
+                        <p>
+                            Loanbase is committed to protecting your privacy. Internally, only employees with a business have access to know Personal Information, or whose duties reasonably require access to it are granted access to Personal Information. Loanbase’s systems and data are constantly under review to ensure that you are getting the best class of service and that market leading security features are in place.
+                        </p>
+                        <p>
+                            We take reasonable steps to protect your Personal Information from misuse, loss, unauthorised access, modification or disclosure, including implementing appropriate security measures. The security measures in place will, from time to time, be reviewed in line with legal and technical developments. However, we give no guarantee that such misuse, loss, unauthorised access, modification or disclosure will not occur. There are protective measures that you should take which as well include but are not limited to changing password regularly, not sharing your Personal Information with other unless you clearly understand the purpose of their request and you know with whom you are dealing.
+                        </p>
+                        <p>
+                            Loanbase reserves the right to retain and share certain personal Information in order to meet our regulatory and statutory requirements and further to our contractual agreements with partners and third parties. Personal Information and other related data may be exported outside of the jurisdiction in which you reside. Your Personal Information may be processed and stored in a foreign country or countries. Under those circumstances, the governments, courts, law enforcement or regulatory agencies of that country or those countries may be able to obtain access to your Personal Information through foreign laws. You need to be aware that the privacy standards of those countries may be lower than those of the jurisdiction in which you reside. You should note that you are not obliged to give your Personal Information to Loanbase, but if you choose not to do so, we may not be able to provide our services, or your access to our services may be limited.
+                        </p>
+
+                        <p>
+                            <b>Consent</b>
+                        </p>
+
+                        <p>
+                            Consent is required for the collection of Personal Information and the subsequent use of disclosure of Personal Information. The form of consent may vary depending upon the circumstances and the type of Personal information obtained. Your agreement with Loanbase’s Terms of Service constitutes your consent to the collection and use of Personal Information as described in this Privacy Policy. Loanbase reserves the right to use and disclose Personal Information without your knowledge or consent as permitted by applicable law.
+                        </p>
+                        <p>
+                            <b>Disclosure of Personal Information</b>
+                        </p>
+
+                        <p>
+                            We use the Personal Information for the purposes indicated at the time you provide us with such information, and/or otherwise for the purposes set out in this Privacy Policy and/or as otherwise permitted by law. We may make available the Personal Information that you provide to us to our affiliates, agents, representatives, service providers and contractors for these purposes. We also reserve the right to disclose Personal information that Loanbase believe, in good faith, is appropriate or necessary to enforce our Terms of Use, take precautions against liability or harm, to investigate and respond to third-party claims or allegations, to respond to a court order or official requests, to protect security or integrity of Loanbase and to protect the rights, property or safety of Loanbase, our uses or others.
+                        </p>
+                        <p>
+                            We may share Users' Personal Information with any financial dispute resolution scheme to which the Company subscribes, and other law enforcement bodies, regulatory agencies, courts, arbitration bodies and dispute resolution schemes, both in UK and internationally, as may be required by law.
+                        </p>
+                        <p>
+                            If you request it in writing, we may share your Personal Information with your nominated advisers. Except where disclosure of your Personal Information is required by law or requested by you, we will generally require any third party which receives or has access to Personal Information to protect such Personal Information and to use it only to carry out the services they are performing for you or for us, unless otherwise required or permitted by law. We will ensure that any such third party is aware of our obligations under this Privacy Policy and we will take reasonable steps to ensure that contracts we enter with such third parties binds them to terms no less protective of any Personal Information disclosed to them than the obligations we undertake to you under this Privacy Policy or which are imposed on us under applicable data protection laws.
+                        </p>
+                        <p>
+                            In the event that Loanbase is involved in a merger, acquisition, sale, bankruptcy, insolvency, reorganization, receivership, assignment or the application of laws or change of control, there may be a disclosure of your information to another entity related to such an event.
+                        </p>
+                        <p>
+                            <b>Access and Changing of Personal Information</b>
+                        </p>
+
+                        <p>
+                            You have the right to access the Personal Information we hold about you, and to require the correction, updating and blocking of inaccurate and/or incorrect data by sending an email to us. We will usually respond to your request within 14 days. You may also request the deletion or destruction of your Personal Information, your Account details or your Transaction details by sending an email to us. Loanbase will act on your request only when it is not inconsistent with its legal and regulatory obligations and compliance procedures. Upon your written request, we will inform you of the use and general disclosure of your Personal Information. Depending on the nature of your request, there may be a minimal charge for accessing your Personal Information.
+                        </p>
+
+                        <p>
+                            <b>Retention of Personal Information</b>
+                        </p>
+
+                        <p>
+                            We will hold your Personal Information only for as long as it is necessary for us to do so, having regard to the purposes described in this Privacy Policy and our own legal and regulatory requirements. In general, Personal Information relating to your Account for at least a period of five years after your Account is closed. Similarly, we usually retain information about Transactions on your Account for a period of five years from the date of the Transaction. Personal Information which is collected for other purposes will be discarded inn accordance with our policies in place from time to time.
+                        </p>
+
+                        <p>
+                            <b>Users Under Age of 13</b>
+                        </p>
+
+                        <p>
+                            Loanbase does not knowingly collect or store any personal information about children under 13 without verifiable prior parental consent. If you believe such information have been inadvertently collected, we shall take necessary steps in order to remove such information from our database. Users under 13 must seek and obtain parental consent to use this website.
+                        </p>
+                        <p>
+                            <b>Links</b>
+                        </p>
+
+                        <p>
+                            There may be links from our Site to other sites and resources provided by third parties. This Privacy Policy applies only to our Site. Accessing those third-party sites or sources requires you to leave our Site. We do not control those third party sites or any of the content contained therein and you agree that we are in no way responsible or liable for any of those third party sites, including, without limitation, their content, policies, failures, promotions, products, services or actions and/or any damages, losses, failures or problems caused by, related to or arising from those sites. We encourage you to review all policies, rules, terms and regulations, including the privacy policies, of each site that you visit.
+                        </p>
+                        <p>
+                            <b>Changes</b>
+                        </p>
+
+                        <p>
+                            Our policies, content, information, promotions, disclosures, disclaimers and features may be revised, modified, updated, and/or supplemented at any time and without prior notice at the sole and absolute discretion of the Company. If we change this Privacy Policy, we will take steps to notify all Users by a notice on our website and will post the amended Privacy Policy on the website.
+                        </p>
+                        <p>
+                            <b>Contact Us</b>
+                        </p>
+                        <p>
+                            If you have any questions, comments, or concerns regarding our Privacy Policy and/or practices, please contact us at <a href="mailto:contact@Loanbase.io" rel="noopener noreferrer" className="contact-mail">contact@Loanbase.io</a> <br/>
+                            Or by writing to us:<br/>
+                            COGNITO TECHNOLOGIES LTD<br/>
+                            86-90 Paul Street,<br/>
+                            London,<br/>
+                            England,<br/>
+                            EC2A 4NE<br/>
+                        </p>
                     </CardBody>
                 </Card>
             </Col>

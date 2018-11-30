@@ -260,7 +260,7 @@ class Dashboard extends Component {
                 {
                     this.getMyLoanRequests();
                     this.setState({ cancelLoanButtonLoading: false },()=>{
-                        toast.success("We're processing your cancellation request.");
+                        toast.success("Your cancellation request is under process.");
                     });
                 }
             });
