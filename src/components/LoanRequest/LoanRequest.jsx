@@ -186,20 +186,26 @@ class LoanRequest extends Component {
         const terms = loanRequest.getTerms();
         this.setState({unlockTokenButtonLoading: true});
         if (typeof owner != 'undefined') {
-            const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
-            let response = await getTransactionReceipt(txHash);
-            if (!_.isUndefined(response)) {
-                transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
-                this.props.refreshTokens(false);
-                this.setState({
-                    customAlertMsgDisplay: false,
-                    transactions,
-                    unlockTokenButtonLoading:false
-                });
+            try{
+                const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
+                let response = await getTransactionReceipt(txHash);
+                if (!_.isUndefined(response)) {
+                    transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
+                    this.props.refreshTokens(false);
+                    this.setState({
+                        customAlertMsgDisplay: false,
+                        transactions,
+                        unlockTokenButtonLoading:false
+                    });
+                }
+                else
+                {
+                    this.setState({unlockTokenButtonLoading: true});
+                }
             }
-            else
+            catch(e)
             {
-                this.setState({unlockTokenButtonLoading: true});
+                this.setState({unlockTokenButtonLoading: false});
             }
         }
     }
