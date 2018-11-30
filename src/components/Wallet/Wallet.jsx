@@ -238,7 +238,7 @@ class Wallet extends Component {
           </Row>
         </div>
 
-        {currentMetamaskAccount != null && wrongMetamaskNetwork == false &&
+        {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
           <Row className="mb-30 mt-30">
             <Col lg={12} md={12} sm={12} xl={12}>
               <div className="tab nav-border" style={{ position: "relative" }}>
@@ -257,7 +257,7 @@ class Wallet extends Component {
           </Row>
         }
 
-        {(wrongMetamaskNetwork == true || currentMetamaskAccount == null) &&
+        {(wrongMetamaskNetwork == true || currentMetamaskAccount == null || currentMetamaskAccount == '') &&
           <div>
             <Row className="mb-30">
               <Col md={3}></Col>
