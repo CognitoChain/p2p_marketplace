@@ -30,19 +30,26 @@ class LoanRequests extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.reloadDetails === true && !nextProps.isTokenLoading) {
+        if (nextProps.reloadDetails === true) {
+            this.props.updateReloadDetails();
             this.getLoanRequests();
         }
     }
 
     getLoanRequests() {
         const { highlightRow } = this.props;
+        const { isLoading } = this.state;
         this.setState({
             highlightRow,
         });
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
+
+        if(!isLoading)
+        {
+            this.setState({ isLoading: true });
+        }
 
         api.setToken(this.props.token).get("loanRequests", { sort, order })
             .then(this.parseLoanRequests)

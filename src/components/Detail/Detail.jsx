@@ -60,7 +60,8 @@ class Detail extends Component {
     this.getDetailData();
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.reloadDetails === true && !nextProps.isTokenLoading) {
+    if (nextProps.reloadDetails === true) {
+      this.props.updateReloadDetails();
       this.getDetailData();
     }
   }

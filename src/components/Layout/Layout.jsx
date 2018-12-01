@@ -72,7 +72,7 @@ class Layout extends Component {
       authenticated,
       networkId: '',
       wrongMetamaskNetwork: false,
-      wrongMetamskNetworkMsg: ''
+      wrongMetamskNetworkMsg: ''      
     };
     this.logout = this.logout.bind(this);
     this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
@@ -80,6 +80,7 @@ class Layout extends Component {
     this.metamaskPermission = this.metamaskPermission.bind(this);
     this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
     this.setLoginData = this.setLoginData.bind(this);
+    this.updateReloadDetails = this.updateReloadDetails.bind(this);
   }
   shouldComponentUpdate(nextProps, nextState){
     if(this.state.authenticated != nextState.authenticated){
@@ -133,6 +134,11 @@ class Layout extends Component {
       iscurrentMetamaskAccountLoading
     })
   }
+  updateReloadDetails() {
+    this.setState({
+      reloadDetails:false
+    });
+  }
   async updateMetamaskAccount(newMetamaskAccount, reloadDetails) {
     newMetamaskAccount = (!_.isUndefined(newMetamaskAccount) && newMetamaskAccount != '' && newMetamaskAccount != null) ? newMetamaskAccount : '';
     this.updateMetamaskAccountData(newMetamaskAccount, reloadDetails)
@@ -154,10 +160,13 @@ class Layout extends Component {
       isUserMetaMaskPermission = false;
       localStorage.removeItem('currentMetamaskAccount');
     }
-    this.setState({ currentMetamaskAccount: newMetamaskAccount, reloadDetails, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
+
+    this.setState({ currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
+      this.setState({
+        reloadDetails
+      });
       this.updateMetaMaskAuthorized();
     });
-
   }
   updateMetaMaskAuthorized() {
     const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked } = this.state;
@@ -235,17 +244,17 @@ class Layout extends Component {
         <Switch>
           <Route path='/market'
             render={() =>
-              <Market {...this.props} {...this.state} />
+              <Market {...this.props} {...this.state} updateReloadDetails={this.updateReloadDetails} />
             }
           />
-          <PrivateRoute {...this.state} path='/dashboard' component={DashboardContainer} />
+          <PrivateRoute {...this.state} path='/dashboard' component={DashboardContainer} updateReloadDetails={this.updateReloadDetails} />
           <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} />
           <PrivateRoute {...this.state} path="/loanrequests" component={LoanRequestsContainer} />
           <PrivateRoute path="/createold" {...this.state} component={CreateLoanRequestContainer} />
           <PrivateRoute {...this.state} path="/create" component={Create} />
           <PrivateRoute {...this.state} path="/tokens" component={TokensContainer} />
           <PrivateRoute {...this.state} path="/request/:id" component={LoanRequestContainer} />
-          <PrivateRoute {...this.state} path="/detail/:id" component={DetailContainer} />
+          <PrivateRoute {...this.state} path="/detail/:id" component={DetailContainer} updateReloadDetails={this.updateReloadDetails} />
           <PrivateRoute {...this.state} path="/investments" component={InvestmentsContainer} />
           <PrivateRoute {...this.state} path="/success" component={Success} />
           <PrivateRoute {...this.state} path="/fund/:id" component={FundContainer} />

@@ -25,15 +25,14 @@ class MyActivities extends Component {
       myFundedRequestsLoading: true,
       metaMaskMsg: false,
       myLoansIsMounted: true,
-      myInvestmensIsMounted: true,
-      myBorrowRequestProcessing:false
+      myInvestmensIsMounted: true
     };
   }
 
   async componentWillReceiveProps(nextProps) {
     const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
-    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount } = this.props;
-    const { myLoansIsMounted, myInvestmensIsMounted,myBorrowRequestProcessing } = this.state;
+    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount, myBorrowRequestProcessed, myFundedRequestProcessed } = this.props;
+    const { myLoansIsMounted, myInvestmensIsMounted } = this.state;
 
     let repaymentSchedule;
     let expectedRepaidAmount;
@@ -41,12 +40,11 @@ class MyActivities extends Component {
     let investmentsActivities = [];
     let myBorrowedRequestsLoading = true;
     let myFundedRequestsLoading = true;
-    
-    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount) && myBorrowRequestProcessing == false) {
+    console.log("myBorrowRequestProcessed");
+    console.log(myBorrowRequestProcessed);
+    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount) && myBorrowRequestProcessed == false) {
       console.log(nextBorrowedRequests.length);
-      this.setState({
-        myBorrowRequestProcessing:true        
-      });
+      this.props.updateMyBorrowRequestProcessed('myBorrowRequestProcessed',true);
       if (nextBorrowedRequests.length > 0) {
         await this.asyncForEach(nextBorrowedRequests, async ts => {
           let isCollateralSeized = false;
@@ -91,7 +89,7 @@ class MyActivities extends Component {
                 buttonText: 'Claim Collateral',
                 buttonClassName: 'green',
                 amount: ts.collateral,
-                sybmol: ts.collateralSymbol,
+                sybmol: ts.collateralSymbol                
               });  
             }
           }
@@ -143,7 +141,7 @@ class MyActivities extends Component {
                     buttonClassName: buttonClassName,
                     repaymentText:'due',
                     daysBefore:daysBefore,
-                    hoursBefore:hoursBefore
+                    hoursBefore:hoursBefore                    
                   });
                   i++;                
                 }
@@ -201,7 +199,8 @@ class MyActivities extends Component {
       }
     }
 
-    if (nextFundedRequests != myFundedRequests && myFundedLoading === false) {
+    if (nextFundedRequests != myFundedRequests && myFundedLoading === false && myFundedRequestProcessed == false) {
+      this.props.updateMyBorrowRequestProcessed('myFundedRequestProcessed',true);
       let expectedRepaidAmount;
       let repaymentSchedule;
       if (nextFundedRequests.length > 0) {

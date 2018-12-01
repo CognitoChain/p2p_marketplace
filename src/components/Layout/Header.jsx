@@ -46,8 +46,8 @@ class Header extends Component {
         currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
         currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
         if ((currentMetamaskAccount == '' && currentAccount != '') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
-            this.props.refreshTokens();
             this.props.updateMetamaskAccount(currentAccount, true);
+            this.props.refreshTokens();
         }
     }
     render() {

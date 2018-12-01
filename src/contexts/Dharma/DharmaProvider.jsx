@@ -66,13 +66,19 @@ class DharmaProvider extends Component {
 
     getUserTokens(flag) {
         const { Token } = Dharma.Types;
+        let { isTokenLoading } = this.state;
         let stateObj = {};
         // Assume the tokens are out of date.
         if (_.isUndefined(flag)) {
             stateObj["tokens"] = [];
         }
-        stateObj["isTokenLoading"] = true;
-        this.setState(stateObj);
+        if(!isTokenLoading){
+            stateObj["isTokenLoading"] = true;    
+        }
+        if(!_.isEmpty(stateObj))
+        {
+            this.setState(stateObj);    
+        }
         dharma.blockchain.getAccounts().then((accounts) => {
             const owner = accounts[0];
             if (typeof owner != 'undefined') {
@@ -98,7 +104,7 @@ class DharmaProvider extends Component {
             tokens: this.state.tokens,
             isTokenLoading: this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
-            refreshTokens: this.getUserTokens,
+            refreshTokens: this.getUserTokens            
         };
 
         return (

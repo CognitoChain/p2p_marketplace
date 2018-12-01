@@ -133,13 +133,13 @@ class MyFundedLoans extends Component {
                 text: "Actions",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     let buttonText = '';
-                    if (row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount && row.isCollateralSeized == false) {
-                        buttonText = (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isCollateralSeizable == true) ? 'Seize Collateral' : '';
+                    if (row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount && row.isRepaid == false) {
+                        buttonText = 'Seize Collateral';
                     }
                     return (
                         <div className="text-center">
                             {buttonText != '' &&
-                                <a href={`detail/${row.id}`} target="_blank" className="btn cognito x-small btn-danger">{buttonText}</a>
+                                <a href={`detail/${row.id}`} target="_blank" className="btn cognito icon x-small seize-collateral-btn">{buttonText}</a>
                             }
                             {buttonText == '' &&
                                 <span>-</span>

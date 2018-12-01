@@ -33,11 +33,14 @@ class Dashboard extends Component {
             cancelLoanButtonLoading: false,
             myBorrowedRequestsIsMounted: true,
             myFundedRequestsIsMounted: true,
-            myLoanRequestsIsMounted: true
+            myLoanRequestsIsMounted: true,
+            myBorrowRequestProcessed:false,
+            myFundedRequestProcessed:false
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
         this.amountTooltipTop = this.amountTooltipTop.bind(this);
+        this.updateMyBorrowRequestProcessed = this.updateMyBorrowRequestProcessed.bind(this);
     }
     componentDidMount() {
         this.setPriceFeedData();
@@ -62,11 +65,21 @@ class Dashboard extends Component {
             myFundedRequestsIsMounted: false
         });
     }
+    
     componentWillReceiveProps(nextProps) {
         if (nextProps.tokens != this.state.tokenlist) {
             this.setState({ tokenlist: nextProps.tokens })
         }
+        if (nextProps.reloadDetails === true) {
+            this.props.updateReloadDetails();
+            this.updateMyBorrowRequestProcessed('myBorrowRequestProcessed');
+            this.updateMyBorrowRequestProcessed('myFundedRequestProcessed');
+            this.setPriceFeedData();
+            this.getBorrowedLoanRequests();
+            this.getFundedLoanRequests();
+        }
     }
+
     amountTooltipTop(token) {
         /*const { tokenlist } = this.state;
         let tootlTipStatus = !token.tootlTipStatus;
@@ -77,11 +90,20 @@ class Dashboard extends Component {
           tokenlist
         });*/
     }
+    updateMyBorrowRequestProcessed(stateName = '',flag = false){
+        /*myFundedRequestProcessed*/
+        this.setState({ [stateName]: flag });
+    }
     async getBorrowedLoanRequests() {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myBorrowedRequestsIsMounted } = this.state;
+        const { myBorrowedRequestsIsMounted,myBorrowedLoading } = this.state;
+
+        if(!myBorrowedLoading)
+        {
+            this.setState({ myBorrowedLoading: true });
+        }
 
         api.setToken(this.props.token).get("user/loans", { sort, order })
             .then(myBorrowedRequests => {
@@ -100,7 +122,13 @@ class Dashboard extends Component {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myFundedRequestsIsMounted } = this.state;
+        const { myFundedRequestsIsMounted,myFundedLoading } = this.state;
+
+        if(!myFundedLoading)
+        {
+            this.setState({ myFundedLoading: true });
+        }
+
         api.setToken(this.props.token).get("user/investments", { sort, order })
             .then(myFundedRequests => {
                 if (myFundedRequestsIsMounted) {
@@ -249,6 +277,7 @@ class Dashboard extends Component {
        let agreementId = row.id;
        let debtorEthAddress = row.debtor;
         const { token, currentMetamaskAccount } = this.props;
+        let { myLoanRequests } = this.state;
         if(!_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
         {
             this.setState({ cancelLoanButtonLoading: true })
@@ -273,7 +302,7 @@ class Dashboard extends Component {
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
         const { token, dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
-        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist ,cancelLoanButtonLoading } = this.state;
+        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist, cancelLoanButtonLoading, myBorrowRequestProcessed, myFundedRequestProcessed } = this.state;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -309,6 +338,9 @@ class Dashboard extends Component {
                                 myBorrowedLoading={myBorrowedLoading}
                                 myFundedLoading={myFundedLoading}
                                 currentMetamaskAccount={currentMetamaskAccount}
+                                myBorrowRequestProcessed={myBorrowRequestProcessed}
+                                myFundedRequestProcessed={myFundedRequestProcessed}
+                                updateMyBorrowRequestProcessed={this.updateMyBorrowRequestProcessed}
                             />
                         </Row>
 

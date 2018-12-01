@@ -111,6 +111,7 @@ class Market extends Component {
                                                 currentMetamaskAccount={this.props.currentMetamaskAccount}
                                                 isTokenLoading={dharmaProps.isTokenLoading}
                                                 reloadDetails={this.props.reloadDetails}
+                                                updateReloadDetails={this.props.updateReloadDetails}
                                             />
                                         )}
                                     </DharmaConsumer>
