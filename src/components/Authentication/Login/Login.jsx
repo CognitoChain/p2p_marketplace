@@ -169,7 +169,7 @@ class Login extends React.Component {
                                 <div className="col-md-3">
                                     <div className="loanbase-step-container">
                                         <h5>Step 1</h5>
-                                        <p>Login to Loanbase Marketplace</p>
+                                        <p >Login to Loanbase</p>
                                         <h6>Create Loan Request</h6>
                                     </div>
                                 </div>
@@ -203,29 +203,29 @@ class Login extends React.Component {
                                 <div className="col-md-3">
                                     <div className="loanbase-step-container">
                                         <h5>Step 1</h5>
-                                        <p>Login to Loanbase Marketplace</p>
-                                        <h6>Create Loan Request</h6>
+                                        <p>Login to Loanbase</p>
+                                        <h6>Browser MarketPlace</h6>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="loanbase-step-container">
                                         <h5>Step 2</h5>
                                         <p>Authorize Smart Contract</p>
-                                        <h6>Unlock Collateral</h6>
+                                        <h6>Unlock Principle</h6>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="loanbase-step-container">
                                         <h5>Step 3</h5>
-                                        <p>Publish in Loanbase Marketplace</p>
-                                        <h6>Get Funded</h6>
+                                        <p>Fund a Loan from Marketplace</p>
+                                        <h6>Fund Loan</h6>
                                     </div>
                                 </div>
                                 <div className="col-md-3">
                                     <div className="loanbase-step-container">
                                         <h5>Step 4</h5>
-                                        <p>Repay Loan</p>
-                                        <h6>Get Collateral back in full</h6>
+                                        <p>Track Repayments in My Loans</p>
+                                        <h6>Earn Interest</h6>
                                     </div>
                                 </div>
                             </div>

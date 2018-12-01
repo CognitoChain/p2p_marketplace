@@ -49,7 +49,7 @@ class Market extends Component {
                             <div className="col-md-3 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 1</h5>
-                                    <p>Login to Loanbase Marketplace</p>
+                                    <p>Login to Loanbase</p>
                                     <h6>Create Loan Request</h6>
                                 </div>
                             </div>

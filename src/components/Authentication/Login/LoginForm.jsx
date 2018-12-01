@@ -282,11 +282,11 @@ class LoginForm extends React.Component {
 
         </div>
         <p className="mt-20 mb-0 remember-checkbox text-left">Don't have an account? <a href="Javascript:void(0)" onClick={() => this.props.updateUrlPathProp('register')}>Create one here</a></p>
-        <div className="d-block text-center mt-10 pt-10 continue-guest-bnt-container">
-         <Link to="/market" className={`btn cognito  btn-theme`}>
-            <span className="text-white">Continue as a Guest</span>
-          </Link>
-        </div>
+        {/*<div className="d-block text-center mt-10 pt-10 continue-guest-bnt-container">*/}
+         {/*<Link to="/market" className={`btn cognito  btn-theme`}>*/}
+            {/*<span className="text-white">Continue as a Guest</span>*/}
+          {/*</Link>*/}
+        {/*</div>*/}
       </div>      
     );
   }
