@@ -111,7 +111,7 @@ class MyActivities extends Component {
                 let paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((st < currentTimestamp) ? 'missed' : 'due'));
                 let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
 
-                if (st > current_timestamp * 1000 && i == 1) {
+                if (st > current_timestamp && i == 1 && amount > 0) {
                   if (ts.debtorAddress == currentMetamaskAccount) {
                     if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
                       buttonText = 'Pay';
@@ -119,29 +119,32 @@ class MyActivities extends Component {
                     }
                   }
 
-                  if(amount > 0)
-                  {
-                      var now = moment(new Date()); 
-                      var end = moment(date, "YYYY-MM-DD", true).format();
-                      var duration = moment.duration(now.diff(end));
-                      var daysBefore = parseInt(duration.asDays());
-                      var hoursBefore = parseInt(duration.asHours());
+                  var now = moment(new Date()); 
+                  var end = moment(date, "YYYY-MM-DD", true).format();
+                  var duration = moment.duration(now.diff(end));
+                  var daysBefore = parseInt(duration.asDays());
+                  var hoursBefore = parseInt(duration.asHours());
 
-                      loanRequestsActivities.push({
-                        id: "l_" + _.random(999999999),
-                        date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
-                        amount: amount,
-                        type: "minus",
-                        sybmol: ts.principalSymbol,
-                        agreementId: ts.id,
-                        sortTimestamp: st,
-                        buttonText: buttonText,
-                        buttonClassName: buttonClassName,
-                        repaymentText:'due',
-                        daysBefore:daysBefore,
-                        hoursBefore:hoursBefore
-                      });
+                  if((daysBefore < 0 || hoursBefore < 0) && paidStatus != 'missed')
+                  {
+                    daysBefore = daysBefore * -1; 
+                    hoursBefore = hoursBefore * -1; 
                   }
+
+                  loanRequestsActivities.push({
+                    id: "l_" + _.random(999999999),
+                    date: moment(date, "DD/MM/YYYY HH:mm:ss", true).format(),
+                    amount: amount,
+                    type: "minus",
+                    sybmol: ts.principalSymbol,
+                    agreementId: ts.id,
+                    sortTimestamp: st,
+                    buttonText: buttonText,
+                    buttonClassName: buttonClassName,
+                    repaymentText:'due',
+                    daysBefore:daysBefore,
+                    hoursBefore:hoursBefore
+                  });
                   i++;                
                 }
                 else if (st < currentTimestamp && totalRepaidAmount < totalRepaymentAmount) {
@@ -323,11 +326,11 @@ class MyActivities extends Component {
         isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
           let text = "";
+          let modulorHours = row.hoursBefore % 24;
           if (row.type == "minus") {
             text = "Repayment "; 
             text += (row.repaymentText == "missed") ? "missed before " : "due in ";
-            text += (row.daysBefore != '' && row.daysBefore > 1) ? row.daysBefore : ((row.hoursBefore != '' && row.hoursBefore > 1) ? row.hoursBefore : ((row.hoursBefore < 1) ? "few" : ""));
-            text += (row.daysBefore != '' && row.daysBefore > 1) ? ' days' : ((row.hoursBefore != '' && row.hoursBefore > 1) ? ' hours' : ((row.hoursBefore < 1) ? " minutes" : ""));
+            text += (row.daysBefore != '' && row.daysBefore >= 1 && modulorHours > 0) ? row.daysBefore+' days '+modulorHours+' hours' : (row.daysBefore != '' && row.daysBefore > 1) ? row.daysBefore + ' days' : ((row.hoursBefore != '' && row.hoursBefore > 1) ? row.hoursBefore+' hours' : ((row.hoursBefore < 1) ? " few minutes" : ""));
           } else if (row.type == "plus") {
             text = "Earning";
           }

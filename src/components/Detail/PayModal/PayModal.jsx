@@ -28,7 +28,7 @@ class PayModal extends Component {
     } = loanDetails;
     let repaymentButtonDisabled = (repaymentButtonLoading === true || unlockTokenButtonDisplay === true) ? true : false;
     return (
-      <Modal open={modalOpen} onClose={onCloseModal} center>
+      <Modal open={modalOpen} onClose={onCloseModal} center classNames={{closeIcon: 'pull-right cursor-pointer'}}>
         <Row>
           <Col lg={12} md={12} sm={6} xl={12}>
             <h2 className="text-center text-bold">Make Repayment</h2>

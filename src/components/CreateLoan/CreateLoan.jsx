@@ -18,6 +18,8 @@ import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import ReactGA from 'react-ga';
+
 class CreateLoan extends Component {
     constructor(props) {
         super(props);
@@ -112,9 +114,17 @@ class CreateLoan extends Component {
     }
 
     async createLoanRequest() {
+
+        // GA Tracking
+        ReactGA.event({
+            category: 'User',
+            action: 'loan-request-create'
+        });
+
         const api = new Api();
+        let { LTVRatioValue } = this.state;
         this.setState({buttonLoading: true});
-        if (this.isFormValid()) {
+        if (this.isFormValid() && LTVRatioValue <= 60) {
             try {
                 const { dharma } = this.props;
                 const currentAccount = await dharma.blockchain.getCurrentAccount();
@@ -143,7 +153,7 @@ class CreateLoan extends Component {
                 customAlertMsgDisplay: true,
                 customAlertMsgStyle: 'danger',
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
-                customAlertMsgTitle: "Please complete required fields",
+                customAlertMsgTitle: (LTVRatioValue > 60) ? "LTV ratio can not be greater then 60." : "Please complete required fields",
                 buttonLoading:false
             });
         }

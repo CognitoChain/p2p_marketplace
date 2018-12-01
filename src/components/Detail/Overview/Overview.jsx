@@ -22,13 +22,16 @@ class Overview extends Component {
     let {
       principal,
       principalSymbol,
-      outstandingAmountDisplay,
       debtorAddress,
       creditorAddress,
       isCollateralSeized,
       isCollateralReturned,
-      outstandingAmount
+      outstandingAmount,
+      isRepaid,
+      totalRepaymentAmount
     } = loanDetails;
+
+    let outstandingAmountDisplay = niceNumberDisplay(outstandingAmount);
 
     return (
       <Card className={"card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics " + overViewBackgroundClass}>
@@ -53,6 +56,16 @@ class Overview extends Component {
                   <br />
                   <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(outstandingAmount,principalSymbol)}>
                     {outstandingAmountDisplay}
+                  </span>{" "}
+                  {principalSymbol}
+                </div>
+              }
+              {outstandingAmountDisplay == 0 && isRepaid &&
+                <div className="">
+                  <span>Total Repaid Amount</span>
+                  <br />
+                  <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaymentAmount,principalSymbol)}>
+                    {niceNumberDisplay(totalRepaymentAmount)}
                   </span>{" "}
                   {principalSymbol}
                 </div>
@@ -114,10 +127,10 @@ class Overview extends Component {
             </Col>
             <Col>
               {
-                isCollateralSeized && <h4 className="text-center"><span class="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
+                isCollateralSeized && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
               }
               {
-                isCollateralReturned && <h4 className="text-center"><span class="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
+                isCollateralReturned && <h4 className="text-center"><span className="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
               }
             </Col>
           </Row>

@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import validators from '../../../validators';
 import Api from "../../../services/api";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
+import ReactGA from 'react-ga';
+
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
@@ -124,6 +126,13 @@ class LoginForm extends React.Component {
     return result;
   }
   async login(event) {
+
+    // GA Tracking
+    ReactGA.event({
+      category: 'User',
+      action: 'login'
+    });
+
     event.preventDefault();
     const {
       email,
@@ -149,6 +158,7 @@ class LoginForm extends React.Component {
       localStorage.setItem('userEmail', email);
       this.props.setLoginData();
       this.props.historyPush.push("/market");
+
     }
     else {
       const json = await response.json();

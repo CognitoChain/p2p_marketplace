@@ -14,6 +14,8 @@ import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay} from "../../utils/Util";
 import "./LoanRequest.css";
+import ReactGA from 'react-ga';
+
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -135,6 +137,13 @@ class LoanRequest extends Component {
     }
 
     async handleFill() {
+
+        // GA Tracking
+        ReactGA.event({
+            category: 'User',
+            action: 'loan-request-fill'
+        });
+
         const { loanRequest, userLoanAgree } = this.state;
         this.setState({buttonLoading: true});
         if (userLoanAgree === true) {
@@ -186,20 +195,26 @@ class LoanRequest extends Component {
         const terms = loanRequest.getTerms();
         this.setState({unlockTokenButtonLoading: true});
         if (typeof owner != 'undefined') {
-            const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
-            let response = await getTransactionReceipt(txHash);
-            if (!_.isUndefined(response)) {
-                transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
-                this.props.refreshTokens(false);
-                this.setState({
-                    customAlertMsgDisplay: false,
-                    transactions,
-                    unlockTokenButtonLoading:false
-                });
+            try{
+                const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
+                let response = await getTransactionReceipt(txHash);
+                if (!_.isUndefined(response)) {
+                    transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
+                    this.props.refreshTokens(false);
+                    this.setState({
+                        customAlertMsgDisplay: false,
+                        transactions,
+                        unlockTokenButtonLoading:false
+                    });
+                }
+                else
+                {
+                    this.setState({unlockTokenButtonLoading: true});
+                }
             }
-            else
+            catch(e)
             {
-                this.setState({unlockTokenButtonLoading: true});
+                this.setState({unlockTokenButtonLoading: false});
             }
         }
     }
@@ -347,7 +362,7 @@ class LoanRequest extends Component {
                                     <CardBody className="pb-0">
                                         <div className="p-4 pb-0">
                                             <CardTitle>Summary </CardTitle>
-                                            <div className="scrollbar" tabIndex={2} style={{ overflowY: 'hidden', outline: 'none' }}>
+                                            <div tabIndex={2}>
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"

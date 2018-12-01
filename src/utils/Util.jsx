@@ -84,6 +84,10 @@ var getTransactionReceiptPromise = function (hash) {
   });
 };
 
+var timeOut = function(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const getTransactionReceipt = async (hash) => {
   try {
     let receipt = null;
@@ -93,6 +97,7 @@ export const getTransactionReceipt = async (hash) => {
       data = await getTransactionReceiptPromise(hash);
       if (!_.isUndefined(data) && data != null && data.blockHash != null && data.blockHash != null && data.from != null && data.from != '' && data.to != null && data.to != '') {
         receipt = data;
+        await timeOut(2000);
       }
       /*can put sleep for one sec*/
     }

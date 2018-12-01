@@ -11,7 +11,6 @@ class Summary extends Component {
     let {
       principalAmount,
       createdDate,
-      collateral,
       collateralAmount,
       collateralSymbol,
       termLengthAmount,
@@ -58,9 +57,7 @@ class Summary extends Component {
         <CardBody>
           <CardTitle>More Details </CardTitle>
           <div
-            className="scrollbar"
             tabIndex={2}
-            style={{ overflowY: "hidden", outline: "none" }}
           >
             <ListGroup className="list-unstyled to-do">
               <SummaryItem
@@ -70,9 +67,9 @@ class Summary extends Component {
               />
               <SummaryItem
                 labelName="Collateral Amount"
-                labelValue={collateral > 0 ? niceNumberDisplay(collateral) : ' - '}
-                labelValue2={collateral > 0 ? collateralSymbol : ''}
-                tooltipValue={tooltipNumberDisplay(collateral,collateralSymbol)}
+                labelValue={collateralAmount > 0 ? niceNumberDisplay(collateralAmount) : ' - '}
+                labelValue2={collateralAmount > 0 ? collateralSymbol : ''}
+                tooltipValue={tooltipNumberDisplay(collateralAmount,collateralSymbol)}
               />
               <SummaryItem
                 labelName="Collateral Value"
