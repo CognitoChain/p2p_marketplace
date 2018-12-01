@@ -258,9 +258,10 @@ class Dashboard extends Component {
             .then(async cancelResponse => {
                 if(cancelResponse.status == "SUCCESS")
                 {
-                    this.getMyLoanRequests();
-                    this.setState({ cancelLoanButtonLoading: false },()=>{
-                        toast.success("Your cancellation request is under process.");
+                    var loanKey = _.findKey(myLoanRequests, ["id", agreementId]);
+                    myLoanRequests[loanKey].loanStatus = 'DELETED';
+                    this.setState({ myLoanRequests,cancelLoanButtonLoading: false },()=>{
+                        toast.success("You have successfully cancelled loan request.");
                     });
                 }
             });

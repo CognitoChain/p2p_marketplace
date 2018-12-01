@@ -121,6 +121,7 @@ class MyLoanRequests extends Component {
             {
                 dataField: "status",
                 text: "Status",
+                isDummyField: true,
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     if (row.loanStatus == "OPEN") {
                         return (
