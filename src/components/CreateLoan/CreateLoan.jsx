@@ -18,6 +18,8 @@ import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import ReactGA from 'react-ga';
+
 class CreateLoan extends Component {
     constructor(props) {
         super(props);
@@ -112,6 +114,13 @@ class CreateLoan extends Component {
     }
 
     async createLoanRequest() {
+
+        // GA Tracking
+        ReactGA.event({
+            category: 'User',
+            action: 'loan-request-create'
+        });
+
         const api = new Api();
         let { LTVRatioValue } = this.state;
         this.setState({buttonLoading: true});

@@ -14,6 +14,8 @@ import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay} from "../../utils/Util";
 import "./LoanRequest.css";
+import ReactGA from 'react-ga';
+
 const TRANSACTION_DESCRIPTIONS = {
     fill: "Loan Request Fill",
     allowance: "Authorize Loan Request",
@@ -135,6 +137,13 @@ class LoanRequest extends Component {
     }
 
     async handleFill() {
+
+        // GA Tracking
+        ReactGA.event({
+            category: 'User',
+            action: 'loan-request-fill'
+        });
+
         const { loanRequest, userLoanAgree } = this.state;
         this.setState({buttonLoading: true});
         if (userLoanAgree === true) {
