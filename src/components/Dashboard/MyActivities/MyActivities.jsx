@@ -226,7 +226,7 @@ class MyActivities extends Component {
               agreementId: ts.id,
               sortTimestamp: seizeTimestamp,
               buttonText: 'Seize Collateral',
-              buttonClassName: 'green'
+              buttonClassName: 'seize-collateral-btn'              
             });
           }
           else
@@ -249,7 +249,7 @@ class MyActivities extends Component {
                       agreementId: ts.id,
                       sortTimestamp: schedule_ts,
                       buttonText: '',
-                      buttonClassName: ''
+                      buttonClassName: ''                      
                     });  
                   }
                   i++;
@@ -301,7 +301,7 @@ class MyActivities extends Component {
           let classname;
           if (row.type == "minus") {
             img = borrowLoanImg;
-            classname = "rounded-circle bg-orange icon-box";
+            classname = "rounded-circle "+(row.missedPaymentClass == 'missed' ? 'bg-missed' : 'bg-orange')+" icon-box";
           } else {
             img = fundLoanImg;
             classname = "rounded-circle bg-green icon-box";
