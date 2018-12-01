@@ -329,7 +329,7 @@ class MyActivities extends Component {
           if (row.type == "minus") {
             text = "Repayment "; 
             text += (row.repaymentText == "missed") ? "missed before " : "due in ";
-            text += (row.daysBefore != '' && row.daysBefore >= 1 && modulorHours > 0) ? row.daysBefore+' days '+modulorHours+' hours' : (row.daysBefore != '' && row.daysBefore > 1) ? row.daysBefore + ' days' : ((row.hoursBefore != '' && row.hoursBefore > 1) ? row.hoursBefore+' hours' : ((row.hoursBefore < 1) ? " few minutes" : ""));
+            text += (row.daysBefore != '' && row.daysBefore >= 1 && modulorHours > 0) ? row.daysBefore+' days '+modulorHours+' hours' : (row.daysBefore != '' && row.daysBefore > 1) ? row.daysBefore + ' days' : ((row.hoursBefore != '' && row.hoursBefore >= 1) ? row.hoursBefore+' hours' : ((row.hoursBefore < 1) ? " few minutes" : ""));
           } else if (row.type == "plus") {
             text = "Earning";
           }
