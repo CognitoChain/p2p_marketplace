@@ -1,10 +1,5 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import Tokens from "../components/Tokens/Tokens";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class TokensContainer extends Component {
@@ -18,5 +13,4 @@ class TokensContainer extends Component {
         );
     }
 }
-
 export default TokensContainer;

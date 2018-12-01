@@ -1,10 +1,17 @@
-const defaultAPI = process.env.REACT_APP_API_SERVER || "";
+const defaultAPI = process.env.REACT_APP_API_SERVER || "/api";
 
 class Api {
-    constructor(apiUrl) {
+    constructor(apiUrl,token) {        
         this.apiUrl = apiUrl || defaultAPI;
     }
-
+    setToken(token){
+        this.token = token;
+        return this;
+    }
+    processResponse(response){
+        if(response.status === 403)
+            localStorage.removeItem('token');
+    }
     /**
      * Makes a GET request to the API server, and returns a promise
      * with the resulting JSON response.
@@ -41,13 +48,34 @@ class Api {
      * @param params
      * @returns {Promise}
      */
-    get(resource, params) {
+    get(resource, params) {        
         const query = params ? `?${this.parseQueryParams(params)}` : '';
-
         return new Promise((resolve, reject) => {
-            fetch(`${this.apiUrl}/${resource}${query}`)
-                .then((response) => resolve(response.json()))
-                .catch((reason) => reject(reason));
+            let obj = {};
+        
+            if(this.token){
+                obj = {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': this.token,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            }
+            fetch(`${this.apiUrl}/${resource}${query}`,obj)
+                .then((response) => {
+                    this.processResponse(response);
+                    if(response.ok){
+                        let json = response.json()
+                        resolve(json)
+                    }
+                    else{
+                        reject(response)
+                    }
+                })
+                .catch((reason) => {
+                    reject(reason)
+                });
         });
     }
 
@@ -59,8 +87,45 @@ class Api {
      * @returns {Promise}
      */
     delete(resource, id) {
-        return new Promise((resolve, reject) => {
+        let url = this.apiUrl+'/'+resource+'/'+id; 
+        /*return new Promise((resolve, reject) => {
             fetch(`${this.apiUrl}/${resource}/${id}`, { method: "DELETE" })
+                .then((response) => resolve(response.json()))
+                .catch((reason) => reject(reason));
+        });*/
+        return new Promise((resolve, reject) => {
+            fetch(url, { 
+                    method: "DELETE",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": this.token
+                    }
+                })
+                .then((response) => resolve(response.json()))
+                .catch((reason) => reject(reason));
+        });
+    }
+
+    /**
+     * Allows putting a record.
+     *
+     * @param resource
+     * @param id
+     * @returns {Promise}
+     */
+    put(resource, id, data) {
+        let url = (id != null) ? this.apiUrl+'/'+resource+'/'+id : this.apiUrl+'/'+resource; 
+        return new Promise((resolve, reject) => {
+            fetch(url, { 
+                    method: "PUT",
+                    cache: "no-cache",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": this.token
+                    },
+                    body: JSON.stringify(data),
+                })
                 .then((response) => resolve(response.json()))
                 .catch((reason) => reject(reason));
         });
@@ -80,14 +145,26 @@ class Api {
                 cache: "no-cache",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': this.token,
                 },
                 body: JSON.stringify(data),
             })
-                .then(async (response) => {
-                    const loanRequest = await response.json();
-                    resolve(loanRequest.id);
-                })
-                .catch((reason) => reject(reason));
+            .then(async (response) => {
+                this.processResponse(response);
+                if(resource === "login"){
+                    resolve(response);
+                }
+                else if(resource === "goauthlogin"){
+                    const headers = response.headers;
+                    const json = await response.json();
+                    resolve([json,headers]);
+                }
+                else{
+                    const json = await response.json();
+                    resolve(json);    
+                }
+            })
+            .catch((reason) => reject(reason));
         });
     }
 

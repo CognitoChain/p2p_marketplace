@@ -1,0 +1,68 @@
+.content-with-market-bg{
+	padding-top:210px;
+}
+.market-bg-content{
+	position: relative;
+	padding: 2rem 2.5rem;
+	text-align: center;
+	color:#fff!important;
+}
+.market-bg-content h5{
+	color: #3298DE!important;
+    font-weight: 600;
+    font-size: 24px;
+}
+.market-bg-content .how-it-works h5,.market-bg-content .how-it-works p,.market-bg-content .how-it-works h6{
+	color: #dee2e6!important;
+	font-size: 1.1em;
+}
+.market-bg-content .how-it-works h6{
+	color:#fff!important;
+    font-weight: 600;
+}
+.market-bg-feature{
+	font-size: 1.8em!important;
+}
+.market-bg-image{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 210px;
+}
+.market-bg-image .image{
+	position: absolute;
+	height: 100%;
+	width:100%;
+	z-index: 0;
+	background-position: center;
+    background-size: cover;
+}
+.bg-overlay {
+	background: rgba(0, 0, 0, 0.8);
+	position: absolute;
+	height: 100%;
+	width:100%;
+	z-index: 0;
+}
+.open-request td{
+	text-align: center !important;
+}
+.open-request-table{
+	margin-bottom: 30px !important;
+}
+.recent-funded-loans-table th:first-child{
+	text-align: left !important; 
+}
+.filter-disabled{
+  opacity: .4;
+  cursor: default !important;
+  pointer-events: none;
+}
+.step-container{
+	border:1px solid #959698 !important;
+	border-radius: 5px !important;
+}
+.step-container h5,.step-container p,.step-container h6{
+	margin: 0 !important;
+}

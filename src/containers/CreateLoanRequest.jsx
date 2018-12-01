@@ -1,16 +1,12 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import CreateLoanRequest from "../components/CreateLoanRequest/CreateLoanRequest";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 
 class CreateLoanRequestContainer extends Component {
     constructor(props) {
         super(props);
-
+        console.log(this.props.token)
+        this.redirect = this.redirect.bind(this);
         this.onCompletion = this.onCompletion.bind(this);
     }
 
@@ -21,6 +17,9 @@ class CreateLoanRequestContainer extends Component {
     onCompletion(id) {
         this.props.history.push(`/?highlightRow=${id}`);
     }
+    redirect(location) {
+        this.props.history.push(location);
+    }
 
     render() {
         return (
@@ -28,8 +27,10 @@ class CreateLoanRequestContainer extends Component {
                 {(dharmaProps) => {
                     return (
                         <CreateLoanRequest
+                            token={this.props.token}
                             dharma={dharmaProps.dharma}
                             tokens={dharmaProps.supportedTokens}
+                            redirect={this.redirect}
                             onCompletion={this.onCompletion}
                         />
                     );
@@ -38,5 +39,4 @@ class CreateLoanRequestContainer extends Component {
         );
     }
 }
-
 export default CreateLoanRequestContainer;

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Alert } from "react-bootstrap";
-
+import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 const MAX_RETRIES = 10;
 
 const TX_STATES = {
@@ -18,29 +17,38 @@ const TX_STATE_TO_STYLE = {
 const TX_STATE_TO_TITLE = {
     awaiting: "Awaiting Transaction to be Mined",
     timedOut: "This Transaction seems to be taking a while...",
-    success: "Transaction Complete",
+    success: "Token Authorised.",
+};
+
+const TX_STATE_TO_ICON = {
+    awaiting: "fa fa-info fa-2x pull-left mr-2",
+    timedOut: "fa fa-exclamation-triangle fa-2x pull-left mr-2",
+    success: "fa fa-check fa-2x pull-left mr-2",
 };
 
 class TransactionManager extends Component {
     constructor(props) {
         super(props);
-
+        const { canAuthorize } = this.props;
         this.state = {
-            txState: TX_STATES.awaiting,
+            txState: (canAuthorize) ? TX_STATES.success : TX_STATES.awaiting,
             numRetries: 0,
+            canAuthorize: canAuthorize
         };
-
         this.retry = this.retry.bind(this);
         this.awaitTransactionMined = this.awaitTransactionMined.bind(this);
     }
 
     componentDidMount() {
-        this.awaitTransactionMined();
+        const { txHash } = this.props;
+        if(txHash){
+            this.awaitTransactionMined();
+        }
     }
 
     awaitTransactionMined() {
         const { dharma, txHash, onSuccess } = this.props;
-
+        
         dharma.blockchain
             .awaitTransactionMinedAsync(txHash)
             .then(() => {
@@ -49,7 +57,7 @@ class TransactionManager extends Component {
                     numRetries: 0,
                 });
 
-                onSuccess();
+                onSuccess(null, "success");
             })
             .catch(this.retry);
     }
@@ -75,17 +83,20 @@ class TransactionManager extends Component {
     render() {
         const { txState } = this.state;
         const { txHash, description } = this.props;
+        let extraTitle = '';
+
+        if (txHash != '' && txHash != null) {
+            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
+        }
 
         return (
-            <Alert bsStyle={TX_STATE_TO_STYLE[txState]}>
-                <h4>{TX_STATE_TO_TITLE[txState]}</h4>
-                <p>{description}</p>
-                <p>
-                    <a href={`https://etherscan.io/tx/${txHash}`} target="_blank">
-                        Transaction Details
-                    </a>
-                </p>
-            </Alert>
+
+            <CustomAlertMsg
+                bsStyle={TX_STATE_TO_STYLE[txState]}
+                className={TX_STATE_TO_ICON[txState]}
+                title={[TX_STATE_TO_TITLE[txState], ' ', extraTitle]}
+                description={description}
+            />
         );
     }
 }

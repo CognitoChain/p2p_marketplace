@@ -1,0 +1,78 @@
+.detail-sumary-second-label{
+	font-size: 10px !important;
+	text-align: right !important;
+}
+.loan-detail-card-statistics
+{
+	background-color: #E3FAE0 !important;
+}
+.loan-detail-numbers{
+	font-size: 16px;
+	font-weight: bolder;
+}
+.btn.cognito.repayment-button
+{
+	background-color: #17A086;
+	color: white !important;
+	padding:10px 15px;
+}
+.payment-due{
+	opacity: 0.3 !important;
+}
+
+.repayment-details
+{
+	font-size: 16px;
+    margin-top: 20px;
+    text-align: left;
+}
+.text-bold{
+	font-weight: bolder !important;
+}
+.make-repayment-btn:focus
+{
+	-webkit-box-shadow:none !important;
+	box-shadow:none !important;
+}
+.payment-success{
+	color:green !important;
+}
+.payment-check-circle{
+	font-size: 15px !important;
+}
+.payment-partial-paid{
+	opacity: 0.7 !important;
+	color:#fd7e14 !important;	
+}
+.payment-missed{
+	opacity: 0.7 !important;
+	color:#dc3545 !important;	
+}
+.overview-bg-success{
+	background-color: #E3FAE0 !important;
+}
+.overview-bg-btn-success{
+	background-color: #17A086 !important
+}
+.overview-bg-orange{
+	background-color: rgba(254, 178, 115, 0.52) !important;
+}
+.overview-bg-btn-orange{
+	background-color: #f09335 !important;
+}
+.overview-bg-error{
+	background-color: rgba(231, 114, 125, 0.35) !important;
+}
+.overview-bg-btn-error{
+	background-color: #e77882 !important;
+}
+.repayment-schedule td {
+    text-align: center!important;
+}
+.table.transaction-history thead th:nth-child(2){
+	text-align: right !important; 
+}
+.detail-unlock-tokens-button,.detail-unlock-tokens-button:hover{
+	background-color: #17A086 !important;
+	color: white !important;
+}

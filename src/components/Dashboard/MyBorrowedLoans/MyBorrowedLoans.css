@@ -1,0 +1,8 @@
+.cursor-pointer{
+	cursor: pointer !important; 
+}
+
+.table.borrowed-request thead th:nth-child(2),.table.borrowed-request thead th:nth-child(5),.table.borrowed-request thead th:nth-child(6){
+	text-align: right !important; 
+}
+

@@ -1,0 +1,4 @@
+export const BLOCKCHAIN_API = {
+    POLLING_INTERVAL: 1000,
+    TIMEOUT: 60000,
+};

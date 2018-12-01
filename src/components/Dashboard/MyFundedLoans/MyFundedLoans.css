@@ -1,0 +1,3 @@
+.table.funded-request thead th:nth-child(2),.table.funded-request thead th:nth-child(5){
+	text-align: right !important; 
+}

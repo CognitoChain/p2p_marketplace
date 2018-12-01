@@ -1,3 +1,6 @@
-.AuthorizableAction-Authorize {
-    margin-right: 10px;
+.AuthorizableAction-Button {
+    margin-left: 10px;
+}
+.unlock-tokens-button{
+	background-color: #17A086 !important;
 }

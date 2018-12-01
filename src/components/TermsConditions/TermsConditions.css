@@ -1,0 +1,27 @@
+.terms-conditions-container ol { 
+	counter-reset: item;
+}
+.terms-conditions-container li{ 
+	display: block; 
+	line-height: 30px !important;
+	font-size: 16px;
+}
+.terms-conditions-container li:before { 
+	content: counters(item, ".") " "; 
+	counter-increment: item; 
+	font-weight: bold;
+}
+.terms-conditions-container .main-title span{
+	font-size: 16px;
+	font-weight: bold;	
+}
+.terms-conditions-container .main-title{
+	margin-top: 15px !important;
+}
+.header-title{
+	font-size: 16px;
+}
+.weblink{
+	cursor: pointer !important;
+	color: #0f3b56 ;
+}

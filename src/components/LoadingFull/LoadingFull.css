@@ -1,0 +1,85 @@
+.loading-full {
+    width: 100%;
+    position: absolute;
+    line-height: 1.4;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    left: 50%;
+ }
+ 
+ .loading__author {
+   font-weight: normal;
+   font-size: 0.9rem;
+   color: rgba(189,189,189 ,1);
+   margin: 0.6rem 0 2rem 0;
+   display: block;
+ }
+ 
+ .loading__anim {
+   width: 35px;
+   height: 35px;
+   border:  5px solid rgba(189,189,189 ,0.25);
+   border-left-color: rgba(3,155,229 ,1);
+   border-top-color: rgba(3,155,229 ,1);
+   border-radius: 50%;
+   display: inline-block;
+   animation: rotate 600ms infinite linear;
+ }
+ .indicator{
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    /* top: 50%; */
+    /* left: 50%; */
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+    display: block;
+    margin-top: 2.25rem;
+    margin-bottom: 1rem;
+}  
+.indicator svg{
+    width:auto!important;
+    margin-right:1rem;
+} 
+.indicator svg polyline{
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.indicator svg polyline#back{
+        stroke: rgba(240,147,53,.3)
+}
+.indicator svg polyline#front{
+    stroke: #f09335;
+    stroke-dasharray: 12, 36;
+    stroke-dashoffset: 48;
+    animation: dash 1s linear infinite;
+        
+}
+        
+@keyframes dash {
+    62.5%{
+        opacity: 0
+    }
+    to{
+        stroke-dashoffset: 0
+    } 
+}
+.cta{
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    color: #222;
+    font-weight: bold;
+}
+  
+ @keyframes rotate {
+   to {
+     transform: rotate(1turn)
+   }
+ }

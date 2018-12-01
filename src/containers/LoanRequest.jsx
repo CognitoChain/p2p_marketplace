@@ -1,26 +1,20 @@
-// External libraries
 import React, { Component } from "react";
-
-// Components
 import LoanRequest from "../components/LoanRequest/LoanRequest";
-
-// Contexts
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 import Api from "../services/api";
 
 class LoanRequestContainer extends Component {
     constructor(props) {
         super(props);
-
         this.onFillComplete = this.onFillComplete.bind(this);
     }
 
-    async onFillComplete(id) {
+    async onFillComplete(id,currentAccount) {
         const api = new Api();
-
-        await api.delete("loanRequests", id);
-
-        this.props.history.push(`/investments`);
+        let data = {'address': currentAccount};
+        console.log("updating loan request - data: ", data)
+        await api.setToken(this.props.token).put("loanRequests", id, data);
+        this.props.history.push(`/fund/${id}`);
     }
 
     render() {
@@ -32,10 +26,13 @@ class LoanRequestContainer extends Component {
                     return (
                         <LoanRequest
                             id={ id }
+                            {...this.props}
                             dharma={ dharmaProps.dharma }
+                            refreshTokens={dharmaProps.refreshTokens}
                             onFillComplete={ async () => {
                                 dharmaProps.refreshTokens();
-                                await this.onFillComplete(id);
+                                const currentAccount = await dharmaProps.dharma.blockchain.getCurrentAccount();
+                                await this.onFillComplete(id,currentAccount);
                             } }
                         />
                     )
@@ -44,5 +41,4 @@ class LoanRequestContainer extends Component {
         );
     }
 }
-
 export default LoanRequestContainer;

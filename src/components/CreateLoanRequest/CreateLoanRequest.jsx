@@ -62,16 +62,22 @@ class CreateLoanRequest extends Component {
 
         const api = new Api();
 
-        const relayer = await api.get("relayerAddress");
-
-        this.setState({ relayerAddress: relayer.address });
+        const relayer = await api.setToken(this.props.token).get("relayerAddress").catch((error) => {
+            if(error.status && error.status === 403){
+                // this.props.redirect(`/login`);
+                // return;
+            }
+        });;
+        if(relayer){
+            this.setState({ relayerAddress: relayer.address });
+        }
     }
 
     async getRelayerFee(newPrincipalAmount) {
         const api = new Api();
 
         return new Promise((resolve) => {
-            api.get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
+            api.setToken(this.props.token).get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
                 resolve(response.fee);
             });
         });
@@ -85,7 +91,7 @@ class CreateLoanRequest extends Component {
             const currentAccount = await dharma.blockchain.getCurrentAccount();
             const loanRequest = await this.generateLoanRequest(currentAccount);
 
-            const id = await api.create("loanRequests", loanRequest.toJSON());
+            const id = await api.setToken(this.props.token).create("loanRequests", loanRequest.toJSON());
 
             this.props.onCompletion(id);
         } catch (e) {

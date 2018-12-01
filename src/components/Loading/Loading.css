@@ -1,3 +1,50 @@
-.Loading {
-    /* Style your loading component here. */
+.indicator{
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    /* top: 50%; */
+    /* left: 50%; */
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+    display: block;
+    margin-top: 2.25rem;
+    margin-bottom: 1rem;
+}  
+.indicator svg{
+    width:auto!important;
+    margin-right:1rem;
+} 
+.indicator svg polyline{
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
+.indicator svg polyline#back{
+        stroke: rgba(240,147,53,.3)
+}
+.indicator svg polyline#front{
+    stroke: #f09335;
+    stroke-dasharray: 12, 36;
+    stroke-dashoffset: 48;
+    animation: dash 1s linear infinite;
+        
+}
+        
+@keyframes dash {
+    62.5%{
+        opacity: 0
+    }
+    to{
+        stroke-dashoffset: 0
+    } 
+}
+.cta{
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    color: #222;
+    font-weight: bold;
+}
+  

@@ -1,39 +1,36 @@
 import React, { Component } from "react";
 import { Button } from "react-bootstrap";
-
-// Styling
 import "./AuthorizableAction.css";
 
 class AuthorizableAction extends Component {
     handleClick(event, callback) {
         event.preventDefault();
-
         callback();
     }
-
     render() {
-        const { canTakeAction, canAuthorize, onAction, onAuthorize } = this.props;
-
+        const { canTakeAction, canAuthorize, onAction, onAuthorize, buttonLoading, unlockTokenButtonLoading } = this.props;
+        let unlockButtonDisable = (canAuthorize || unlockTokenButtonLoading) ? true : false;
+        let buttonDisable = (!canTakeAction || buttonLoading) ? true : false;
         return (
             <div className="Actions">
-                <Button
+            	<Button
                     onClick={(event) => this.handleClick(event, onAuthorize)}
-                    disabled={!canAuthorize}
+                    disabled={unlockButtonDisable}
                     bsStyle="primary"
-                    className="AuthorizableAction-Authorize">
-                    Authorize Token Transfer
+                    className={`AuthorizableAction-Button unlock-tokens-button btn btn-success cognito ${canAuthorize ? 'd-none' : ''}`}
+                    >
+                    {this.props.children[0]}
                 </Button>
 
                 <Button
                     onClick={(event) => this.handleClick(event, onAction)}
-                    disabled={!canTakeAction}
+                    disabled={buttonDisable}
                     bsStyle="primary"
-                    className="AuthorizableAction-Action">
-                    {this.props.children}
+                    className="AuthorizableAction-Button btn btn-primary cognito">
+                    {this.props.children[1]}                    
                 </Button>
             </div>
         );
     }
 }
-
 export default AuthorizableAction;

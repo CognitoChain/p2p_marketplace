@@ -1,0 +1,438 @@
+body{
+  position: relative;
+  background-color:#fafafa !important;
+}
+.side-menu-fixed .side-menu li a{
+  text-decoration: none!important;
+}
+.btn.cognito{
+	text-transform:capitalize;
+  padding: 10px 15px;
+}
+.btn.cognito.disabled, .btn.cognito:disabled{
+  opacity: .90;
+  cursor: not-allowed;
+}
+.btn.cognito.orange { 
+  background: $orange;
+  color: $white; 
+  &:hover { 
+    color: $orange;
+    background: $white; 
+   }
+}
+.btn.cognito.green {
+  background: $green;
+  color: $white;
+  &:hover {
+    color: $green;
+    background: $white;
+  }
+}
+.btn.cognito.btn-link { 
+  text-transform: capitalize;
+  color: $dark-blue ;
+  padding: 0;
+  line-height: 25px;
+  border-radius: 0;
+}
+.btn.cognito.btn-theme { 
+  background: $theme-color;
+  color: $white; 
+  &:hover { 
+    background: $theme-hover-color; 
+   }
+}
+.btn.cognito.x-small { 
+	padding-top: 5px;
+	padding-bottom: 5px; 
+}
+.btn.cognito.small { 
+	padding-top: 10px;
+	padding-bottom: 10px; 
+	font-size: $font-base; 
+}
+.btn.cognito.medium { 
+	padding-top: 15px;
+	padding-bottom: 15px; 
+	font-size: $font-base; 
+}
+.btn.cognito.large { 
+	padding-top: 20px;
+	padding-bottom: 20px; 
+	font-size: $font-base; 
+}
+.bg-orange{
+  background-color: $orange;
+}
+.round-icon {
+  display: inline-block;
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  background-color: #222;
+  color: #FFF;
+  text-align: center;
+  &.hollow {
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    background-color: #FFF;
+    color: #222;
+    text-align: center;
+    -webkit-box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 0px 3px rgba(0, 0, 0, 0.75);
+  }
+  &.round-sm {
+    height: 20px;
+    width: 20px;
+    line-height: 25px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    font-size: 0.7em;
+  }
+  &.round-icon-lg {
+    height: 35px;
+    width: 35px;
+    line-height: 40px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    font-size: 1em;
+  }
+  &.blue {
+    background-color: $theme-color;
+  }
+  &.orange {
+    background-color: $orange;
+  }
+  &.green {
+    background-color: $success;
+  }
+  &.hollow {
+    &.blue {
+      color: $theme-color;
+      background-color: $white;
+      -webkit-box-shadow: 0px 0px 0px 3px $theme-color;
+      -moz-box-shadow: 0px 0px 0px 3px $theme-color;
+      box-shadow: 0px 0px 0px 3px $theme-color;
+    }
+    &.orange {
+      color: $orange;
+      background-color: $white;
+      -webkit-box-shadow: 0px 0px 0px 3px $orange;
+      -moz-box-shadow: 0px 0px 0px 3px $orange;
+      box-shadow: 0px 0px 0px 3px $orange;
+    }
+    &.green {
+      color: $success;
+      background-color: $white;
+      -webkit-box-shadow: 0px 0px 0px 3px $success;
+      -moz-box-shadow: 0px 0px 0px 3px $success;
+      box-shadow: 0px 0px 0px 3px $success;
+    }
+  }
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.create-loan-slider .input-range{
+  margin-top:1em!important;
+}
+.input-range__track--active{
+  background: #18a2b8;
+}
+.input-range__slider{
+  background: #18a2b8;
+  border: 1px solid #18a2b8;
+}
+.footer-container{
+  left: 30px;
+  right: 30px;
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+}
+.footer-full-width{
+  left:0;
+  right:0;
+}
+.main-content-container{
+  padding-bottom:60px
+}
+.web3-header{
+  padding: 50px 20px 20px 20px;
+  text-align: center;
+}
+.web3-exclamation-triangle{
+  color: #F4AB40; 
+  font-size: 40px; 
+  padding-bottom: 20px;
+}
+.web3-error-description{
+  font-size:16px;
+}
+.bg-green{
+  background-color: $green;
+}
+.transaction-detail-link{
+  color:#2A80B9 !important;
+}
+#loading{
+  background-color: #090606 !important;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 3;
+  margin-top: 0px;
+  top: 0px;
+  opacity: 0.85;
+}
+#loading-center{
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#loading-center-absolute {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 200px;
+  width: 200px;
+  margin-top: -100px;
+  margin-left: -100px;
+  -ms-transform: rotate(-135deg); 
+  -webkit-transform: rotate(-135deg); 
+  transform: rotate(-135deg);
+
+}
+.object{
+  -moz-border-radius: 50% 50% 50% 50%;
+  -webkit-border-radius: 50% 50% 50% 50%;
+  border-radius: 50% 50% 50% 50%;
+  position: absolute;
+  border-top: 5px solid #FFF;
+  border-bottom: 5px solid transparent;
+  border-left:  5px solid #FFF;
+  border-right: 5px solid transparent;
+  -webkit-animation: animate 2s infinite;
+  animation: animate 2s infinite; 
+}
+#object_one{
+  left: 75px;
+  top: 75px;
+  width: 50px;
+  height: 50px;
+}
+#object_two{
+  left: 65px;
+  top: 65px;
+  width: 70px;
+  height: 70px;
+  -webkit-animation-delay: 0.2s;
+  animation-delay: 0.2s;
+}
+#object_three{
+  left: 55px;
+  top: 55px;
+  width: 90px;
+  height: 90px;
+  -webkit-animation-delay: 0.4s;
+  animation-delay: 0.4s;
+}
+#object_four{
+  left: 45px;
+  top: 45px;
+  width: 110px;
+  height: 110px;
+  -webkit-animation-delay: 0.6s;
+  animation-delay: 0.6s;  
+} 
+.custom-alert-msg h6{
+  color :inherit;
+}
+.react-bootstrap-table thead>tr>th{
+  border-top: none!important;
+}
+.agree-loan-check{
+	// margin:10px 0 !important;
+	padding-top: 10px !important;
+	font-size: 10px !important;
+}
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 10px !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.checkbox-container span{
+    line-height: 25px;
+ }
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border: 1px solid #9E9E9E;
+    border-radius: 3px;
+}
+
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #fff;
+}
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #fff;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-container .checkmark:after {
+    left: 8px;
+    top: 3px;
+    width: 7px;
+    height: 15px;
+    border: solid #164968;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.react-bootstrap-table-pagination .btn-secondary {
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  color: $light-gray!important;
+}
+.pagination .page-item.active .page-link{
+    background: #163955 !important;
+    outline: 0;
+    border: 1px solid #163956 !important;
+}
+.page-link{
+  padding: .375rem .75rem!important;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+.react-bootstrap-table .created-title{
+  text-align:left;
+}
+.react-bootstrap-table .amount-title{
+  text-align: right;
+}
+@-webkit-keyframes animate {
+  50% {
+    -ms-transform: rotate(360deg) scale(0.8); 
+    -webkit-transform: rotate(360deg) scale(0.8); 
+    transform: rotate(360deg) scale(0.8); 
+  }
+}
+@keyframes animate {
+  50% {
+    -ms-transform: rotate(360deg) scale(0.8); 
+    -webkit-transform: rotate(360deg) scale(0.8); 
+    transform: rotate(360deg) scale(0.8); 
+  } 
+}
+
+
+@media (min-width: 768px) {
+  .pull-md-left {
+      float: left;
+  }
+  .pull-md-right {
+      float: right;
+  }
+}
+
+.lock-switch-label,.unlock-switch-label,.token-loading{
+  vertical-align: top;
+}
+.login-fancy.login-left{
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+.login-fancy.login-left p{
+  min-height: 200px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.header-links{
+  font-size:18px;
+  color:#f29c1f !important;
+}
+.side-menu-fixed .side-menu li a:hover,.side-menu-fixed .side-menu li.active > a{
+  font-weight:bolder !important;
+}
+.number-highlight{
+	font-weight: 600 !important;
+	font-size: 14px !important; 
+	color:#0f3b56;
+}
+.loans-time-label{
+  font-size: 11px !important;
+}
+.number-bold{
+	font-weight: 800;
+}
+.side-menu li a{
+  display: flex !important;
+  align-items:center !important;
+}
+.continue-guest-bnt-container{
+  border-top :1px solid #dee2e6;
+}
+.max-width-14 {
+  max-width: 7rem;
+}
+.sidebar-bottom-section a{
+  color:rgba(255, 255, 255, 0.7)
+}
+@media (min-width: 992px) {
+  .min-height-85vh--lg {
+    min-height: 85vh;
+  }
+  .h-100-lg{
+    height: 100%;
+  }
+}

@@ -1,0 +1,40 @@
+.eth-address{
+	font-size: 16px;
+	font-weight: bolder;
+	margin-top: 5px;
+}
+.crypto-currency-text{
+	margin-left:10px;
+}
+.card .card-body .icon-box{
+	height: 40px !important;
+	width: 40px !important;
+}
+.card.card-statistics .icon-box .highlight-icon {
+	font-size: 20px !important;
+	line-height: 40px !important;
+}
+.wallet-page .card-statistics .card-body{
+	padding: 0.75em;
+}
+.btn.cognito.x-small {
+   	font-size: 0.90em !important;
+}
+.wallet-token-symbol,.wallet-token-balance{
+	font-weight: bolder !important;
+}
+.btn.cognito.btn-danger {
+   	/*background-color: red;*/
+}
+/* .lock-button{
+	border-color: #dc3545 !important;
+}
+.lock-button:hover {
+    color: #dc3545 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: #dc3545 !important;
+} */
+.unlock-button:focus{
+	box-shadow: none !important;
+}

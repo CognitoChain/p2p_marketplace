@@ -1,0 +1,35 @@
+.assets-color .progress-bar{
+	background-color: #00CC99 !important;
+}
+.liabilities-color .progress-bar{
+	background-color: #FFA31A !important;
+}
+.assets-container,.liability-container{
+	margin-bottom: 5px;
+}
+.statistics-label{
+	font-size: 16px;
+	font-weight: bold;
+}
+.assets-container .progress,.liability-container .progress{
+	height: 6px !important;
+}
+.color-orange{
+	color:#FFA31A!important;
+}
+.color-green{
+	color: #00CC99!important;
+}
+.currency-text{
+	font-size:10px;
+	font-weight: 500;
+}
+.my-activities-table tr{
+	border-bottom:1px solid #eeeeee;
+}
+.weight-bolder{
+	font-weight: 600;
+}
+.table thead th {
+    border-bottom: none !important;
+}

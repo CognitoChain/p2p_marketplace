@@ -10,7 +10,9 @@ Based on the Dharma Relayer kit:
 ```
 https://github.com/dharmaprotocol/relayer-kit
 ```
- 
+# Install latest packages
+yarn install
+
 # Start Local Dev environment
 ```
 $ yarn blockchain
@@ -66,7 +68,7 @@ $ NETWORK=kovan PORT=8000 yarn server
 
 #  Access webapp in AWS
 ```
-http://ec2-35-178-211-233.eu-west-2.compute.amazonaws.com/
+http://ec2-35-178-211-233.eu-west-2.compute.amazonaws.com
 ```
 
 
