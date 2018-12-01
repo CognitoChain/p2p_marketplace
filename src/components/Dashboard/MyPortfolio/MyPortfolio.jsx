@@ -109,7 +109,26 @@ class MyPortfolio extends Component {
                                 </Row>
                         }
                         {
-                            !isLoading && !metaMaskMsg &&
+                            !totalAssetAmount && !isLoading && !metaMaskMsg &&
+                            <div className="portfolio-bg-image">
+                                <div className="portfolio-empty-image" style={{ backgroundImage: "url('assets/images/portfolio-empty.jpg')" }}>
+                                <div className="portfolio-bg-content">
+                                    Looks like you don't have any digital assets <br/>
+                                        Would you like to buy?<br/>
+                                    <a
+                                        href={`https://www.coinbase.com/`}
+                                        target="_blank" className="btn cognito green">
+                                        {"Go to Coinbase"}
+                                    </a>
+                                </div>
+                                </div>
+                            </div>
+
+                        }
+
+                        {
+                            !isLoading && !metaMaskMsg && totalAssetAmount &&
+
 
                             <Row className="align-items-center h-100 position-absolute portfolio-row w-100">
                                 <Col md={6}>

@@ -21,6 +21,14 @@ body{
     background: $white; 
    }
 }
+.btn.cognito.green {
+  background: $green;
+  color: $white;
+  &:hover {
+    color: $green;
+    background: $white;
+  }
+}
 .btn.cognito.btn-link { 
   text-transform: capitalize;
   color: $dark-blue ;
@@ -410,10 +418,6 @@ body{
 .side-menu li a{
   display: flex !important;
   align-items:center !important;
-}
-.btn.cognito.green { 
-  background: $green;
-  color: $white;   
 }
 .continue-guest-bnt-container{
   border-top :1px solid #dee2e6;
