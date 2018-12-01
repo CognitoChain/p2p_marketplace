@@ -66,3 +66,6 @@
 .step-container h5,.step-container p,.step-container h6{
 	margin: 0 !important;
 }
+.title-text{
+	opacity: .70;
+}
