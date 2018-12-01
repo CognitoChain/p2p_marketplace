@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
 import * as moment from "moment-timezone";
 import _ from "lodash";
+import { toast } from 'react-toastify';
 import Summary from "./Summary/Summary";
 import Overview from "./Overview/Overview";
 import PayModal from "./PayModal/PayModal";
@@ -371,6 +372,7 @@ class Detail extends Component {
     let alertMessage, alertMessageDisplay = '';
     repaymentAmount = parseFloat(repaymentAmount);
     outstandingAmount = parseFloat(outstandingAmount).toFixed(3);
+
     if (typeof currentMetamaskAccount != "undefined" && debtorEthAddress == currentMetamaskAccount && repaymentAmount > 0
     ) {
       const debt = await Debt.fetch(dharma, id);
@@ -394,21 +396,22 @@ class Detail extends Component {
         }
       }
       else {
-        alertMessageDisplay = 'danger';
-        alertMessage = "Repayment amount can not be more then outstanding amount."
+        toast.error("Repayment amount can not be more then outstanding amount.");
       }
     } else {
-      alertMessage =
+      let toastMessage =
         currentMetamaskAccount != debtorEthAddress
           ? "Invalid access."
           : repaymentAmount == 0
             ? "Payment amount must be greater then zero."
             : "Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.";
-      alertMessageDisplay = 'danger';
+      toast.error(toastMessage);
     }
     this.setState({
       alertMessageDisplay,
-      alertMessage
+      alertMessage,
+      repaymentButtonLoading:false,
+      buttonLoading:false
     })
   }
 
