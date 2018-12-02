@@ -6,7 +6,6 @@ import _ from "lodash";
 import { Link } from 'react-router-dom';
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
 import LoadingFull from "../LoadingFull/LoadingFull";
-import TransactionManager from "../TransactionManager/TransactionManager";
 import TokenSelect from "./TokenSelect/TokenSelect";
 import TimeUnitSelect from "./TimeUnitSelect/TimeUnitSelect";
 import SummaryItem from "./SummaryItem/SummaryItem";
@@ -165,6 +164,7 @@ class CreateLoan extends Component {
         const symbol = tokenSymbol ? tokenSymbol : collateralTokenSymbol;
         const isCompleted = status && status == "success" ? true : false;
         const { Token } = Dharma.Types;
+        this.setState({customAlertMsgDisplay:false});
         const currentAccount = await dharma.blockchain.getCurrentAccount();
         let stateObj = {};
         /*const tokens = new Tokens(dharma, currentAccount);*/
@@ -173,9 +173,16 @@ class CreateLoan extends Component {
         stateObj["isBottomButtonLoading"] = false;
         if (typeof currentAccount != "undefined") {
             const tokenData = await Token.getDataForSymbol(dharma, symbol, currentAccount);
-            const hasSufficientAllowance =
+            let hasSufficientAllowance =
                 tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount || isCompleted;
             stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
+            if(tokenData.hasUnlimitedAllowance)
+            {
+                stateObj["customAlertMsgDisplay"] = true;
+                stateObj["customAlertMsgStyle"] = 'success';
+                stateObj["customAlertMsgClassname"] = 'fa fa-check fa-2x pull-left mr-2';
+                stateObj["customAlertMsgTitle"] = 'Token Authorised.';
+            }
             stateObj["collateralCurrentBalance"] = tokenData.balance;
         }
         this.setState(stateObj);
@@ -186,7 +193,7 @@ class CreateLoan extends Component {
         const { Token } = Dharma.Types;
         const { collateralTokenSymbol } = this.state;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        this.setState({unlockTokenButtonLoading: true});
+        this.setState({unlockTokenButtonLoading: true,customAlertMsgDisplay:false});
         if (typeof currentAccount != 'undefined') {
             try {
                 const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
@@ -194,14 +201,27 @@ class CreateLoan extends Component {
                     collateralTokenSymbol,
                     currentAccount,
                 );
+
+                this.setState({
+                    txHash,
+                    customAlertMsgDisplay: true,
+                    customAlertMsgStyle: 'warning',
+                    customAlertMsgClassname: 'fa fa-info fa-2x pull-left mr-2',
+                    customAlertMsgTitle: 'Mining transaction'
+                });
+
                 let response = await getTransactionReceipt(txHash);
                 if(!_.isUndefined(response))
                 {
                     this.props.refreshTokens(false);
                     this.setState({
-                        customAlertMsgDisplay: false,
                         txHash,
-                        unlockTokenButtonLoading:false
+                        unlockTokenButtonLoading:false,
+                        hasSufficientAllowance:true,
+                        customAlertMsgDisplay: true,
+                        customAlertMsgStyle: 'success',
+                        customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
+                        customAlertMsgTitle: 'Token Authorised.'
                     });    
                 }
             }
@@ -259,8 +279,8 @@ class CreateLoan extends Component {
     toggleDropDown(field) {
         field = field + "DropdownOpen";
         this.setState({
-            [field]: !this.state[field],
-            customAlertMsgDisplay:false
+            [field]: !this.state[field]/*,
+            customAlertMsgDisplay:false*/
         });
     }
     onDropdownItemClick(field, element) {
@@ -469,16 +489,14 @@ class CreateLoan extends Component {
             unlockTokenButtonLoading,
             buttonLoading
         } = this.state;
-
         const { wrongMetamaskNetwork, isMetaMaskAuthRised } = this.props;
-
-        let msgDisplay = false;
-        if (txHash != '' || hasSufficientAllowance) {
-            msgDisplay = true;
-        }
         const isFormValid = this.isFormValid();
         let sortedTokens = _.orderBy(tokens, ['symbol'], ['asc']);
         let LTVRatio = LTVRatioValue <= 60 ? LTVRatioValue : 60
+        let extraTitle = '';
+        if (txHash != '' && txHash != null) {
+            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
+        }
         return (
             <div className="create-loan-container">
                 <div className="page-title">
@@ -659,23 +677,11 @@ class CreateLoan extends Component {
                                                 </div>
                                             </CardBody>
 
-                                            {!isBottomButtonLoading && msgDisplay === true &&
-                                                <TransactionManager
-                                                    key={txHash}
-                                                    txHash={txHash}
-                                                    dharma={dharma}
-                                                    onSuccess={this.setHasSufficientAllowance}
-                                                    canAuthorize={
-                                                        hasSufficientAllowance
-                                                    }
-                                                />
-                                            }
-
                                             {customAlertMsgDisplay === true &&
                                                 <CustomAlertMsg
                                                     bsStyle={customAlertMsgStyle}
                                                     className={customAlertMsgClassname}
-                                                    title={customAlertMsgTitle}
+                                                    title={[customAlertMsgTitle, ' ', extraTitle]}
                                                 />
                                             }
 

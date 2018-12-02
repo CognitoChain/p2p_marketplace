@@ -6,7 +6,6 @@ import * as moment from "moment";
 import { Link } from 'react-router-dom';
 import Api from "../../services/api";
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";
-import TransactionManager from "../TransactionManager/TransactionManager";
 import LoadingFull from "../LoadingFull/LoadingFull";
 import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
@@ -16,17 +15,12 @@ import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay} from "..
 import "./LoanRequest.css";
 import ReactGA from 'react-ga';
 
-const TRANSACTION_DESCRIPTIONS = {
-    fill: "Loan Request Fill",
-    allowance: "Authorize Loan Request",
-};
 class LoanRequest extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             loanRequest: null,
-            transactions: [],
             error: null,
             principal: 0,
             principalTokenSymbol: "WETH",
@@ -154,12 +148,14 @@ class LoanRequest extends Component {
                         let response = await getTransactionReceipt(txHash);
                         if(response)
                         {
-                            const { transactions } = this.state;
-                            transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.fill });
+                            this.props.refreshTokens();
                             this.setState({
-                                transactions,
-                                buttonLoading:false
+                                buttonLoading:false,
+                                customAlertMsgStyle: 'success',
+                                customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
+                                customAlertMsgTitle: 'Loan request filled 123.'
                             });
+                            this.props.onFillComplete();
                         }
                     });
             }
@@ -177,6 +173,7 @@ class LoanRequest extends Component {
         }
         else {
             this.setState({
+                txHash:'',
                 customAlertMsgDisplay: true,
                 customAlertMsgStyle: 'danger',
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
@@ -188,7 +185,7 @@ class LoanRequest extends Component {
     }
 
     async handleAuthorize() {
-        const { loanRequest, transactions } = this.state;
+        const { loanRequest } = this.state;
         const { dharma } = this.props;
         const { Token } = Dharma.Types;
         const owner = await dharma.blockchain.getCurrentAccount();
@@ -197,14 +194,26 @@ class LoanRequest extends Component {
         if (typeof owner != 'undefined') {
             try{
                 const txHash = await Token.makeAllowanceUnlimitedIfNecessary(dharma, terms.principalTokenSymbol, owner);
+                this.setState({
+                    txHash,
+                    customAlertMsgDisplay: true,
+                    customAlertMsgStyle: 'warning',
+                    customAlertMsgClassname: 'fa fa-info fa-2x pull-left mr-2',
+                    customAlertMsgTitle: 'Mining transaction',
+                    customAlertMsgDescription:''
+                });
                 let response = await getTransactionReceipt(txHash);
                 if (!_.isUndefined(response)) {
-                    transactions.push({ txHash, description: TRANSACTION_DESCRIPTIONS.allowance });
                     this.props.refreshTokens(false);
                     this.setState({
-                        customAlertMsgDisplay: false,
-                        transactions,
-                        unlockTokenButtonLoading:false
+                        error:null,
+                        unlockTokenButtonLoading:false,
+                        hasSufficientAllowance:true,
+                        customAlertMsgDisplay: true,
+                        customAlertMsgStyle: 'success',
+                        customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
+                        customAlertMsgTitle: 'Token Authorised.',
+                        customAlertMsgDescription:''
                     });
                 }
                 else
@@ -249,8 +258,7 @@ class LoanRequest extends Component {
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: title,
-                    customAlertMsgDescription: description,
-                    disableSubmitBtn: false
+                    customAlertMsgDescription: description                    
                 });
             });
     }
@@ -260,7 +268,7 @@ class LoanRequest extends Component {
         const { loanRequest } = this.state;
 
         const { Token } = Dharma.Types;
-
+        this.setState({customAlertMsgDisplay:false});
         const currentAccount = await dharma.blockchain.getCurrentAccount();
 
         const terms = loanRequest.getTerms();
@@ -271,6 +279,14 @@ class LoanRequest extends Component {
             const tokenData = await Token.getDataForSymbol(dharma, terms.principalTokenSymbol, currentAccount);
             const hasSufficientAllowance =
                 tokenData.hasUnlimitedAllowance || tokenData.allowance >= terms.principalAmount || isCompleted;
+            if(tokenData.hasUnlimitedAllowance === true && tokenData.balance >= terms.principalAmount)
+            {
+                stateObj["customAlertMsgDisplay"] = true;
+                stateObj["customAlertMsgStyle"] = 'success';
+                stateObj["customAlertMsgClassname"] = 'fa fa-check fa-2x pull-left mr-2';
+                stateObj["customAlertMsgTitle"] = 'Token Authorised.';
+                stateObj["customAlertMsgDescription"] = '';
+            }
             stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
             stateObj["isBottomButtonLoading"] = false;
         }
@@ -311,7 +327,6 @@ class LoanRequest extends Component {
             txHash,
             LTVRatioValue,
             loanRequest,
-            transactions,
             createdDate,
             createdTime,
             interestAmount,
@@ -329,6 +344,10 @@ class LoanRequest extends Component {
         } = this.state;
 
         const { dharma, onFillComplete } = this.props;
+        let extraTitle = '';
+        if (txHash != '' && txHash != null) {
+            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
+        }
         return (
             <div>
 
@@ -436,44 +455,12 @@ class LoanRequest extends Component {
                                         </div>
                                     </CardBody>
 
-                                    {!isBottomButtonLoading && transactions.map((transaction) => {
-                                        const { txHash, description } = transaction;
-                                        let onSuccess;
-                                        if (description === TRANSACTION_DESCRIPTIONS.fill) {
-                                            onSuccess = onFillComplete;
-                                        } else {
-                                            onSuccess = this.reloadState;
-                                        }
-                                        return (
-                                            <TransactionManager
-                                                key={txHash}
-                                                txHash={txHash}
-                                                dharma={dharma}
-                                                description={description}
-                                                onSuccess={onSuccess}
-                                                canAuthorize={
-                                                    hasSufficientAllowance
-                                                }
-                                            />
-                                        );
-                                    })
-                                    }
-                                    {
-                                        !isBottomButtonLoading && transactions.length == 0 && hasSufficientAllowance && <TransactionManager
-                                            key={txHash}
-                                            txHash={txHash}
-                                            dharma={dharma}
-                                            canAuthorize={
-                                                hasSufficientAllowance
-                                            }
-                                        />
-                                    }
-
+                                    
                                     {customAlertMsgDisplay === true &&
                                         <CustomAlertMsg
                                             bsStyle={customAlertMsgStyle}
                                             className={customAlertMsgClassname}
-                                            title={customAlertMsgTitle}
+                                            title={[customAlertMsgTitle, ' ', extraTitle]}
                                             description={customAlertMsgDescription}
                                         />
                                     }
