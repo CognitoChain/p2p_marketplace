@@ -37,7 +37,6 @@ class LoanRequestsContainer extends Component {
             <DharmaConsumer>
                 {(dharmaProps) => (
                     <LoanRequests
-                        token={this.props.token}
                         dharma={dharmaProps.dharma}
                         redirect={this.redirect}
                         highlightRow={highlightRow}

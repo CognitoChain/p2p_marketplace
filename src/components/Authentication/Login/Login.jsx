@@ -13,7 +13,7 @@ import assetBackedImg from "../../../assets/images/asset_backed.svg";
 import easyImg from "../../../assets/images/easy.svg";
 import noFeesImg from "../../../assets/images/no_fees.svg";
 import peerTopeerImg from "../../../assets/images/peer_to_peer.svg";
-
+import auth from '../../../utils/auth';
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ForgotForm from "./ForgotForm";
@@ -41,7 +41,7 @@ class Login extends React.Component {
 
     render() {
         let { urlPath } = this.state;
-        const { authenticated } = this.props;
+        const authToken = auth.getToken();
         let formTemplate = <LoginForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
         if (urlPath == "register") {
@@ -88,7 +88,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             {
-                                !authenticated && (
+                                _.isNull(authToken) && (
                                     <div className="col-md-4">
 
                                         <div className="row">
@@ -111,46 +111,46 @@ class Login extends React.Component {
                     <div className="pt-50 pb-50 container">
                         <h3 className="text-center mb-50 loan-base-title">Why Loanbase?</h3>
                         <div className="row features-row">
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={transparencyImg} alt="Transparency" />
-                                    <h3 class="h4">Transparency</h3>
-                                    <p class="mb-0">All transactions are broadcasted to ethereum blockchain, Hence highly transparent and instantly auditable.</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={transparencyImg} alt="Transparency" />
+                                    <h3 className="h4">Transparency</h3>
+                                    <p className="mb-0">All transactions are broadcasted to ethereum blockchain, Hence highly transparent and instantly auditable.</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={assetBackedImg} alt="Secured" />
-                                    <h3 class="h4">Secured</h3>
-                                    <p class="mb-0">Loans are secured against collateral held by smart contracts. No counterparty risk.</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={assetBackedImg} alt="Secured" />
+                                    <h3 className="h4">Secured</h3>
+                                    <p className="mb-0">Loans are secured against collateral held by smart contracts. No counterparty risk.</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={easyImg} alt="Easy" />
-                                    <h3 class="h4">Easy</h3>
-                                    <p class="mb-0">Our Personalised Dashboard gives you instant access to your loan portfolio.</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={easyImg} alt="Easy" />
+                                    <h3 className="h4">Easy</h3>
+                                    <p className="mb-0">Our Personalised Dashboard gives you instant access to your loan portfolio.</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={alertsImg} alt="Alerts" />
-                                    <h3 class="h4">Alerts</h3>
-                                    <p class="mb-0">We will send notification for repayments and alert you if the loan defaults.</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={alertsImg} alt="Alerts" />
+                                    <h3 className="h4">Alerts</h3>
+                                    <p className="mb-0">We will send notification for repayments and alert you if the loan defaults.</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={noFeesImg} alt="No Fees" />
-                                    <h3 class="h4">No Fees</h3>
-                                    <p class="mb-0">Zero fee lending while in beta. Pay only gas for processing transactions on the Ethereum blockchain</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={noFeesImg} alt="No Fees" />
+                                    <h3 className="h4">No Fees</h3>
+                                    <p className="mb-0">Zero fee lending while in beta. Pay only gas for processing transactions on the Ethereum blockchain</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-5">
-                                <div class="text-center px-lg-3">
-                                    <img class="max-width-14 mb-2" src={peerTopeerImg} alt="Peer to Peer" />
-                                    <h3 class="h4">Peer to Peer</h3>
-                                    <p class="mb-0">Lenders and Borrowers are connected without intermediaries</p>
+                            <div className="col-md-4 mb-5">
+                                <div className="text-center px-lg-3">
+                                    <img className="max-width-14 mb-2" src={peerTopeerImg} alt="Peer to Peer" />
+                                    <h3 className="h4">Peer to Peer</h3>
+                                    <p className="mb-0">Lenders and Borrowers are connected without intermediaries</p>
                                 </div>
                             </div>
                         </div>

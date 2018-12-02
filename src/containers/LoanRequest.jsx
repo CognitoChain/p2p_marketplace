@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import LoanRequest from "../components/LoanRequest/LoanRequest";
 import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 import Api from "../services/api";
+import auth from '../utils/auth';
 
 class LoanRequestContainer extends Component {
     constructor(props) {
@@ -13,7 +14,8 @@ class LoanRequestContainer extends Component {
         const api = new Api();
         let data = {'address': currentAccount};
         console.log("updating loan request - data: ", data)
-        await api.setToken(this.props.token).put("loanRequests", id, data);
+        const authToken = auth.getToken();
+        await api.setToken(authToken).put("loanRequests", id, data);
         this.props.history.push(`/fund/${id}`);
     }
 

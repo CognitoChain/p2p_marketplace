@@ -103,8 +103,6 @@ class Market extends Component {
                                     <DharmaConsumer>
                                         {(dharmaProps) => (
                                             <LoanRequests
-                                                authenticated={this.props.authenticated}
-                                                token={this.props.token}
                                                 dharma={dharmaProps.dharma}
                                                 redirect={this.redirect}
                                                 highlightRow={highlightRow}

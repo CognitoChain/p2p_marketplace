@@ -4,6 +4,7 @@ import _ from "lodash";
 import GoogleLogin from "react-google-login";
 import validators from '../../../validators';
 import Api from "../../../services/api";
+import auth from '../../../utils/auth';
 class RegisterForm extends React.Component {
   constructor(props) {
     super(props);
@@ -40,10 +41,12 @@ class RegisterForm extends React.Component {
           const headers = result[1];
           const authorization = headers.get('Authorization');
           if (authorization && authorization != null) {
-            localStorage.setItem('socialLogin', "yes");
-            localStorage.setItem('token', authorization);
-            localStorage.setItem('userEmail', response.email);
-            this.props.setLoginData();
+            let userInfo = {};
+            userInfo.email = response.email;
+            userInfo.socialLogin =  "yes";
+            auth.setToken(authorization);
+            auth.setUserInfo(userInfo);
+            this.props.checkLogin();
             this.props.history.push("/market");
           }
           else {

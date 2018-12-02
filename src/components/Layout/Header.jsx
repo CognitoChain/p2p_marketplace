@@ -4,6 +4,8 @@ import _ from 'lodash';
 import logoImg from "../../assets/images/logo.svg?v1";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Avatar from 'react-avatar';
+import auth from '../../utils/auth';
+
 class Header extends Component {
 
     constructor(props) {
@@ -51,8 +53,9 @@ class Header extends Component {
         }
     }
     render() {
-
-        const { userEmail, wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, socialLogin, authenticated, isMetaMaskAuthRised, currentLocation } = this.props;
+        const authUserInfo = auth.getUserInfo();
+        const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation } = this.props;
+        const authToken = auth.getToken();
 
         return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -72,7 +75,7 @@ class Header extends Component {
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
+                        !_.isNull(authToken) && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
                             // <CustomAlertMsg
                             //     bsStyle='danger'
                             //     extraClass="d-inline-block header-notice mb-0"
@@ -83,18 +86,17 @@ class Header extends Component {
                         )
                     }
                     {
-                        authenticated === true && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
+                        !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
                             <label className="headerEthAddress">{currentMetamaskAccount}</label>
                         )
                     }
                     <ul className="nav navbar-nav d-inline-block">
                         <li className="nav-item dropdown mr-30">
-                            {console.log(authenticated)}
                             {
-                                authenticated === true && (
+                                !_.isNull(authToken) && (
                                     <div>
                                         <div className="nav-link nav-pill user-avatar btn btn-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                            <Avatar name={userEmail} size="30px" round={true} />
+                                            <Avatar name={authUserInfo.email} size="30px" round={true} />
                                         </div>
                                         <div className="dropdown-menu dropdown-menu-right">
                                             <div>
@@ -102,13 +104,13 @@ class Header extends Component {
                                                     <div className="media">
                                                         <div className="media-body">
                                                             <h5 className="mt-0 mb-0">Welcome</h5>
-                                                            <span>{userEmail}</span>
+                                                            <span>{authUserInfo.email}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="dropdown-divider"></div>
                                                 {
-                                                    socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
+                                                    authUserInfo.socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
                                                 }
                                                 <a className="dropdown-item" onClick={() => { this.props.logout()}} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
@@ -117,7 +119,7 @@ class Header extends Component {
                                 )
                             }
                             {
-                                authenticated === false && currentLocation != "login" && currentLocation != "" && (
+                                _.isNull(authToken) && currentLocation != "login" && currentLocation != "" && (
                                     <div className="header-links">
                                         <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                     </div>

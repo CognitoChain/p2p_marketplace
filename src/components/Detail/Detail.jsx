@@ -14,6 +14,7 @@ import Api from "../../services/api";
 import LoadingFull from "../LoadingFull/LoadingFull";
 import { niceNumberDisplay, convertBigNumber, getTransactionReceipt } from "../../utils/Util";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
+import auth from '../../utils/auth';
 import "./Detail.css";
 class Detail extends Component {
   constructor(props) {
@@ -251,8 +252,9 @@ class Detail extends Component {
   }
   async getPriceFeeds() {
     const api = new Api();
+    const authToken = auth.getToken();
     const priceFeeds = await api
-      .setToken(this.props.token)
+      .setToken(authToken)
       .get(`priceFeed`);
     this.setState({ priceFeeds })
   }
@@ -263,13 +265,14 @@ class Detail extends Component {
     let collateralReturnable = false;
     let isCollateralSeizable = false;
     let isCollateralSeized = false;
+    const authToken = auth.getToken();
     const api = new Api();
     if (!isRefreshOnly) {
       this.setState({ isLoading: true });
     }
     const debt = await Debt.fetch(dharma, id);
     api
-      .setToken(this.props.token)
+      .setToken(authToken)
       .get(`loan/${id}`)
       .then(async loanRequestData => {
         if (!_.isUndefined(loanRequestData)) {

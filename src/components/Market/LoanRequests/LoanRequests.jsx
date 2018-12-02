@@ -10,6 +10,7 @@ import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
 import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
+import auth from '../../../utils/auth';
 import "./LoanRequests.css";
 class LoanRequests extends Component {
     constructor(props) {
@@ -51,7 +52,8 @@ class LoanRequests extends Component {
             this.setState({ isLoading: true });
         }
 
-        api.setToken(this.props.token).get("loanRequests", { sort, order })
+        const authToken = auth.getToken();
+        api.setToken(authToken).get("loanRequests", { sort, order })
             .then(this.parseLoanRequests)
             .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
             .catch((error) => {
@@ -84,6 +86,7 @@ class LoanRequests extends Component {
     }
     getData() {
         const { loanRequests } = this.state;
+        const authToken = auth.getToken();
         return loanRequests.map((request) => {
             return {
                 ...request,
@@ -92,7 +95,7 @@ class LoanRequests extends Component {
                 term: `${request.termDuration} ${request.termUnit}`,
                 expiration: moment.unix(request.expiresAt).fromNow(),
                 requestedDate: moment(request.requestedAt).calendar(),
-                authenticated: this.props.authenticated,
+                authToken: authToken,
                 currentMetamaskAccount:this.props.currentMetamaskAccount
             };
         });
@@ -103,7 +106,8 @@ class LoanRequests extends Component {
         });
     }
     openlink(row_id) {
-        if (this.props.authenticated) {
+        const authToken = auth.getToken();
+        if (!_.isNull(authToken)) {
             this.props.redirect(`/request/${row_id}`);
         }
         else {

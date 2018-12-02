@@ -26,36 +26,49 @@ import Api from "../../services/api";
 import GDPR from "../GDPR/GDPR";
 import Disclaimer from "../Disclaimer/Disclaimer";
 import CookiePolicy from "../CookiePolicy/CookiePolicy";
-const PrivateRoute = ({ component: Component, authenticated, ...rest }) => {
+import auth from '../../utils/auth';
+
+let currentLocation = '';
+let loginCheckInterval;
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  let messageLoginPage = '', messageClass = '';
+  // console.log("PrivateRoute")
+  // console.log(messageLoginPage)
+  const authToken = auth.getToken();
+  if (authToken == null) {
+    messageLoginPage = "LOGIN_REQUIRED";
+    messageClass = "warning";
+  }
+  //console.log(messageLoginPage)
   return (
-    <Route
-      {...rest}
-      render={(props) => authenticated === true
-        ? <Component {...rest} {...props} />
-        : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />}
-    />
+    <div>
+      <Route
+        {...rest}
+        render={(props) => !_.isNull( authToken)
+          ? <Component {...rest} {...props} />
+          : <Redirect to={{ pathname: '/login', state: { from: props.location, message: messageLoginPage, messageClass } }} />}
+      />
+    </div>
   )
 }
-const PublicRoute = ({ component: Component, authenticated, ...rest }) => {
+const PublicRoute = ({ component: Component, ...rest }) => {
+  const authToken = auth.getToken();
   return (
     <Route
       {...rest}
-      render={(props) => authenticated === false
+      render={(props) => _.isNull(authToken)
         ? <Component {...rest} {...props} />
         : <Redirect to={{ pathname: '/', state: { from: props.location } }} />}
     />
   )
 }
-let currentLocation;
+
 class Layout extends Component {
   constructor(props) {
     super(props);
     let currentMetamaskAccount = localStorage.getItem('currentMetamaskAccount');
     currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
-    const token = localStorage.getItem('token');
-    const userEmail = localStorage.getItem('userEmail');
-    const socialLogin = localStorage.getItem('socialLogin');
-    const authenticated = ((token && token !== null) ? true : false);
+
     let isWeb3Enabled = true;
     if (!window.web3) {
       isWeb3Enabled = false
@@ -68,10 +81,6 @@ class Layout extends Component {
       isUserMetaMaskPermission: false,
       isMetaMaskAuthRised: false,
       isUserMetaMaskPermissionAsked: false,
-      token,
-      userEmail,
-      socialLogin,
-      authenticated,
       networkId: '',
       wrongMetamaskNetwork: false,
       wrongMetamskNetworkMsg: ''      
@@ -81,55 +90,45 @@ class Layout extends Component {
     this.updateMetaMaskLoading = this.updateMetaMaskLoading.bind(this);
     this.metamaskPermission = this.metamaskPermission.bind(this);
     this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
-    this.setLoginData = this.setLoginData.bind(this);
-    this.updateReloadDetails = this.updateReloadDetails.bind(this);
+    this.checkLogin = this.checkLogin.bind(this);
   }
-  shouldComponentUpdate(nextProps, nextState){
-    if(this.state.authenticated != nextState.authenticated){
-      return false
-    }
-    else{
-      return true;
-    }
+  logout(msg, message_type) {
+    auth.clearToken();
+    auth.clearUserInfo();
+    clearInterval(loginCheckInterval)
+    loginCheckInterval = false;
+    this.props.history.push({
+      pathname: '/login',
+      state: { message: msg, messageClass: message_type }
+    });
   }
-  logout(msg) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('socialLogin');
-    this.updateMetamaskAccount('', false);
-    this.setLoginData();
-    if(!_.isUndefined(msg))
-    {
-      this.props.history.push({
-        pathname: '/login',
-        state: { message: msg }
-      });
+  checkLogin() {
+    const authToken = auth.getToken();
+    if (!_.isNull(authToken)) {
+      console.log("Interval Started")
+      loginCheckInterval = setInterval(() => {
+        const updatedToken = auth.getToken();
+        if (_.isNull(updatedToken)) {
+          this.logout("TOKEN_EXPIRED", "warning");
+        }
+      }, 1500)
     }
-    else{
-      this.props.history.push("/login");
-    }
-  }
-  setLoginData() {
-    const token = localStorage.getItem('token');
-    const userEmail = localStorage.getItem('userEmail');
-    const socialLogin = localStorage.getItem('socialLogin');
-    const authenticated = ((token && token !== null) ? true : false);
-    this.setState({
-      token,
-      userEmail,
-      socialLogin,
-      authenticated
-    })
   }
   componentDidMount() {
     this.checkNetworkId();
+    this.checkLogin()
+  }
+  componentWillUnmount() {
+    console.log("Interval Cleared unmount")
+    clearInterval(loginCheckInterval)
+    loginCheckInterval = false;
   }
   componentDidUpdate() {
-    window.scroll({
-      top: 0,
-      left: 0,
-      behavior: 'smooth'
-    });
+    // window.scroll({
+    //   top: 0,
+    //   left: 0,
+    //   behavior: 'smooth'
+    // });
   }
   updateMetaMaskLoading(iscurrentMetamaskAccountLoading) {
     this.setState({
@@ -146,14 +145,15 @@ class Layout extends Component {
     this.updateMetamaskAccountData(newMetamaskAccount, reloadDetails)
   }
   async updateMetamaskAccountData(newMetamaskAccount, reloadDetails) {
-    let { token, isUserMetaMaskPermission } = this.state;
+    let { isUserMetaMaskPermission } = this.state;
     console.log("updateMetamaskAccountData")
     if (newMetamaskAccount) {
       isUserMetaMaskPermission = true;
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
       if (this.state.currentMetamaskAccount != newMetamaskAccount) {
+        const authToken = auth.getToken();
         const api = new Api();
-        api.setToken(token).create("user/wallet", {
+        api.setToken(authToken).create("user/wallet", {
           address: newMetamaskAccount
         });
       }
@@ -178,8 +178,8 @@ class Layout extends Component {
     })
   }
   async metamaskPermission() {
-    const { authenticated } = this.state;
-    if (!authenticated) {
+    const authToken = auth.getToken();
+    if (!authToken) {
       return;
     }
     this.setState({ isUserMetaMaskPermission: false, isUserMetaMaskPermissionAsked: true }, () => {
@@ -187,6 +187,7 @@ class Layout extends Component {
     })
     if (window.ethereum) {
       try {
+        console.log("aaa")
         await window.ethereum.enable();
         this.setState({ isUserMetaMaskPermission: true, isUserMetaMaskPermissionAsked: false }, () => {
           this.updateMetaMaskAuthorized();
@@ -229,10 +230,10 @@ class Layout extends Component {
   renderAuthenticationRoute() {
     return (
       <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
-        <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} setLoginData={this.setLoginData} />
+        <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} checkLogin={this.checkLogin} />
         <PublicRoute {...this.state} path="/email-verify/" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-verify/:token" exact={true} component={Login} urlpath={currentLocation} />
-        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} setLoginData={this.setLoginData} />
+        <PublicRoute {...this.state} path="/register" component={Login} urlpath={currentLocation} checkLogin={this.checkLogin} />
         <PublicRoute {...this.state} path="/forgot" component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/password-reset/:token" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-unsubscribe/:token" exact={true} component={Login} urlpath={currentLocation} />
@@ -240,7 +241,8 @@ class Layout extends Component {
     );
   }
   renderAuthenitcatedRoute() {
-    const { authenticated, socialLogin } = this.state;
+    const authToken = auth.getToken();
+    const authUserInfo = auth.getUserInfo();
     return (
       <Base metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
         <Switch>
@@ -261,7 +263,7 @@ class Layout extends Component {
           <PrivateRoute {...this.state} path="/success" component={Success} />
           <PrivateRoute {...this.state} path="/fund/:id" component={FundContainer} />
           {
-            <PrivateRoute {...this.state} authenticated={authenticated && socialLogin == "no"} path="/change-password" component={ChangePassword} logout={this.logout} />
+            <PrivateRoute {...this.state} authToken={authToken && authUserInfo.socialLogin == "no"} path="/change-password" component={ChangePassword} logout={this.logout} />
           }
         </Switch>
       </Base>
@@ -272,7 +274,7 @@ class Layout extends Component {
       <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <Route exact={true} path='/'
           render={() =>
-            <Login {...this.props} {...this.state} urlpath={currentLocation} setLoginData={this.setLoginData}/>
+            <Login {...this.props} {...this.state} urlpath={currentLocation} checkLogin={this.checkLogin} />
           }
         />
         <Route exact={true} path='/privacy'
@@ -281,9 +283,9 @@ class Layout extends Component {
           }
         />
         <Route exact={true} path='/gdpr'
-               render={() =>
-                   <GDPR {...this.props} {...this.state} />
-               }
+          render={() =>
+            <GDPR {...this.props} {...this.state} />
+          }
         />
         <Route exact={true} path='/terms'
           render={() =>

@@ -5,6 +5,7 @@ import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Api from "../../services/api";
 import _ from "lodash";
+import auth from '../../utils/auth';
 class ChangePassword extends Component {
 
     constructor(props) {
@@ -93,13 +94,14 @@ class ChangePassword extends Component {
             currentPassword,
             password
         } = this.state;
+        const authToken = auth.getToken();
         if (currentPassword != "" && password != '') {
             this.setState({
                 buttonLoading: true
             })
             const api = new Api();
             let data = { 'currentPassword': currentPassword, 'newPassword': password };
-            const response = await api.setToken(this.props.token).put("user/password", null, data).catch((error) => {
+            const response = await api.setToken(authToken).put("user/password", null, data).catch((error) => {
                 if (error.status && error.status === 500) {
                     this.setState({
                         customAlertMsgDisplay: true,
@@ -113,7 +115,7 @@ class ChangePassword extends Component {
                 buttonLoading: false
             })
             if (!_.isUndefined(response) && response.status == "SUCCESS") {
-                this.props.logout("PASSWORD_CHANGED_SUCCESSFULLY");
+                this.props.logout("PASSWORD_CHANGED_SUCCESSFULLY","success");
             }
             else {
                 this.setState({
@@ -127,7 +129,7 @@ class ChangePassword extends Component {
     }
 
     render() {
-        const { userEmail } = this.props;
+        const authUserInfo = auth.getUserInfo();
         const {
             customAlertMsgDisplay,
             customAlertMsgStyle,
@@ -147,7 +149,7 @@ class ChangePassword extends Component {
                             <Card className="card-statistics mb-30 h-100 p-2">
                                 <CardBody>
                                     <CardTitle className="card-title-custom">Change Password </CardTitle>
-                                    <label className="mt-10 mb-10 user-email"><i className="fa fa-envelope"></i> {userEmail}</label>
+                                    <label className="mt-10 mb-10 user-email"><i className="fa fa-envelope"></i> {authUserInfo.email}</label>
 
                                     {customAlertMsgDisplay === true &&
                                         <CustomAlertMsg

@@ -8,6 +8,7 @@ import Api from "../../../services/api";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
 import ReactGA from 'react-ga';
 
+import auth from '../../../utils/auth';
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
@@ -16,7 +17,7 @@ class LoginForm extends React.Component {
       password: '',
       error: null,
       processing: false,
-      buttonLoading:false,
+      buttonLoading: false,
       locationState: this.props.locationState || {}
     };
     this.socialSignup = this.socialSignup.bind(this);
@@ -30,8 +31,9 @@ class LoginForm extends React.Component {
   }
   componentDidMount() {
     const { locationState } = this.state;
-  
-    if (!_.isUndefined(locationState) && !_.isEmpty(locationState)) {
+    console.log("locationState")
+    console.log(locationState)
+    if (!_.isUndefined(locationState) && !_.isEmpty(locationState) && !_.isUndefined(locationState.message)) {
       this.props.historyPush.push({
         pathname: '/login',
         state: {}
@@ -49,23 +51,25 @@ class LoginForm extends React.Component {
 
   socialSignup(res, type) {
     if (typeof res.tokenId != "undefined") {
-      this.googleSignIn(res.tokenId).then((result)=> {
-        try{
-          const response =  result[0];
+      this.googleSignIn(res.tokenId).then((result) => {
+        try {
+          const response = result[0];
           const headers = result[1];
           const authorization = headers.get('Authorization');
           if (authorization && authorization != null) {
-            localStorage.setItem('socialLogin', "yes");
-            localStorage.setItem('token', authorization);
-            localStorage.setItem('userEmail', response.email);
-            this.props.setLoginData();
+            let userInfo = {};
+            userInfo.email = response.email;
+            userInfo.socialLogin =  "yes";
+            auth.setToken(authorization)
+            auth.setUserInfo(userInfo);
+            this.props.checkLogin();
             this.props.historyPush.push("/market");
           }
           else {
             toast.error("Please try again later..");
           }
         }
-        catch(e){
+        catch (e) {
           toast.error("Please try again later..");
         }
       });
@@ -137,9 +141,10 @@ class LoginForm extends React.Component {
     const {
       email,
       password,
+      locationState
     } = this.state;
     this.setState({
-      buttonLoading:true
+      buttonLoading: true
     })
     const api = new Api();
     const response = await api.create("login", {
@@ -147,23 +152,29 @@ class LoginForm extends React.Component {
       password: password
     });
     this.setState({
-      buttonLoading:false
+      buttonLoading: false
     })
     //const authorization = response.headers.get('Authorization');
     const authorization = response.headers.get('Authorization');
 
     if (authorization && authorization != null) {
-      localStorage.setItem('socialLogin', "no");
-      localStorage.setItem('token', authorization);
-      localStorage.setItem('userEmail', email);
-      this.props.setLoginData();
-      this.props.historyPush.push("/market");
-
+      let userInfo = {};
+      userInfo.email = email;
+      userInfo.socialLogin =  "no";
+      auth.setToken(authorization);
+      auth.setUserInfo(userInfo);
+      this.props.checkLogin();
+      if (!_.isUndefined(locationState.from)) {
+        this.props.historyPush.push(locationState.from);
+      }
+      else {
+        this.props.historyPush.push("/market");
+      }
     }
     else {
       const json = await response.json();
       if (json.ERROR == "USER_DISABLED") {
-      
+
         this.props.historyPush.push({
           pathname: '/email-verify',
           state: { message: "USER_DISABLED", email }
@@ -217,37 +228,42 @@ class LoginForm extends React.Component {
         </div>
       )
     }
-    else if (locationState.message == "EMAIL_VERIFICATION_SUCCESS" || locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") {
-      let flag = (locationState.message == "PASSWORD_RESET_SUCCESS" || locationState.message == "PASSWORD_CHANGED_SUCCESSFULLY") ? true : false; 
+    else {
+      let messageCode = locationState.message;
+      let message = messageCode;
+      if (messageCode == "EMAIL_VERIFICATION_SUCCESS") {
+        message = "Your account is successfully verified. You can login now."
+      }
+      else if (messageCode == "PASSWORD_RESET_SUCCESS" || messageCode == "PASSWORD_CHANGED_SUCCESSFULLY") {
+        message = "Password changed successfully.Please login using new passowrd."
+      }
+      else if (messageCode == "LOGIN_REQUIRED") {
+        message = "Please login to continue."
+      }
+      else if(messageCode == "TOKEN_EXPIRED"){
+        message = "Token expired. Please login to continue."
+      }
       return (
         <div>
-          {locationState.message == "EMAIL_VERIFICATION_SUCCESS" &&
           <p>
-            Your account is successfully verified. You can login now.
+            {message}
           </p>
-          }
-          {flag === true &&
-          <p>
-             Password changed successfully.Please login using new passowrd.
-          </p>
-          }
         </div>
       )
     }
-    return;
   }
   render() {
     const responseGoogle = response => {
       this.socialSignup(response, "google");
     };
-    const { email, password,buttonLoading } = this.state;
+    const { email, password, buttonLoading ,locationState} = this.state;
     const isFormValid = this.isFormValid();
     return (
       <div>
         <h3 className="mt-20 mb-20 login-label text-left">Sign In</h3>
         {
-          !_.isUndefined(this.state.locationState.message) && <CustomAlertMsg
-            bsStyle={"success"}
+          !_.isUndefined(locationState.message) && <CustomAlertMsg
+            bsStyle={locationState.messageClass!=''?locationState.messageClass:"success"}
             title={this.renderMessage()}
           />
         }

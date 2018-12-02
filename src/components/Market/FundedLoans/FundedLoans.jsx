@@ -8,6 +8,7 @@ import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
 import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
+import auth from '../../../utils/auth';
 import "./FundedLoans.css";
 const columns = [
     {
@@ -129,7 +130,8 @@ class FundedLoans extends Component {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        api.setToken(this.props.token).get("loanRequests", { sort, order })
+        const authToken = auth.getToken();
+        api.setToken(authToken).get("loanRequests", { sort, order })
             .then(this.fundedLoansRequests)
             .then(fundedLoansLists => {
                 if(myFundedLoansIsMounted)    

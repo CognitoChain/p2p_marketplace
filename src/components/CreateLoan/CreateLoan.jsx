@@ -14,6 +14,7 @@ import Error from "../Error/Error";
 import validators from '../../validators';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "../../utils/Util";
+import auth from '../../utils/auth';
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
@@ -87,10 +88,10 @@ class CreateLoan extends Component {
 
     async componentDidMount() {
         this.setHasSufficientAllowance();
-
+        const authToken=  auth.getToken()
         const api = new Api();
 
-        const relayer = await api.setToken(this.props.token).get("relayerAddress").catch((error) => {
+        const relayer = await api.setToken(authToken).get("relayerAddress").catch((error) => {
             if (error.status && error.status === 403) {
                 // this.props.redirect(`/login`);
                 // return;
@@ -104,9 +105,9 @@ class CreateLoan extends Component {
 
     async getRelayerFee(newPrincipalAmount) {
         const api = new Api();
-
+        const authToken = auth.getToken()
         return new Promise((resolve) => {
-            api.setToken(this.props.token).get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
+            api.setToken(authToken).get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
                 resolve(response.fee);
             });
         });
@@ -122,13 +123,14 @@ class CreateLoan extends Component {
 
         const api = new Api();
         let { LTVRatioValue } = this.state;
+        const authToken =  auth.getToken();
         this.setState({buttonLoading: true});
         if (this.isFormValid() && LTVRatioValue <= 60) {
             try {
                 const { dharma } = this.props;
                 const currentAccount = await dharma.blockchain.getCurrentAccount();
                 const loanRequest = await this.generateLoanRequest(currentAccount);
-                api.setToken(this.props.token).create("loanRequests", {
+                api.setToken(authToken).create("loanRequests", {
                     ...loanRequest.toJSON(),
                     id: loanRequest.getAgreementId(),
                 });
@@ -433,7 +435,8 @@ class CreateLoan extends Component {
         let principalTokenSymbol = this.state.principalTokenSymbol;
         let collateralTokenSymbol = this.state.collateralTokenSymbol;
         const api = new Api();
-        api.setToken(this.props.token)
+        const authToken =  auth.getToken();
+        api.setToken(authToken)
             .get(`priceFeed`)
             .then(async priceFeedData => {
                 principalTokenSymbol = (principalTokenSymbol == "WETH" && _.isUndefined(priceFeedData[principalTokenSymbol])) ? "ETH" : principalTokenSymbol;

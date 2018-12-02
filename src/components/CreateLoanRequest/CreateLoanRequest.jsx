@@ -26,6 +26,7 @@ import Api from "../../services/api";
 import "./CreateLoanRequest.css";
 import Title from "../Title/Title";
 import Error from "../Error/Error";
+import auth from '../../utils/auth';
 
 class CreateLoanRequest extends Component {
     constructor(props) {
@@ -59,10 +60,10 @@ class CreateLoanRequest extends Component {
 
     async componentDidMount() {
         this.setHasSufficientAllowance();
-
+        const authToken =  auth.getToken();
         const api = new Api();
 
-        const relayer = await api.setToken(this.props.token).get("relayerAddress").catch((error) => {
+        const relayer = await api.setToken(authToken).get("relayerAddress").catch((error) => {
             if(error.status && error.status === 403){
                 // this.props.redirect(`/login`);
                 // return;
@@ -75,9 +76,10 @@ class CreateLoanRequest extends Component {
 
     async getRelayerFee(newPrincipalAmount) {
         const api = new Api();
+        const authToken =  auth.getToken();
 
         return new Promise((resolve) => {
-            api.setToken(this.props.token).get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
+            api.setToken(authToken).get("relayerFee", { principalAmount: newPrincipalAmount }).then((response) => {
                 resolve(response.fee);
             });
         });
@@ -91,8 +93,9 @@ class CreateLoanRequest extends Component {
             const currentAccount = await dharma.blockchain.getCurrentAccount();
             console.log("createLoanRequest() - currentAccount: ", currentAccount);
             const loanRequest = await this.generateLoanRequest(currentAccount);
+            const authToken =  auth.getToken();
 
-            const id = await api.setToken(this.props.token).create("loanRequests", loanRequest.toJSON());
+            const id = await api.setToken(authToken).create("loanRequests", loanRequest.toJSON());
 
             this.props.onCompletion(id);
         } catch (e) {

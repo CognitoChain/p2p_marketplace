@@ -1,5 +1,5 @@
+import auth from '../utils/auth';
 const defaultAPI = process.env.REACT_APP_API_SERVER || "/api";
-
 class Api {
     constructor(apiUrl,token) {        
         this.apiUrl = apiUrl || defaultAPI;
@@ -9,8 +9,10 @@ class Api {
         return this;
     }
     processResponse(response){
-        if(response.status === 403)
-            localStorage.removeItem('token');
+        if(response.status === 403){
+            auth.clearToken();
+            auth.clearUserInfo();
+        }
     }
     /**
      * Makes a GET request to the API server, and returns a promise

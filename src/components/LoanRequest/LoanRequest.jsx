@@ -12,6 +12,7 @@ import Error from "../Error/Error";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay} from "../../utils/Util";
+import auth from '../../utils/auth';
 import "./LoanRequest.css";
 import ReactGA from 'react-ga';
 
@@ -63,10 +64,10 @@ class LoanRequest extends Component {
         const { LoanRequest } = Dharma.Types;
 
         const { dharma, id } = this.props;
-
+        const authToken = auth.getToken();
         const api = new Api();
         let LTVRatioValue = 0;
-        api.setToken(this.props.token).get(`loanRequests/${id}`).then(async (loanRequestData) => {
+        api.setToken(authToken).get(`loanRequests/${id}`).then(async (loanRequestData) => {
 
             const loanRequest = await LoanRequest.load(dharma, loanRequestData);
             let collateralCurrentAmount = 0;
@@ -76,7 +77,7 @@ class LoanRequest extends Component {
             });
             var get_terms = loanRequest.getTerms();
 
-            await api.setToken(this.props.token).get(`priceFeed`)
+            await api.setToken(authToken).get(`priceFeed`)
                 .then(async priceFeedData => {
                     let principalTokenSymbol = get_terms.principalTokenSymbol;
                     principalTokenSymbol = (principalTokenSymbol == "WETH" && _.isUndefined(priceFeedData[principalTokenSymbol])) ? "ETH" : principalTokenSymbol;

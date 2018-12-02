@@ -5,7 +5,6 @@ import DharmaConsumer from "../contexts/Dharma/DharmaConsumer";
 class CreateLoanRequestContainer extends Component {
     constructor(props) {
         super(props);
-        console.log(this.props.token)
         this.redirect = this.redirect.bind(this);
         this.onCompletion = this.onCompletion.bind(this);
     }
@@ -27,7 +26,6 @@ class CreateLoanRequestContainer extends Component {
                 {(dharmaProps) => {
                     return (
                         <CreateLoanRequest
-                            token={this.props.token}
                             dharma={dharmaProps.dharma}
                             tokens={dharmaProps.supportedTokens}
                             redirect={this.redirect}

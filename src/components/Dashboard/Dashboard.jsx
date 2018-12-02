@@ -12,8 +12,11 @@ import MyActivities from "./MyActivities/MyActivities";
 import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
 import { convertBigNumber } from "../../utils/Util";
+import auth from '../../utils/auth';
+
 import './Dashboard.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+
 class Dashboard extends Component {
 
     constructor(props) {
@@ -48,16 +51,6 @@ class Dashboard extends Component {
         this.getFundedLoanRequests();
         this.getMyLoanRequests();
     }
-    /*async componentWillMount(){
-        const { dharma } = this.props;
-        const currentMetamaskAccount = await dharma.blockchain.getCurrentAccount();
-        if(!_.isUndefined(currentMetamaskAccount))
-        {
-            this.setState({
-                currentMetamaskAccount: currentMetamaskAccount
-            });    
-        }
-    }*/
     componentWillUnmount() {
         this.setState({
             myBorrowedRequestsIsMounted: false,
@@ -80,10 +73,10 @@ class Dashboard extends Component {
         }
     }
 
-    amountTooltipTop(token) {
+    amountTooltipTop() {
         /*const { tokenlist } = this.state;
-        let tootlTipStatus = !token.tootlTipStatus;
-        let symbol = token.symbol;
+        let tootlTipStatus = !.tootlTipStatus;
+        let symbol = .symbol;
         var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
         tokenlist[tokenKey].tootlTipStatus = tootlTipStatus;
         this.setState({
@@ -104,8 +97,9 @@ class Dashboard extends Component {
         {
             this.setState({ myBorrowedLoading: true });
         }
+        const authToken =  auth.getToken();
 
-        api.setToken(this.props.token).get("user/loans", { sort, order })
+        api.setToken(authToken).get("user/loans", { sort, order })
             .then(myBorrowedRequests => {
                 if (myBorrowedRequestsIsMounted) {
                     this.setState({ myBorrowedRequests, myBorrowedLoading: false });
@@ -128,8 +122,9 @@ class Dashboard extends Component {
         {
             this.setState({ myFundedLoading: true });
         }
+        const authToken =  auth.getToken();
 
-        api.setToken(this.props.token).get("user/investments", { sort, order })
+        api.setToken(authToken).get("user/investments", { sort, order })
             .then(myFundedRequests => {
                 if (myFundedRequestsIsMounted) {
                     this.setState({ myFundedRequests, myFundedLoading: false });
@@ -147,7 +142,8 @@ class Dashboard extends Component {
         const sort = "createdAt";
         const order = "desc";
         const { myLoanRequestsIsMounted } = this.state;
-        api.setToken(this.props.token).get("user/loanRequests", { sort, order })
+        const authToken =  auth.getToken();
+        api.setToken(authToken).get("user/loanRequests", { sort, order })
             .then(this.parseMyLoanRequests)
             .then(myLoanRequests => {
                 if (myLoanRequestsIsMounted) {
@@ -261,11 +257,12 @@ class Dashboard extends Component {
 
 
     setPriceFeedData() {
-        const { token, currentMetamaskAccount } = this.props;
-     
+        const { currentMetamaskAccount } = this.props;
+        const authToken =  auth.getToken();
+
         if (typeof currentMetamaskAccount != "undefined") {
             const api = new Api();
-            api.setToken(token)
+            api.setToken(authToken)
                 .get(`priceFeed`)
                 .then(async priceFeedData => {
                     this.setState({ priceFeedData: priceFeedData });
@@ -276,13 +273,15 @@ class Dashboard extends Component {
     cancelLoanRequest(row){
        let agreementId = row.id;
        let debtorEthAddress = row.debtor;
-        const { token, currentMetamaskAccount } = this.props;
         let { myLoanRequests } = this.state;
+        const { currentMetamaskAccount } = this.props;
+        const authToken =  auth.getToken();
+
         if(!_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
         {
             this.setState({ cancelLoanButtonLoading: true })
             const api = new Api();
-            api.setToken(token)
+            api.setToken(authToken)
             .delete('loanRequests',agreementId)
             .then(async cancelResponse => {
                 if(cancelResponse.status == "SUCCESS")
@@ -301,7 +300,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { token, dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
+        const { dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
         const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist, cancelLoanButtonLoading, myBorrowRequestProcessed, myFundedRequestProcessed } = this.state;
         return (
             <div>
@@ -313,26 +312,21 @@ class Dashboard extends Component {
                         </Col>
                     </Row>
                 </div>
-                {/* <!-- widgets --> */}
 
                 {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
                     <div>
                         <Row className="mb-30">
                             <MyPortfolio
-                                authenticated={authenticated}
                                 dharma={dharma}
                                 tokens={tokenlist}
                                 isTokenLoading={isTokenLoading}
                                 myBorrowedLoading={myBorrowedLoading}
-                                token={token}
                                 myBorrowedRequests={myBorrowedRequests}
                                 currentMetamaskAccount={currentMetamaskAccount}
                                 priceFeedData={priceFeedData}
                             />
                             <MyActivities
-                                authenticated={authenticated}
                                 dharma={dharma}
-                                token={token}
                                 myBorrowedRequests={myBorrowedRequests}
                                 myFundedRequests={myFundedRequests}
                                 myBorrowedLoading={myBorrowedLoading}
@@ -384,7 +378,6 @@ class Dashboard extends Component {
                                                 <TabPane tabId="1">
 
                                                     <MyBorrowedLoans
-                                                        token={token}
                                                         dharma={dharma}
                                                         redirect={redirect}
                                                         myBorrowedLoading={myBorrowedLoading}
@@ -398,7 +391,6 @@ class Dashboard extends Component {
                                                 <TabPane tabId="2">
 
                                                     <MyFundedLoans
-                                                        token={token}
                                                         dharma={dharma}
                                                         redirect={redirect}
                                                         myFundedLoading={myFundedLoading}
@@ -411,7 +403,6 @@ class Dashboard extends Component {
                                                 <TabPane tabId="3">
 
                                                     <MyLoanRequests
-                                                        token={token}
                                                         dharma={dharma}
                                                         redirect={redirect}
                                                         myLoansLoading={myLoansLoading}
