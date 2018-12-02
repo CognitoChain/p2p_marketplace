@@ -21,9 +21,9 @@ class ModalMessage extends Component {
                 <Row>
                     <Col lg={12} md={12} sm={6} xl={12} className="web3-error-description">
                         <p className="mt-15 mb-15">
-                            Cognito Chain is a Web3-enabled application, which is just a fancy way of saying that it needs to be plugged into the Ethereum blockchain.
+                            Loanbase is a Web3-enabled application, which is just a fancy way of saying that it needs to be plugged into the Ethereum blockchain.
 			                </p>
-                        <p className="mt-15 mb-15">In order to use Cognito Chain on the web, you will need to install the MetaMask browser extension, available for Chrome, Firefox, Opera, and the new Brave browser.
+                        <p className="mt-15 mb-15">In order to use Loanbase on the web, you will need to install the MetaMask browser extension, available for Chrome, Firefox, Opera, and the new Brave browser.
 			              	</p>
                         <div className="mt-30 mb-30 text-center">
                             <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer" className="btn cognito orange">Download Metamask</a>
