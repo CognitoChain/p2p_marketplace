@@ -25,6 +25,7 @@ import _ from "lodash";
 import Api from "../../services/api";
 import GDPR from "../GDPR/GDPR";
 import Disclaimer from "../Disclaimer/Disclaimer";
+import CookiePolicy from "../CookiePolicy/CookiePolicy";
 const PrivateRoute = ({ component: Component, authenticated, ...rest }) => {
   return (
     <Route
@@ -294,6 +295,11 @@ class Layout extends Component {
                    <Disclaimer {...this.props} {...this.state} />
                }
         />
+        <Route exact={true} path='/cookie-policy'
+               render={() =>
+                   <CookiePolicy {...this.props} {...this.state} />
+               }
+        />
       </Basepages>
     )
   }
@@ -302,7 +308,7 @@ class Layout extends Component {
     const urlStringArr = urlString.split("/");
     currentLocation = urlStringArr[0];
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
-    let homeRoutes = ["privacy","gdpr", "terms", "disclaimer"];
+    let homeRoutes = ["privacy","gdpr", "terms", "disclaimer", "cookie-policy"];
     return (
       <div>
         {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}
