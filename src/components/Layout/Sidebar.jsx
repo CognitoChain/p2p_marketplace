@@ -18,9 +18,9 @@ class Sidebar extends Component {
       <div className="side-menu-fixed">
         <ScrollArea speed={0.8} style={{ overflow: 'hidden' }}
           className="scrollbar side-menu-bg"
-          contentClassName="saidbar"
+          contentClassName="sidebar"
           horizontal={false} >
-          <div className="saidbar">
+          <div className="sidebar">
 
             <ul className="nav navbar-nav side-menu" id="sidebarnav">
               {/* <!-- menu item Dashboard--> */}
@@ -52,7 +52,7 @@ class Sidebar extends Component {
                   <a href="/gdpr" target="_blank">GDPR</a>
                 </li>
                 <li>
-                  <a href="terms" target="_blank">Terms and Conditions</a>
+                  <a href="/terms" target="_blank">Terms and Conditions</a>
                 </li>
               </ul>
             </div>

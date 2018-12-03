@@ -447,7 +447,7 @@ class LoanRequest extends Component {
 
                                                 <div className="agree-loan-check pt-1 mtb-2 mb-30">
                                                     <label className="checkbox-container">
-                                                        <span>I have read and agreed to the <a href="/loan-agreement" target="_blank" className="link-blue">Loan Agreement</a></span>
+                                                        <span>I agree to the <a href="/terms" target="_blank" className="link-blue">Terms and Conditions</a></span>
                                                         <input type="checkbox" id="gridCheck" name="loanAgreement" value="y" onChange={this.handleAgreeChange} />
                                                         <span className="checkmark"></span>
                                                     </label>
