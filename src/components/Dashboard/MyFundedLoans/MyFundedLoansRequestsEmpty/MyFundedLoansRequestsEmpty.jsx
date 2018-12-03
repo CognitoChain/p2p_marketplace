@@ -12,7 +12,7 @@ import "./MyFundedLoansRequestsEmpty.css";
 class MyFundedLoansRequestsEmpty extends React.Component {
     render() {
         return (
-            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={["There are no funded loans yet. Fund a loan from  ",<Link to="/" className="btn btn-sm btn-link" style={{padding:0}}>Market</Link>," page."]} />
+            <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={["There are no funded loans yet. Fund a loan from  ",<Link to="/market" className="btn btn-sm btn-link" style={{padding:0}}>Market</Link>," page."]} />
         );
     }
 }
