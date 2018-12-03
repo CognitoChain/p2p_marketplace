@@ -90,6 +90,7 @@ class Layout extends Component {
     this.updateMetaMaskLoading = this.updateMetaMaskLoading.bind(this);
     this.metamaskPermission = this.metamaskPermission.bind(this);
     this.updateMetaMaskAuthorized = this.updateMetaMaskAuthorized.bind(this);
+    this.updateReloadDetails = this.updateReloadDetails.bind(this);
     this.checkLogin = this.checkLogin.bind(this);
   }
   logout(msg, message_type) {
