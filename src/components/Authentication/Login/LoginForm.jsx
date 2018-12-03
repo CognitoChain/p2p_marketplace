@@ -241,7 +241,7 @@ class LoginForm extends React.Component {
         message = "Please login to continue."
       }
       else if(messageCode == "TOKEN_EXPIRED"){
-        message = "Token expired. Please login to continue."
+        message = "Your session has expired. Please login to continue."
       }
       return (
         <div>
