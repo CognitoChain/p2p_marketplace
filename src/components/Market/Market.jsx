@@ -106,10 +106,8 @@ class Market extends Component {
                                                 dharma={dharmaProps.dharma}
                                                 redirect={this.redirect}
                                                 highlightRow={highlightRow}
-                                                currentMetamaskAccount={this.props.currentMetamaskAccount}
                                                 isTokenLoading={dharmaProps.isTokenLoading}
-                                                reloadDetails={this.props.reloadDetails}
-                                                updateReloadDetails={this.props.updateReloadDetails}
+                                                {...this.props}
                                             />
                                         )}
                                     </DharmaConsumer>
@@ -129,6 +127,7 @@ class Market extends Component {
                                             return <FundedLoans
                                                 dharma={dharmaProps.dharma}
                                                 redirect={this.redirect}
+                                                {...this.props}
                                             />
                                         }}
                                     </DharmaConsumer>

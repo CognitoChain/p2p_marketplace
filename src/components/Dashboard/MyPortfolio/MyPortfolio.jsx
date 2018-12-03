@@ -22,11 +22,11 @@ class MyPortfolio extends Component {
         };
     }
     async componentWillReceiveProps(nextProps) {
-        const { currentMetamaskAccount } = this.props;
+        const { isMetaMaskAuthRised } = this.props;
         const { priceFeedData,myBorrowedRequests,tokens } = nextProps;
         let totalAssetAmount = 0;
         let totalLiablitiesAmount = 0;
-        if (!_.isUndefined(priceFeedData) && !_.isUndefined(currentMetamaskAccount)) {
+        if (!_.isUndefined(priceFeedData) && isMetaMaskAuthRised) {
             if (tokens.length>0) {
                 tokens.forEach(ts => {
                     if (ts.balance > 0) {

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay,convertBigNumber,tooltipNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
@@ -31,18 +31,17 @@ class MyActivities extends Component {
 
   async componentWillReceiveProps(nextProps) {
     const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
-    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount, myBorrowRequestProcessed, myFundedRequestProcessed } = this.props;
+    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount,isMetaMaskAuthRised, myBorrowRequestProcessed, myFundedRequestProcessed } = this.props;
     const { myLoansIsMounted, myInvestmensIsMounted } = this.state;
 
     let repaymentSchedule;
-    let expectedRepaidAmount;
     let loanRequestsActivities = [];
     let investmentsActivities = [];
     let myBorrowedRequestsLoading = true;
     let myFundedRequestsLoading = true;
     console.log("myBorrowRequestProcessed");
     console.log(myBorrowRequestProcessed);
-    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && !_.isUndefined(currentMetamaskAccount) && myBorrowRequestProcessed == false) {
+    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && isMetaMaskAuthRised && myBorrowRequestProcessed == false) {
       console.log(nextBorrowedRequests.length);
       this.props.updateMyBorrowRequestProcessed('myBorrowRequestProcessed',true);
       if (nextBorrowedRequests.length > 0) {
@@ -72,7 +71,7 @@ class MyActivities extends Component {
           let missedDate = '';
           let missedPaymentClass = '';
 
-          if(ts.debtorAddress == currentMetamaskAccount && ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true)
+          if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true)
           {
             let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
               ts.id
@@ -110,7 +109,7 @@ class MyActivities extends Component {
                 let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
 
                 if (st > current_timestamp && i == 1 && amount > 0) {
-                  if (ts.debtorAddress == currentMetamaskAccount) {
+                  if (isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount) {
                     if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
                       buttonText = 'Pay';
                       buttonClassName = 'orange';
@@ -150,7 +149,7 @@ class MyActivities extends Component {
                   missedRepaymentAmount = niceNumberDisplay(missedRepaymentAmount);
                   missedSt = st;
                   missedDate = date;
-                  if((paidStatus == 'partial_paid' || paidStatus == 'missed') && ts.debtorAddress == currentMetamaskAccount)
+                  if(isMetaMaskAuthRised && (paidStatus == 'partial_paid' || paidStatus == 'missed') && ts.debtorAddress == currentMetamaskAccount)
                   {
                     missedPaymentClass = (paidStatus == 'partial_paid') ? 'partial_paid' : 'missed';
                     missedButtonText = 'Pay';
@@ -201,7 +200,6 @@ class MyActivities extends Component {
 
     if (nextFundedRequests != myFundedRequests && myFundedLoading === false && myFundedRequestProcessed == false) {
       this.props.updateMyBorrowRequestProcessed('myFundedRequestProcessed',true);
-      let expectedRepaidAmount;
       let repaymentSchedule;
       if (nextFundedRequests.length > 0) {
         await this.asyncForEach(nextFundedRequests, async ts => {
@@ -213,7 +211,7 @@ class MyActivities extends Component {
           let installmentPrincipal = parseFloat(ts.principal) / parseFloat(ts.termLengthAmount);
           installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
           let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
-          if(ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable == true && ts.isRepaid === false)
+          if(isMetaMaskAuthRised && ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable == true && ts.isRepaid === false)
           {
             let seizeTimestamp = repaymentSchedule.pop();
             let seizeDate = new Date(seizeTimestamp);

@@ -164,10 +164,7 @@ class Layout extends Component {
       localStorage.removeItem('currentMetamaskAccount');
     }
 
-    this.setState({ currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
-      this.setState({
-        reloadDetails
-      });
+    this.setState({ currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission,reloadDetails }, () => {
       this.updateMetaMaskAuthorized();
     });
   }

@@ -10,7 +10,7 @@ import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } 
 import "./MyFundedLoans.css";
 class MyFundedLoans extends Component {
     render() {
-        const { myFundedRequests, myFundedLoading, currentMetamaskAccount } = this.props;
+        const { myFundedRequests, myFundedLoading, currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
         if (myFundedLoading) {
             return <Loading />;
         }
@@ -133,7 +133,7 @@ class MyFundedLoans extends Component {
                 text: "Actions",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     let buttonText = '';
-                    if (row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount && row.isRepaid == false) {
+                    if (isMetaMaskAuthRised && row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount && row.isRepaid == false) {
                         buttonText = 'Seize Collateral';
                     }
                     return (

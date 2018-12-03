@@ -86,6 +86,7 @@ class LoanRequests extends Component {
     }
     getData() {
         const { loanRequests } = this.state;
+        const { isMetaMaskAuthRised,currentMetamaskAccount } = this.props;
         const authToken = auth.getToken();
         return loanRequests.map((request) => {
             return {
@@ -96,7 +97,8 @@ class LoanRequests extends Component {
                 expiration: moment.unix(request.expiresAt).fromNow(),
                 requestedDate: moment(request.requestedAt).calendar(),
                 authToken: authToken,
-                currentMetamaskAccount:this.props.currentMetamaskAccount
+                isMetaMaskAuthRised:isMetaMaskAuthRised,
+                currentMetamaskAccount:currentMetamaskAccount
             };
         });
     }
@@ -242,7 +244,7 @@ class LoanRequests extends Component {
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    if (row.debtorEthAddress != row.currentMetamaskAccount) {
+                    if (row.isMetaMaskAuthRised && row.debtorEthAddress != row.currentMetamaskAccount) {
                         return (
                             <div className="text-center">
                                     <a href="javascript:;" className="btn btn-outline-success cognito x-small" onClick={() => _self.openlink(row.id)}>Fund</a>
