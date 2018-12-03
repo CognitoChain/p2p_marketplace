@@ -34,7 +34,7 @@ class PayModal extends Component {
             <h2 className="text-center text-bold">Make Repayment</h2>
 
             <p className="repayment-details mt-15 mb-15">
-              Your outstanding balance is <span className="text-bold">{niceNumberDisplay(outstandingAmount)} {principalSymbol}</span> in total. You are due <span className="text-bold">{niceNumberDisplay(nextRepaymentAmount)} {principalSymbol}</span> by <span className="text-bold">{nextRepaymentDate}</span>.
+              Your outstanding balance is <span className="text-bold">{outstandingAmount} {principalSymbol}</span> in total. You are due <span className="text-bold">{nextRepaymentAmount} {principalSymbol}</span> by <span className="text-bold">{nextRepaymentDate}</span>.
             </p>
 
             <input
