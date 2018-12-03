@@ -32,7 +32,7 @@ class Wallet extends Component {
     this.getETH();
   }*/
   componentWillReceiveProps(nextProps) {
-    if (nextProps.tokens != this.props.tokenlist) {
+    if (nextProps.tokens != this.props.tokens) {
       this.setState({ tokenlist: nextProps.tokens })
     }
   }

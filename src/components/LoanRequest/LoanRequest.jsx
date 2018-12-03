@@ -149,12 +149,11 @@ class LoanRequest extends Component {
                         let response = await getTransactionReceipt(txHash);
                         if(response)
                         {
-                            this.props.refreshTokens();
                             this.setState({
                                 buttonLoading:false,
                                 customAlertMsgStyle: 'success',
                                 customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
-                                customAlertMsgTitle: 'Loan request filled 123.'
+                                customAlertMsgTitle: 'Loan request filled'
                             });
                             this.props.onFillComplete();
                         }
@@ -205,7 +204,6 @@ class LoanRequest extends Component {
                 });
                 let response = await getTransactionReceipt(txHash);
                 if (!_.isUndefined(response)) {
-                    this.props.refreshTokens(false);
                     this.setState({
                         error:null,
                         unlockTokenButtonLoading:false,
@@ -382,7 +380,7 @@ class LoanRequest extends Component {
                                     <CardBody className="pb-0">
                                         <div className="p-4 pb-0">
                                             <CardTitle>Summary </CardTitle>
-                                            <div tabIndex={2}>
+                                            <div>
                                                 <ListGroup className="list-unstyled to-do">
                                                     <SummaryItem
                                                         labelName="Loan Amount"

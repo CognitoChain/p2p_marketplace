@@ -16,7 +16,11 @@ class LoanRequestContainer extends Component {
         console.log("updating loan request - data: ", data)
         const authToken = auth.getToken();
         await api.setToken(authToken).put("loanRequests", id, data);
-        this.props.history.push(`/fund/${id}`);
+        this.props.history.push(`/fund/${id}`);        
+    }
+
+    timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     render() {
@@ -32,9 +36,10 @@ class LoanRequestContainer extends Component {
                             dharma={ dharmaProps.dharma }
                             refreshTokens={dharmaProps.refreshTokens}
                             onFillComplete={ async () => {
-                                dharmaProps.refreshTokens();
                                 const currentAccount = await dharmaProps.dharma.blockchain.getCurrentAccount();
                                 await this.onFillComplete(id,currentAccount);
+                                await this.timeout(2000);
+                                dharmaProps.refreshTokens();
                             } }
                         />
                     )
