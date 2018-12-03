@@ -9,9 +9,10 @@ class ModalMessage extends Component {
 
     }
     render() {
-        const { isWeb3Enabled } = this.props;
+        const { isWeb3Enabled,currentLocation } = this.props;
+        let modalOpen = (!isWeb3Enabled && currentLocation != '' && currentLocation != 'login') ? true : false;
         return (
-            <Modal open={!isWeb3Enabled} center closeOnEsc={false} closeOnOverlayClick={false} showCloseIcon={false} onClose={this.onCloseModal}>
+            <Modal open={modalOpen} center closeOnEsc={false} closeOnOverlayClick={false} showCloseIcon={false} onClose={this.onCloseModal}>
                 <div className="web3-header">
                     <i className="fa fa-exclamation-triangle web3-exclamation-triangle"></i><br />
                     <h2 className="text-center text-bold">

@@ -54,7 +54,7 @@ class Header extends Component {
     }
     render() {
         const authUserInfo = auth.getUserInfo();
-        const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation } = this.props;
+        const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation, isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
 
         return (
@@ -71,6 +71,15 @@ class Header extends Component {
                                 bsStyle='danger'
                                 extraClass="d-inline-block header-notice mb-0"
                                 title={wrongMetamskNetworkMsg}
+                            />
+                        )
+                    }
+                    {
+                        isWeb3Enabled === false && (currentLocation == '' || currentLocation == 'login') && (
+                            <CustomAlertMsg
+                                bsStyle='danger'
+                                extraClass="d-inline-block header-notice mb-0"
+                                title="Your browser isn't Web3-enabled."
                             />
                         )
                     }

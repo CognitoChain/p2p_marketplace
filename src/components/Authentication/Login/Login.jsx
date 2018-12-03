@@ -41,6 +41,7 @@ class Login extends React.Component {
 
     render() {
         let { urlPath } = this.state;
+        let { isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
         let formTemplate = <LoginForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
@@ -88,7 +89,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             {
-                                _.isNull(authToken) && (
+                                _.isNull(authToken) && isWeb3Enabled && (
                                     <div className="col-md-4">
 
                                         <div className="row">
