@@ -392,10 +392,8 @@ class Detail extends Component {
           }
         }
         catch (e) {
-          console.log(e)
-          console.log(new Error(e))
-          alertMessageDisplay = 'danger';
-          alertMessage = "Please try again."
+          let errorMsg = (!_.isUndefined(e.message)) ? e.message : 'Something went wrong. Please try again.';
+          toast.error(errorMsg);
         }
       }
       else {
@@ -441,12 +439,11 @@ class Detail extends Component {
         });
       }
     }
-    catch (e) {
-
+    catch (e) { 
+      let errorMsg = (!_.isUndefined(e.message)) ? e.message : 'Something went wrong. Please try again.';
+      toast.error(errorMsg);
       this.setState({
-        unlockTokenButtonLoading: false,
-        alertMessageDisplay: 'danger',
-        alertMessage: "Please try again."
+        unlockTokenButtonLoading: false        
       });
     }
   }
@@ -486,11 +483,12 @@ class Detail extends Component {
               });
             }
             alertMessageDisplay = 'success';
-            alertMessage = "You have successfully claimed your collateral."
+            alertMessage = "You have successfully claimed your collateral.";
           }
         } catch (e) {
+          let errorMsg = (!_.isUndefined(e.message)) ? e.message : 'Something went wrong. Please try again.';
           alertMessageDisplay = 'danger';
-          alertMessage = "Please try again 1."
+          alertMessage = errorMsg;
         }
       }
     }
@@ -540,8 +538,9 @@ class Detail extends Component {
             alertMessage = "Please try again."
           }
         } catch (e) {
+          let errorMsg = (!_.isUndefined(e.message)) ? e.message : 'Something went wrong. Please try again.';
           alertMessageDisplay = 'danger';
-          alertMessage = "Please try again."
+          alertMessage = errorMsg;
         }
       } else {
         alertMessageDisplay = 'danger';
