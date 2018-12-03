@@ -9,6 +9,7 @@ class Overview extends Component {
       nextRepaymentDate,
       repaymentBtnDisplay,
       currentMetamaskAccount,
+      isMetaMaskAuthRised,
       collateralBtnDisplay,
       collateralSeizeBtnDisplay,
       overViewButtonBackgroundClass,
@@ -74,7 +75,7 @@ class Overview extends Component {
           </Row>
           <Row className="mt-20">
             <Col lg={5} md={5} sm={6} xl={5}>
-              {outstandingAmountDisplay > 0 &&
+              {outstandingAmountDisplay > 0 && isMetaMaskAuthRised &&
                 currentMetamaskAccount == debtorAddress && (
 
                   <div className="pull-left">

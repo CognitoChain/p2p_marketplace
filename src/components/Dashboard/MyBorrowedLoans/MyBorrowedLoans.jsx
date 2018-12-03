@@ -17,7 +17,7 @@ class MyBorrowedLoans extends Component {
         );
     }
     render() {
-        const { myBorrowedRequests, myBorrowedLoading, currentMetamaskAccount } = this.props;
+        const { myBorrowedRequests, myBorrowedLoading, currentMetamaskAccount,isMetaMaskAuthRised} = this.props;
         if (myBorrowedLoading) {
             return <Loading />;
         }
@@ -126,7 +126,7 @@ class MyBorrowedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     let buttonText = '';
                     let buttonClassName = '';
-                    if (row.debtorAddress == currentMetamaskAccount) {
+                    if (isMetaMaskAuthRised && row.debtorAddress == currentMetamaskAccount) {
                         if (parseFloat(row.repaidAmount) < parseFloat(row.repaymentAmount) && row.isRepaid == false && row.isCollateralSeized == false) {
                             buttonText = 'Pay';
                             buttonClassName = 'orange';

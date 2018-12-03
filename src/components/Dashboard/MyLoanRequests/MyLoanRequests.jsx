@@ -16,7 +16,7 @@ class MyLoanRequests extends Component {
         );
     }
     render() {
-        const { myLoanRequests,myLoansLoading,currentMetamaskAccount,cancelLoanRequest,cancelLoanButtonLoading } = this.props;
+        const { myLoanRequests,myLoansLoading,currentMetamaskAccount,isMetaMaskAuthRised,cancelLoanRequest,cancelLoanButtonLoading } = this.props;
         
         if (myLoansLoading) {
             return <Loading/>;
@@ -149,7 +149,7 @@ class MyLoanRequests extends Component {
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    if (row.debtor == currentMetamaskAccount && row.loanStatus == "OPEN") {
+                    if (isMetaMaskAuthRised && row.debtor == currentMetamaskAccount && row.loanStatus == "OPEN") {
                         return (
                             <div className="text-center">
                                     <a href="javascript:;" className="btn btn-outline-danger cognito x-small" onClick={() => { 

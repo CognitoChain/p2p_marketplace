@@ -38,6 +38,11 @@ class Header extends Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
+    componentWillReceiveProps(nextProps){
+        if(nextProps.isMetaMaskAuthRised && nextProps.isMetaMaskAuthRised != this.props.isMetaMaskAuthRised){
+            this.props.refreshTokens();
+        }
+    }
     async connectMetaMask() {
         await this.props.metamaskPermission();
     }
@@ -49,15 +54,14 @@ class Header extends Component {
         currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
         if ((currentMetamaskAccount == '' && currentAccount != '') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
             this.props.updateMetamaskAccount(currentAccount, true);
-            this.props.refreshTokens();
         }
     }
     render() {
         const authUserInfo = auth.getUserInfo();
         const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation, isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
-
-        return (
+        
+        return (    
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
                 <div className="text-left navbar-brand-wrapper">

@@ -257,10 +257,10 @@ class Dashboard extends Component {
 
 
     setPriceFeedData() {
-        const { currentMetamaskAccount } = this.props;
+        const { isMetaMaskAuthRised } = this.props;
         const authToken =  auth.getToken();
 
-        if (typeof currentMetamaskAccount != "undefined") {
+        if (isMetaMaskAuthRised) {
             const api = new Api();
             api.setToken(authToken)
                 .get(`priceFeed`)
@@ -274,10 +274,10 @@ class Dashboard extends Component {
        let agreementId = row.id;
        let debtorEthAddress = row.debtor;
         let { myLoanRequests } = this.state;
-        const { currentMetamaskAccount } = this.props;
+        const { currentMetamaskAccount ,isMetaMaskAuthRised} = this.props;
         const authToken =  auth.getToken();
 
-        if(!_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
+        if(isMetaMaskAuthRised && !_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
         {
             this.setState({ cancelLoanButtonLoading: true })
             const api = new Api();
@@ -300,8 +300,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { dharma, redirect, isTokenLoading, authenticated, wrongMetamaskNetwork, currentMetamaskAccount } = this.props;
-        const { highlightRow, myBorrowedLoading, myFundedLoading, myLoansLoading, priceFeedData, tokenlist, cancelLoanButtonLoading, myBorrowRequestProcessed, myFundedRequestProcessed } = this.state;
+        const { wrongMetamaskNetwork,isMetaMaskAuthRised } = this.props;
         return (
             <div>
                 <div className="page-title mb-20">
@@ -313,27 +312,19 @@ class Dashboard extends Component {
                     </Row>
                 </div>
 
-                {currentMetamaskAccount != null && currentMetamaskAccount != '' && wrongMetamaskNetwork == false &&
+                {isMetaMaskAuthRised && wrongMetamaskNetwork == false &&
                     <div>
                         <Row className="mb-30">
                             <MyPortfolio
-                                dharma={dharma}
-                                tokens={tokenlist}
-                                isTokenLoading={isTokenLoading}
-                                myBorrowedLoading={myBorrowedLoading}
+                                {...this.props}
+                                {...this.state}
                                 myBorrowedRequests={myBorrowedRequests}
-                                currentMetamaskAccount={currentMetamaskAccount}
-                                priceFeedData={priceFeedData}
                             />
                             <MyActivities
-                                dharma={dharma}
+                                {...this.props}
+                                {...this.state}
                                 myBorrowedRequests={myBorrowedRequests}
                                 myFundedRequests={myFundedRequests}
-                                myBorrowedLoading={myBorrowedLoading}
-                                myFundedLoading={myFundedLoading}
-                                currentMetamaskAccount={currentMetamaskAccount}
-                                myBorrowRequestProcessed={myBorrowRequestProcessed}
-                                myFundedRequestProcessed={myFundedRequestProcessed}
                                 updateMyBorrowRequestProcessed={this.updateMyBorrowRequestProcessed}
                             />
                         </Row>
@@ -376,26 +367,17 @@ class Dashboard extends Component {
                                             </div>
                                             <TabContent activeTab={this.state.activeTab}>
                                                 <TabPane tabId="1">
-
                                                     <MyBorrowedLoans
-                                                        dharma={dharma}
-                                                        redirect={redirect}
-                                                        myBorrowedLoading={myBorrowedLoading}
+                                                        {...this.props}
+                                                        {...this.state}
                                                         myBorrowedRequests={myBorrowedRequests}
-                                                        highlightRow={highlightRow}
-                                                        currentMetamaskAccount={currentMetamaskAccount}
                                                     />
-
                                                 </TabPane>
-
                                                 <TabPane tabId="2">
-
                                                     <MyFundedLoans
-                                                        dharma={dharma}
-                                                        redirect={redirect}
-                                                        myFundedLoading={myFundedLoading}
+                                                        {...this.props}
+                                                        {...this.state}
                                                         myFundedRequests={myFundedRequests}
-                                                        currentMetamaskAccount={currentMetamaskAccount}
                                                     />
 
                                                 </TabPane>
@@ -403,13 +385,10 @@ class Dashboard extends Component {
                                                 <TabPane tabId="3">
 
                                                     <MyLoanRequests
-                                                        dharma={dharma}
-                                                        redirect={redirect}
-                                                        myLoansLoading={myLoansLoading}
+                                                        {...this.props}
+                                                        {...this.state}
                                                         myLoanRequests={myLoanRequests}
                                                         cancelLoanRequest={(row) => this.cancelLoanRequest(row)}
-                                                        currentMetamaskAccount={currentMetamaskAccount}
-                                                        cancelLoanButtonLoading={cancelLoanButtonLoading}
                                                     />
 
                                                 </TabPane>
@@ -424,7 +403,7 @@ class Dashboard extends Component {
                     </div>
                 }
 
-                {(wrongMetamaskNetwork == true || currentMetamaskAccount == null || currentMetamaskAccount == '') &&
+                {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
                     <div>
                         <Row className="mb-30">
                             <Col md={3}></Col>
