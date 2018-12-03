@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Row, Col } from 'reactstrap';
 import _ from 'lodash';
 import cognitoImg from "../../../assets/images/logo.svg";
+import loanBaseImg from "../../../assets/images/logo.png";
 import etherImg from "../../../assets/images/eth-image.png";
 import dharmaImg from "../../../assets/images/dharma-logo.png";
 import loanImg from "../../../assets/images/loans.jpg";
@@ -68,7 +69,7 @@ class Login extends React.Component {
                         <div className="image" style={{ backgroundImage: "url('" + loanImg + "')" }}></div>
                         <div className="login-bg-overlay"></div>
 
-                        <div className="row pt-50 pb-50 h-100-lg justify-content-lg-between align-items-lg-center">
+                        <div className="row m-0 pt-50 pb-50 h-100-lg justify-content-lg-between align-items-lg-center">
                             <div className="col-md-8">
                                 <div className="header-image-content text-left">
                                     <div className="row">
@@ -241,7 +242,7 @@ class Login extends React.Component {
                                 <h2>Powered By</h2>
                             </div>
                             <div className="col-md-3">
-                                <img src={cognitoImg} alt="" />
+                                <img src={loanBaseImg} alt="" class="img-fluid" />
                             </div>
                             <div className="col-md-3">
                                 <img src={etherImg} alt="" />
