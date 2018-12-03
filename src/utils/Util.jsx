@@ -33,13 +33,7 @@ export const niceNumberDisplay = (value, decimalPoint) => {
     niceNumber = parseFloat(value);
     let decimal = (!_.isUndefined(decimalPoint)) ? decimalPoint : 3;
     let numberAsString = value.toString();
-    if(numberAsString.indexOf('.') === -1) {
-      niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
-    }
-    else
-    {
-      niceNumber = (niceNumber > 0) ? niceNumber.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;  
-    }
+    niceNumber = (niceNumber > 0) ? niceNumber.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;  
   }  
   return niceNumber;
 }
@@ -48,7 +42,13 @@ export const tooltipNumberDisplay = (value, symbol, action = "append") => {
   if(!_.isUndefined(value)){
     let niceNumber = parseFloat(value);
     let numberAsString = value.toString();
-    niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
+    if(numberAsString.indexOf('.') === -1 || numberAsString.split(".")[1].length < 3) {
+      niceNumber = (niceNumber > 0) ? niceNumber.toFixed(3).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
+    }
+    else
+    {
+      niceNumber = (niceNumber > 0) ? numberAsString.replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;
+    }
     if(!_.isUndefined(symbol))
     {
       finalNumber = action == "append" ? niceNumber + " " + symbol : symbol + " " + niceNumber;  
