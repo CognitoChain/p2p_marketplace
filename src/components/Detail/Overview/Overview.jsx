@@ -30,9 +30,7 @@ class Overview extends Component {
       isRepaid,
       totalRepaymentAmount
     } = loanDetails;
-
     let outstandingAmountDisplay = niceNumberDisplay(outstandingAmount);
-
     return (
       <Card className={"card-statistics h-100 my-activities-container p-3 loan-detail-card-statistics " + overViewBackgroundClass}>
         <CardBody>
@@ -50,7 +48,7 @@ class Overview extends Component {
             </Col>
 
             <Col lg={6} md={6} sm={6} xl={6} className="text-right">
-              {outstandingAmountDisplay > 0 && isLoanUser &&
+              {outstandingAmountDisplay > 0 && repaymentBtnDisplay &&
                 <div className="">
                   <span>Outstanding Amount</span>
                   <br />
@@ -60,7 +58,7 @@ class Overview extends Component {
                   {principalSymbol}
                 </div>
               }
-              {outstandingAmountDisplay == 0 && isRepaid &&
+              {isRepaid &&
                 <div className="">
                   <span>Total Repaid Amount</span>
                   <br />
@@ -103,8 +101,7 @@ class Overview extends Component {
                 </button>
               )}
 
-              {outstandingAmountDisplay == 0 &&
-                collateralBtnDisplay === true && (
+              {collateralBtnDisplay === true && (
                   <button
                     className="btn cognito repayment-button icon mb-15 btn-make-repayment"
                     onClick={unblockCollateral}

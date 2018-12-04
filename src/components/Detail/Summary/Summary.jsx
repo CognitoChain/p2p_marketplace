@@ -56,9 +56,7 @@ class Summary extends Component {
       <Card className="card-statistics h-100 p-4">
         <CardBody>
           <CardTitle>More Details </CardTitle>
-          <div
-            tabIndex={2}
-          >
+          <div>
             <ListGroup className="list-unstyled to-do">
               <SummaryItem
                 labelName="Created Date"
