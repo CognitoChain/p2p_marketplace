@@ -2,10 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col } from 'reactstrap';
 import _ from 'lodash';
-import cognitoImg from "../../../assets/images/logo.svg";
-import loanBaseImg from "../../../assets/images/logo.png";
-import etherImg from "../../../assets/images/eth-image.png";
-import dharmaImg from "../../../assets/images/dharma-logo.png";
+import loanBaseImg from "../../../assets/images/loanbase_poweredby.png";
+import etherImg from "../../../assets/images/eth_poweredby.png";
+import dharmaImg from "../../../assets/images/dharma_poweredby.png";
 import loanImg from "../../../assets/images/loans.jpg";
 import loanBaselogoImg from "../../../assets/images/loanbase.svg";
 import transparencyImg from "../../../assets/images/transparency.svg";
@@ -245,10 +244,10 @@ class Login extends React.Component {
                                 <img src={loanBaseImg} alt="" class="img-fluid" />
                             </div>
                             <div className="col-md-3">
-                                <img src={etherImg} alt="" />
+                                <img src={etherImg} alt="" class="img-fluid"/>
                             </div>
                             <div className="col-md-3">
-                                <img src={dharmaImg} alt="" />
+                                <img src={dharmaImg} alt="" class="img-fluid"/>
                             </div>
                         </div>
                     </div>
