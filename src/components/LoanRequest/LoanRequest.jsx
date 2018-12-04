@@ -469,7 +469,7 @@ class LoanRequest extends Component {
                                                 {
                                                     !isBottomButtonLoading && <AuthorizableAction
                                                         canTakeAction={!error && hasSufficientAllowance && !disableSubmitBtn}
-                                                        canAuthorize={hasSufficientAllowance}
+                                                        canAuthorize={error || hasSufficientAllowance}
                                                         onAction={this.handleFill}
                                                         onAuthorize={this.handleAuthorize}
                                                         unlockTokenButtonLoading={unlockTokenButtonLoading}
