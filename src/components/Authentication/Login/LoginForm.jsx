@@ -2,7 +2,6 @@ import React from 'react';
 import GoogleLogin from "react-google-login";
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { Link } from 'react-router-dom';
 import validators from '../../../validators';
 import Api from "../../../services/api";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";

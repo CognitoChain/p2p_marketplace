@@ -1,6 +1,5 @@
 // External libraries
 import React from "react";
-import { Link } from "react-router-dom";
 import CustomAlertMsg from "../../../CustomAlertMsg/CustomAlertMsg";
 
 // Styling

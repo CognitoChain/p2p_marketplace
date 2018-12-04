@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Row, Col } from 'reactstrap';
 import _ from 'lodash';
 import loanBaseImg from "../../../assets/images/loanbase_poweredby.png";
 import etherImg from "../../../assets/images/eth_poweredby.png";

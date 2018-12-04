@@ -32,7 +32,6 @@ export const niceNumberDisplay = (value, decimalPoint) => {
   {
     niceNumber = parseFloat(value);
     let decimal = (!_.isUndefined(decimalPoint)) ? decimalPoint : 3;
-    let numberAsString = value.toString();
     niceNumber = (niceNumber > 0) ? niceNumber.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,') : 0;  
   }  
   return niceNumber;

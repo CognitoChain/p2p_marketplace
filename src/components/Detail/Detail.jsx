@@ -69,7 +69,7 @@ class Detail extends Component {
   }
   getScheduledata() {
     const { currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
-    const { loanDetails, userTimezone, repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay, isLoanUser } = this.state;
+    const { loanDetails, userTimezone, isLoanUser } = this.state;
     const {
       principalAmount,
       creditorAddress,

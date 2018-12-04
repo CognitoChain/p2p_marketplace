@@ -24,7 +24,6 @@ class Overview extends Component {
       principal,
       principalSymbol,
       debtorAddress,
-      creditorAddress,
       isCollateralSeized,
       isCollateralReturned,
       outstandingAmount,

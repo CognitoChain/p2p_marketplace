@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import {  Row, Col } from "reactstrap";
 import Modal from "react-responsive-modal";
-import { niceNumberDisplay } from "../../../utils/Util";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
 class PayModal extends Component {
   render() {

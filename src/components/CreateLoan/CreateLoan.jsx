@@ -465,7 +465,7 @@ class CreateLoan extends Component {
     }
 
     render() {
-        const { tokens, dharma } = this.props;
+        const { tokens } = this.props;
         const {
             principalTokenSymbolDropdownOpen,
             collateralTokenSymbolDropdownOpen,
