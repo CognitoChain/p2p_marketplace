@@ -75,6 +75,7 @@ class Layout extends Component {
     }
     this.state = {
       currentMetamaskAccount: currentMetamaskAccount,
+      oldCurrentMetamaskAccount:'',
       reloadDetails: false,
       isModalMessageOpen: false,
       isWeb3Enabled,
@@ -143,10 +144,10 @@ class Layout extends Component {
   }
   async updateMetamaskAccount(newMetamaskAccount, reloadDetails) {
     newMetamaskAccount = (!_.isUndefined(newMetamaskAccount) && newMetamaskAccount != '' && newMetamaskAccount != null) ? newMetamaskAccount : '';
-    this.updateMetamaskAccountData(newMetamaskAccount, reloadDetails)
+    this.updateMetamaskAccountData(newMetamaskAccount)
   }
-  async updateMetamaskAccountData(newMetamaskAccount, reloadDetails) {
-    let { isUserMetaMaskPermission } = this.state;
+  async updateMetamaskAccountData(newMetamaskAccount) {
+    let { isUserMetaMaskPermission,currentMetamaskAccount } = this.state;
     console.log("updateMetamaskAccountData")
     if (newMetamaskAccount) {
       isUserMetaMaskPermission = true;
@@ -164,15 +165,25 @@ class Layout extends Component {
       localStorage.removeItem('currentMetamaskAccount');
     }
 
-    this.setState({ currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission,reloadDetails }, () => {
+    this.setState({ oldCurrentMetamaskAccount:currentMetamaskAccount,currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
       this.updateMetaMaskAuthorized();
     });
   }
   updateMetaMaskAuthorized() {
-    const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked } = this.state;
-    const isMetaMaskAuthRised = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked == false);
+    const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked,oldCurrentMetamaskAccount,isMetaMaskAuthRised,currentMetamaskAccount } = this.state;
+    const isMetaMaskAuthRisedNew = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked == false);
+    console.log("Layout jsx isMetaMaskAuthRised");
+    console.log(isMetaMaskAuthRisedNew);
+    let reloadDetails = false;
+    if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew ) {
+      reloadDetails = true
+    }
+    else if (isMetaMaskAuthRised && oldCurrentMetamaskAccount != currentMetamaskAccount ) {
+      reloadDetails = true
+    }
     this.setState({
-      isMetaMaskAuthRised
+      isMetaMaskAuthRised:isMetaMaskAuthRisedNew,
+      reloadDetails
     })
   }
   async metamaskPermission() {

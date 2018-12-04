@@ -19,7 +19,8 @@ class LoanRequests extends Component {
             loanRequests: [],
             highlightRow: null,
             isLoading: true,
-            modal: false
+            modal: false,
+            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
         };
         this.parseLoanRequests = this.parseLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -32,8 +33,12 @@ class LoanRequests extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.reloadDetails === true) {
-            this.props.updateReloadDetails();
+          this.props.updateReloadDetails();
+          this.setState({
+            isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
+          }, () => {
             this.getLoanRequests();
+          });
         }
     }
 
@@ -85,8 +90,8 @@ class LoanRequests extends Component {
         });
     }
     getData() {
-        const { loanRequests } = this.state;
-        const { isMetaMaskAuthRised,currentMetamaskAccount } = this.props;
+        const { loanRequests,isMetaMaskAuthRised } = this.state;
+        const { currentMetamaskAccount } = this.props;
         const authToken = auth.getToken();
         return loanRequests.map((request) => {
             return {

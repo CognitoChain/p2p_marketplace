@@ -38,7 +38,8 @@ class Dashboard extends Component {
             myFundedRequestsIsMounted: true,
             myLoanRequestsIsMounted: true,
             myBorrowRequestProcessed:false,
-            myFundedRequestProcessed:false
+            myFundedRequestProcessed:false,
+            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -63,13 +64,18 @@ class Dashboard extends Component {
         if (nextProps.tokens != this.state.tokenlist) {
             this.setState({ tokenlist: nextProps.tokens })
         }
+        
         if (nextProps.reloadDetails === true) {
-            this.props.updateReloadDetails();
+          this.props.updateReloadDetails();
+          this.setState({
+            isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
+          }, () => {
             this.updateMyBorrowRequestProcessed('myBorrowRequestProcessed');
             this.updateMyBorrowRequestProcessed('myFundedRequestProcessed');
             this.setPriceFeedData();
             this.getBorrowedLoanRequests();
             this.getFundedLoanRequests();
+          });
         }
     }
 
@@ -257,7 +263,7 @@ class Dashboard extends Component {
 
 
     setPriceFeedData() {
-        const { isMetaMaskAuthRised } = this.props;
+        const { isMetaMaskAuthRised } = this.state;
         const authToken =  auth.getToken();
 
         if (isMetaMaskAuthRised) {
@@ -273,8 +279,8 @@ class Dashboard extends Component {
     cancelLoanRequest(row){
        let agreementId = row.id;
        let debtorEthAddress = row.debtor;
-        let { myLoanRequests } = this.state;
-        const { currentMetamaskAccount ,isMetaMaskAuthRised} = this.props;
+        let { myLoanRequests, isMetaMaskAuthRised } = this.state;
+        const { currentMetamaskAccount} = this.props;
         const authToken =  auth.getToken();
 
         if(isMetaMaskAuthRised && !_.isUndefined(agreementId) && debtorEthAddress == currentMetamaskAccount)
@@ -300,7 +306,8 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { wrongMetamaskNetwork,isMetaMaskAuthRised } = this.props;
+        const { isMetaMaskAuthRised } = this.state;
+        const { wrongMetamaskNetwork } = this.props;
         return (
             <div>
                 <div className="page-title mb-20">
