@@ -320,8 +320,8 @@ class CreateLoan extends Component {
         let interestAmount = 0;
         let totalReapaymentAmount = 0;
         let stateObj = {};
-        if (interestRate > 0) {
-            interestAmount = (principal * interestRate) / 100;
+        if (interestRate >= 0) {
+            interestAmount = (interestRate == 0) ? 0 : (principal * interestRate) / 100;
             totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
             stateObj["interestAmount"] = interestAmount;
             stateObj["totalReapaymentAmount"] = totalReapaymentAmount;
