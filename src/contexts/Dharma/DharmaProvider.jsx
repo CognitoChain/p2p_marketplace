@@ -48,6 +48,7 @@ class DharmaProvider extends Component {
             supportedTokens: [],
         };
 
+        this.refreshUserTokens = this.refreshUserTokens.bind(this);
         this.getUserTokens = this.getUserTokens.bind(this);
     }
 
@@ -63,48 +64,47 @@ class DharmaProvider extends Component {
             this.setState({ supportedTokens });
         });
     }
-
-    getUserTokens(flag) {
-        const { Token } = Dharma.Types;
-        let { isTokenLoading } = this.state;
-        let stateObj = {};
+    refreshUserTokens(flag){
+        
+        let { isTokenLoading,tokens} = this.state;
         // Assume the tokens are out of date.
         if (_.isUndefined(flag)) {
-            stateObj["tokens"] = [];
+            tokens = [];
         }
         if(!isTokenLoading){
-            stateObj["isTokenLoading"] = true;    
+            isTokenLoading = true;    
         }
-        if(!_.isEmpty(stateObj))
-        {
-            this.setState(stateObj);    
-        }
-        dharma.blockchain.getAccounts().then((accounts) => {
+        this.setState({
+            tokens,
+            isTokenLoading
+        }, () => {
+            console.log("getUserTokens")
+            this.getUserTokens();
+        })
+    }
+     getUserTokens() {
+        const { Token } = Dharma.Types;
+        dharma.blockchain.getAccounts().then(async(accounts) => {
+            let tokens = [];
             const owner = accounts[0];
-            if (typeof owner != 'undefined') {
-                Token.all(dharma, owner).then((tokenData) => {
-                    this.setState({
-                        tokens: tokenData,
-                        isTokenLoading: false
-                    });
+            if (!_.isUndefined(owner)) {
+                await Token.all(dharma, owner).then((tokenData) => {
+                    tokens = tokenData;
                 });
             }
-            else {
-                this.setState({
-                    tokens: [],
-                    isTokenLoading: false
-                });
-            }
+            this.setState({
+                tokens,
+                isTokenLoading: false
+            });
         });
     }
-
     render() {
         const dharmaProps = {
             dharma: dharma,
             tokens: this.state.tokens,
             isTokenLoading: this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
-            refreshTokens: this.getUserTokens            
+            refreshTokens: this.refreshUserTokens            
         };
 
         return (

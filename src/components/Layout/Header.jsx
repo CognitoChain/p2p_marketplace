@@ -40,7 +40,12 @@ class Header extends Component {
     }
     componentWillReceiveProps(nextProps){
         if(nextProps.isMetaMaskAuthRised && nextProps.isMetaMaskAuthRised != this.props.isMetaMaskAuthRised){
-            this.props.refreshTokens();
+            
+        }
+    }
+    componentDidUpdate(prevProps) {
+        if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
+            this.props.refreshTokens();    
         }
     }
     async connectMetaMask() {
@@ -53,7 +58,7 @@ class Header extends Component {
         currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
         currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
         if ((currentMetamaskAccount == '' && currentAccount != '') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
-            this.props.updateMetamaskAccount(currentAccount, true);
+            this.props.updateMetamaskAccount(currentAccount, true);            
         }
     }
     render() {
