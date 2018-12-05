@@ -62,11 +62,11 @@ class Detail extends Component {
     this.getPriceFeeds();
     await this.getDetailData();
   }
-   componentWillReceiveProps(nextProps) {
-    if (nextProps.reloadDetails === true) {
-      this.props.updateReloadDetails();
+   componentDidUpdate(prevProps) {
+    if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
+      //this.props.updateReloadDetails();
       this.setState({
-        isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
+        isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
       }, (async () => {
         await this.getDetailData();
       }));
