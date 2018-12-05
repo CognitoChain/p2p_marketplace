@@ -44,8 +44,12 @@ class Header extends Component {
         }
     }
     componentDidUpdate(prevProps) {
+        // console.log("componentDidUpdate Header")
+        // console.log(prevProps.reloadDetails)
+        // console.log(this.props.reloadDetails)
         if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
             this.props.refreshTokens();    
+            this.props.updateReloadDetails();
         }
     }
     async connectMetaMask() {
