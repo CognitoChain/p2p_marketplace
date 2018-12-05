@@ -29,21 +29,19 @@ class Dashboard extends Component {
             myBorrowedRequests: [],
             myFundedRequests: [],
             myLoanRequests: [],
+            myEthBalance:0,
+            myEthBalanceLoading:true,
             tokenlist: this.props.tokens,
             myBorrowedLoading: true,
             myFundedLoading: true,
             myLoansLoading: true,
             cancelLoanButtonLoading: false,
-            myBorrowedRequestsIsMounted: true,
-            myFundedRequestsIsMounted: true,
-            myLoanRequestsIsMounted: true,
             myBorrowRequestProcessed:false,
             myFundedRequestProcessed:false,
-            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
+            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
-        this.amountTooltipTop = this.amountTooltipTop.bind(this);
         this.updateMyBorrowRequestProcessed = this.updateMyBorrowRequestProcessed.bind(this);
     }
     componentDidMount() {
@@ -51,6 +49,7 @@ class Dashboard extends Component {
         this.getBorrowedLoanRequests();
         this.getFundedLoanRequests();
         this.getMyLoanRequests();
+        this.getETHbalance()
     }
     componentWillUnmount() {
         this.setState({
@@ -59,7 +58,6 @@ class Dashboard extends Component {
             myFundedRequestsIsMounted: false
         });
     }
-    
     componentWillReceiveProps(nextProps) {
         if (nextProps.tokens != this.state.tokenlist) {
             this.setState({ tokenlist: nextProps.tokens })
@@ -70,24 +68,34 @@ class Dashboard extends Component {
           this.setState({
             isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
           }, () => {
-            this.updateMyBorrowRequestProcessed('myBorrowRequestProcessed');
-            this.updateMyBorrowRequestProcessed('myFundedRequestProcessed');
             this.setPriceFeedData();
             this.getBorrowedLoanRequests();
             this.getFundedLoanRequests();
+            this.getETHbalance()
           });
         }
     }
-
-    amountTooltipTop() {
-        /*const { tokenlist } = this.state;
-        let tootlTipStatus = !.tootlTipStatus;
-        let symbol = .symbol;
-        var tokenKey = _.findKey(tokenlist, ["symbol", symbol]);
-        tokenlist[tokenKey].tootlTipStatus = tootlTipStatus;
-        this.setState({
-          tokenlist
-        });*/
+    async getETHbalance(){
+        
+        let myEthBalance = 0;
+        const { myEthBalanceLoading } = this.state;
+        const { currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
+        if(!isMetaMaskAuthRised){
+            return;
+        }
+        if(!myEthBalanceLoading){
+            this.setState({ myEthBalanceLoading: true,myEthBalance:0 });
+        }
+        console.log(currentMetamaskAccount)
+        await window.web3.eth.getBalance(currentMetamaskAccount, (err, balance) => {
+            console.log(balance)
+            let ethBalance = window.web3.fromWei(balance, "ether");
+            myEthBalance = (ethBalance > 0) ? parseFloat(ethBalance) : 0;
+            this.setState({
+                myEthBalance,
+                myEthBalanceLoading: false
+            });
+        });
     }
     updateMyBorrowRequestProcessed(stateName = '',flag = false){
         /*myFundedRequestProcessed*/
@@ -97,24 +105,21 @@ class Dashboard extends Component {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myBorrowedRequestsIsMounted,myBorrowedLoading } = this.state;
+        const { myBorrowedLoading } = this.state;
 
-        if(!myBorrowedLoading)
-        {
-            this.setState({ myBorrowedLoading: true });
+        if(!myBorrowedLoading){
+            this.setState({ myBorrowedLoading: true,myBorrowedRequests:[] });
         }
         const authToken =  auth.getToken();
 
         api.setToken(authToken).get("user/loans", { sort, order })
             .then(myBorrowedRequests => {
-                if (myBorrowedRequestsIsMounted) {
-                    this.setState({ myBorrowedRequests, myBorrowedLoading: false });
-                }
+                this.setState({ myBorrowedRequests, myBorrowedLoading: false });
             })
             .catch((error) => {
-                if (error.status && error.status === 403) {
-                    this.props.redirect(`/login/`);
-                }
+                // if (error.status && error.status === 403) {
+                //     this.props.redirect(`/login/`);
+                // }
             });
     }
 
@@ -122,19 +127,16 @@ class Dashboard extends Component {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myFundedRequestsIsMounted,myFundedLoading } = this.state;
+        const { myFundedLoading } = this.state;
 
-        if(!myFundedLoading)
-        {
-            this.setState({ myFundedLoading: true });
+        if(!myFundedLoading){
+            this.setState({ myFundedLoading: true,myFundedRequests:[] });
         }
         const authToken =  auth.getToken();
 
         api.setToken(authToken).get("user/investments", { sort, order })
             .then(myFundedRequests => {
-                if (myFundedRequestsIsMounted) {
-                    this.setState({ myFundedRequests, myFundedLoading: false });
-                }
+                this.setState({ myFundedRequests, myFundedLoading: false });
             })
             .catch((error) => {
                 if (error.status && error.status === 403) {
@@ -147,14 +149,12 @@ class Dashboard extends Component {
         const api = new Api();
         const sort = "createdAt";
         const order = "desc";
-        const { myLoanRequestsIsMounted } = this.state;
+        
         const authToken =  auth.getToken();
         api.setToken(authToken).get("user/loanRequests", { sort, order })
             .then(this.parseMyLoanRequests)
             .then(myLoanRequests => {
-                if (myLoanRequestsIsMounted) {
-                    this.setState({ myLoanRequests, myLoansLoading: false });
-                }
+                this.setState({ myLoanRequests, myLoansLoading: false });
             })
             .catch((error) => {
                 if (error.status && error.status === 403) {
@@ -326,6 +326,8 @@ class Dashboard extends Component {
                                 {...this.props}
                                 {...this.state}
                                 myBorrowedRequests={myBorrowedRequests}
+                                myFundedRequests={myFundedRequests}
+                                updateMyBorrowRequestProcessed={this.updateMyBorrowRequestProcessed}
                             />
                             <MyActivities
                                 {...this.props}
