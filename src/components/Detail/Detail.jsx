@@ -16,7 +16,6 @@ import { niceNumberDisplay, convertBigNumber, getTransactionReceipt } from "../.
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import auth from '../../utils/auth';
 import "./Detail.css";
-import fromExponential from 'from-exponential';
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -375,7 +374,7 @@ class Detail extends Component {
     const { loanDetails } = this.state;
     const { principalNumDecimals } = loanDetails;
     let outstandingAmount = await debt.getOutstandingAmount();
-    outstandingAmount = fromExponential(outstandingAmount);
+    outstandingAmount = new Intl.NumberFormat('en-US', { useGrouping : false } ).format(outstandingAmount);
     outstandingAmount = (outstandingAmount > 0 && !_.isObject(outstandingAmount)) ? outstandingAmount : convertBigNumber(outstandingAmount,principalNumDecimals);
     return outstandingAmount;
   }
@@ -579,7 +578,7 @@ class Detail extends Component {
 
   onCloseModal = () => {
     const { repaymentButtonLoading } = this.state;
-    this.setState({ buttonLoading: repaymentButtonLoading, modalOpen: false });
+    this.setState({ buttonLoading: false, modalOpen: false });
   };
 
   render() {
