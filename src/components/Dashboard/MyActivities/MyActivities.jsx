@@ -21,40 +21,52 @@ class MyActivities extends Component {
       investmentsActivities: [],
       loanRequestsActivities: [],
       isLoading: true,
-      myBorrowedRequestsLoading: true,
-      myFundedRequestsLoading: true,
       metaMaskMsg: false,
-      myLoansIsMounted: true,
-      myInvestmensIsMounted: true
+      allowStateSet:true      
     };
   }
 
-  async componentWillReceiveProps(nextProps) {
-    const { dharma, myBorrowedRequests: nextBorrowedRequests, myFundedRequests: nextFundedRequests, myBorrowedLoading, myFundedLoading } = nextProps;
-    const { myBorrowedRequests, myFundedRequests, currentMetamaskAccount,isMetaMaskAuthRised, myBorrowRequestProcessed, myFundedRequestProcessed } = this.props;
-    const { myLoansIsMounted, myInvestmensIsMounted } = this.state;
+  shouldComponentUpdate(nextProps, nextState) {
+    return (nextState.allowStateSet === false) ? false : true;
+  }
 
+  async componentDidUpdate(prevProps) {
+    const { 
+      myFundedLoading:prevMyFundedLoading,
+      myBorrowedLoading:prevMyBorrowedLoading
+    } = prevProps;
+    const { 
+      myFundedLoading,
+      myBorrowedLoading
+    } = this.props;
+    if (myBorrowedLoading != prevMyBorrowedLoading) {
+      this.getBorrowedLoanRequestsActivities();
+    }
+    if (myFundedLoading!=prevMyFundedLoading) {
+      this.getFundedLoanRequestsActivities();
+    }
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      allowStateSet: false
+    });
+  }
+
+  async getBorrowedLoanRequestsActivities(){
+    const { myBorrowedRequests,currentMetamaskAccount,myBorrowedLoading,isMetaMaskAuthRised } = this.props;
     let repaymentSchedule;
     let loanRequestsActivities = [];
-    let investmentsActivities = [];
-    let myBorrowedRequestsLoading = true;
-    let myFundedRequestsLoading = true;
-    console.log("myBorrowRequestProcessed");
-    console.log(myBorrowRequestProcessed);
-    if (myBorrowedRequests != nextBorrowedRequests && myBorrowedLoading === false && isMetaMaskAuthRised && myBorrowRequestProcessed == false) {
-      console.log(nextBorrowedRequests.length);
-      this.props.updateMyBorrowRequestProcessed('myBorrowRequestProcessed',true);
-      if (nextBorrowedRequests.length > 0) {
-        await this.asyncForEach(nextBorrowedRequests, async ts => {
-          let isCollateralSeized = false;
+    
+    if(myBorrowedLoading){
+      return;
+    }
+
+    if (myBorrowedRequests.length > 0) {
+      await this.asyncForEach(myBorrowedRequests, async ts => {
           let totalRepaidAmount = parseFloat(ts.repaidAmount); 
           let totalRepaymentAmount = parseFloat(ts.repaymentAmount);
           let outstandingAmount = totalRepaymentAmount - totalRepaidAmount;
-          if (outstandingAmount > 0) {
-            isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
-                ts.id
-            );
-          }
           repaymentSchedule = ts.repaymentSchedule;
           let expectedRepaidAmountDharma = 0;
           let interestRatePercent = parseFloat(ts.interestRatePercent);
@@ -73,10 +85,7 @@ class MyActivities extends Component {
 
           if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true)
           {
-            let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
-              ts.id
-            );
-            if(isCollateralReturned == false)
+            if(ts.isCollateralReturned == false)
             {
               let claimTimestamp = repaymentSchedule.pop();
               let claimDate = new Date(claimTimestamp);
@@ -92,14 +101,13 @@ class MyActivities extends Component {
               });  
             }
           }
-          else if(isCollateralSeized == false)
+          else if(ts.isCollateralSeized == false)
           {
             if (!_.isUndefined(repaymentSchedule)) {
               await this.asyncForEach(repaymentSchedule, async st => {
                 let currentTimestamp = moment().unix();
                 let date = new Date(st);
                 st = st / 1000; 
-
                 let buttonText = '';
                 let buttonClassName = '';
                 let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
@@ -187,22 +195,24 @@ class MyActivities extends Component {
               }
             }  
           }
-        });
-      }
-      myBorrowedRequestsLoading = false
-      if (myLoansIsMounted) {
-        this.setState({
-          loanRequestsActivities,
-          myBorrowedRequestsLoading
-        });
-      }
+      });
+    }
+    this.setState({
+      loanRequestsActivities        
+    });
+  }
+
+  async getFundedLoanRequestsActivities(){
+    let investmentsActivities = [];
+    let repaymentSchedule;
+    const { myFundedRequests,myFundedLoading,isMetaMaskAuthRised,currentMetamaskAccount } = this.props;
+    
+    if(myFundedLoading){
+      return;
     }
 
-    if (nextFundedRequests != myFundedRequests && myFundedLoading === false && myFundedRequestProcessed == false) {
-      this.props.updateMyBorrowRequestProcessed('myFundedRequestProcessed',true);
-      let repaymentSchedule;
-      if (nextFundedRequests.length > 0) {
-        await this.asyncForEach(nextFundedRequests, async ts => {
+    if (myFundedRequests.length > 0) {
+      await this.asyncForEach(myFundedRequests, async ts => {
           let current_timestamp = moment().unix();
           let i = 1;
           repaymentSchedule = ts.repaymentSchedule;
@@ -255,24 +265,15 @@ class MyActivities extends Component {
               });
             }
           }
-        });
-      }
-      myFundedRequestsLoading = false;
-      if (myInvestmensIsMounted) {
-        this.setState({
-          investmentsActivities,
-          myFundedRequestsLoading
-        });
-      }
+      });
     }
+    
+    this.setState({
+      investmentsActivities      
+    });  
+    
   }
 
-  componentWillUnmount() {
-    this.setState({
-      myLoansIsMounted: false,
-      myInvestmensIsMounted: false
-    });
-  }
   async asyncForEach(array, callback) {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
@@ -280,10 +281,9 @@ class MyActivities extends Component {
   }
 
   render() {
-    const { loanRequestsActivities, investmentsActivities, metaMaskMsg, myFundedRequestsLoading, myBorrowedRequestsLoading } = this.state;
+    const { loanRequestsActivities, investmentsActivities, metaMaskMsg } = this.state;
     const { myFundedLoading, myBorrowedLoading } = this.props;
-    let isLoading = myBorrowedRequestsLoading || myFundedRequestsLoading || myBorrowedLoading || myFundedLoading;
-
+    let isLoading = myBorrowedLoading || myFundedLoading;
     let activities = [];
     if (!isLoading) {
       activities = [...loanRequestsActivities, ...investmentsActivities];
