@@ -124,10 +124,10 @@ class Overview extends Component {
             </Col>
             <Col>
               {
-                isCollateralSeized && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
+                isCollateralSeized && isLoanUser && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
               }
               {
-                isCollateralReturned && <h4 className="text-center"><span className="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
+                isCollateralReturned && isLoanUser && <h4 className="text-center"><span className="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
               }
             </Col>
           </Row>
