@@ -86,7 +86,7 @@ class TransactionManager extends Component {
         let extraTitle = '';
 
         if (txHash != '' && txHash != null) {
-            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank"> Transaction Details</a></span>);
+            extraTitle = (<span className="transaction-detail-link"><a href={`https://etherscan.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer"> Transaction Details</a></span>);
         }
 
         return (

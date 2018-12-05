@@ -318,7 +318,7 @@ class MyPortfolio extends Component {
                                         Would you like to buy?<br />
                                         <a
                                             href={`https://www.coinbase.com/`}
-                                            target="_blank" className="btn cognito green mt-5">
+                                            target="_blank" rel="noopener noreferrer" className="btn cognito green mt-5">
                                             {"Go to Coinbase"}
                                         </a>
                                     </div>

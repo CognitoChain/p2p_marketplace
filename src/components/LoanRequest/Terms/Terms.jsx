@@ -28,7 +28,7 @@ class Terms extends Component {
                     <dd className="col-sm-9">
                         <a
                             href={`https://etherscan.io/address/${terms.debtorAddress}`}
-                            target="_blank">
+                            target="_blank" rel="noopener noreferrer">
                             {terms.debtorAddress}
                         </a>
                     </dd>
