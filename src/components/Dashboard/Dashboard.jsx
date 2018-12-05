@@ -58,23 +58,35 @@ class Dashboard extends Component {
             myFundedRequestsIsMounted: false
         });
     }
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.tokens != this.state.tokenlist) {
-            this.setState({ tokenlist: nextProps.tokens })
-        }
-        
-        if (nextProps.reloadDetails === true) {
-          this.props.updateReloadDetails();
-          this.setState({
-            isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
-          }, () => {
-            this.setPriceFeedData();
-            this.getBorrowedLoanRequests();
-            this.getFundedLoanRequests();
-            this.getETHbalance()
-          });
-        }
+    componentDidUpdate(prevProps){
+        if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
+            this.setState({
+              isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
+            }, () => {
+              this.setPriceFeedData();
+              this.getBorrowedLoanRequests();
+              this.getFundedLoanRequests();
+              this.getETHbalance()
+            });
+          }
     }
+    // componentWillReceiveProps(nextProps) {
+    //     if (nextProps.tokens != this.state.tokenlist) {
+    //         this.setState({ tokenlist: nextProps.tokens })
+    //     }
+        
+    //     if (nextProps.reloadDetails === true) {
+    //       this.props.updateReloadDetails();
+    //       this.setState({
+    //         isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
+    //       }, () => {
+    //         this.setPriceFeedData();
+    //         this.getBorrowedLoanRequests();
+    //         this.getFundedLoanRequests();
+    //         this.getETHbalance()
+    //       });
+    //     }
+    // }
     async getETHbalance(){
         
         let myEthBalance = 0;

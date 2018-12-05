@@ -37,8 +37,8 @@ class MyPortfolio extends Component {
         };
     }
     componentDidMount(){
-        const { isTokenLoading } = this.props;
-        if(!isTokenLoading){
+        const { isTokenLoading,priceFeedData } = this.props;
+        if(!isTokenLoading && !_.isUndefined(priceFeedData)){
             this.setState({
                 totalTokenProcessed: false,
                 assetsProcessed:false,
@@ -57,7 +57,8 @@ class MyPortfolio extends Component {
             myEthBalanceLoading:prevMyEthBalanceLoading,
             isTokenLoading:prevIsTokenLoading,
             myFundedLoading:prevMyFundedLoading,
-            myBorrowedLoading:prevMyBorrowedLoading
+            myBorrowedLoading:prevMyBorrowedLoading,
+            priceFeedData:prevPriceFeedData
         } = prevProps;
         const {
             isMetaMaskAuthRised,
@@ -82,7 +83,7 @@ class MyPortfolio extends Component {
                     this.calculateETHBalance()
                 })
             }
-            if (isTokenLoading!=prevIsTokenLoading) {
+            if (isTokenLoading!=prevIsTokenLoading || priceFeedData!=prevPriceFeedData) {
                 this.setState({
                     totalTokenProcessed: false,
                     assetsProcessed:false,
@@ -92,7 +93,7 @@ class MyPortfolio extends Component {
                 })
             }
 
-            if (myFundedLoading!=prevMyFundedLoading) {
+            if (myFundedLoading!=prevMyFundedLoading || priceFeedData!=prevPriceFeedData) {
                 this.setState({
                     totalFundProcessed: false,
                     assetsProcessed:false,
@@ -103,10 +104,9 @@ class MyPortfolio extends Component {
             }
             /*Counting total assets ends*/
 
-            if (myBorrowedLoading != prevMyBorrowedLoading) {
+            if (myBorrowedLoading != prevMyBorrowedLoading || priceFeedData!=prevPriceFeedData) {
                 this.setState({
                     liabilitiesProcessed: false,
-                    assetsProcessed:false,
                     doughnutDataPrepared:false,
                 }, () => {
                     this.calculateTotalLiablitiesAmount()
@@ -146,23 +146,32 @@ class MyPortfolio extends Component {
 
     }
     async calculateTotalTokenBalance() {
+        console.log("calculateTotalTokenBalance")
         const { tokens, priceFeedData,isTokenLoading } = this.props;
         let totalTokenBalance = 0;
+        console.log("isTokenLoading " + isTokenLoading)
         if(isTokenLoading){
             return;
         }
+        console.log(tokens)
         if (tokens.length > 0) {
+            console.log("yes")
             await this.asyncForEach(tokens, async ts => {
                 if (ts.balance > 0) {
                     let tokenBalance = ts.balance;
                     let tokenSymbol = (ts.symbol == "WETH" && _.isUndefined(priceFeedData[ts.symbol])) ? "ETH" : ts.symbol;
+                    console.log("--")
+                    console.log(tokenSymbol)
                     if (!_.isUndefined(priceFeedData[tokenSymbol])) {
                         let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
                         let tokenCurrentAmount = parseFloat(tokenBalance) * parseFloat(tokenCurrentPrice);
+                        console.log(tokenCurrentAmount)
+
                         totalTokenBalance += tokenCurrentAmount;
                     }
                 }
             });
+            console.log(totalTokenBalance)
         }
         this.setState({
             totalTokenBalance,
@@ -224,8 +233,14 @@ class MyPortfolio extends Component {
     }
     updateAssetsProcessed() {
         const { totalTokenProcessed, totalEthProcessed, totalFundProcessed, totalTokenBalance, totalEthBalance, totalFundBalance,myFundedRequests } = this.state;
+        console.log("updateAssetsProcessed")
+        console.log("totalTokenProcessed + " + totalTokenProcessed + " --- " + totalTokenBalance)
+        console.log("totalEthProcessed + " + totalEthProcessed+ " --- " + totalEthBalance)
+        console.log("totalFundProcessed + " + totalFundProcessed+ " --- " + totalFundBalance)
         if (totalTokenProcessed === true && totalEthProcessed === true && totalFundProcessed === true) {
             let totalAssetAmount = parseFloat(totalTokenBalance) + parseFloat(totalEthBalance) + parseFloat(totalFundBalance);
+            console.log(totalAssetAmount)
+
             this.setState({
                 totalAssetAmount,
                 assetsProcessed: true
@@ -236,6 +251,9 @@ class MyPortfolio extends Component {
     }
     callCalculateValues() {
         const { assetsProcessed, liabilitiesProcessed } = this.state;
+        console.log("callCalculateValues")
+        console.log("assetsProcessed + " + assetsProcessed + " --- ")
+        console.log("liabilitiesProcessed + " + liabilitiesProcessed+ " --- ")
         if (assetsProcessed === true && liabilitiesProcessed === true) {
             this.calculateValues();
         }
@@ -300,7 +318,7 @@ class MyPortfolio extends Component {
                             </Row>
                         }
                         {
-                            !totalAssetAmount && !isLoading && !metaMaskMsg &&
+                            totalAssetAmount == 0 && !isLoading && !metaMaskMsg &&
                             <div className="portfolio-bg-image">
                                 <div className="portfolio-empty-image" style={{ backgroundImage: "url('assets/images/portfolio-empty.jpg')" }}>
                                     <div className="portfolio-bg-content">
@@ -308,7 +326,7 @@ class MyPortfolio extends Component {
                                         Would you like to buy?<br />
                                         <a
                                             href={`https://www.coinbase.com/`}
-                                            target="_blank" className="btn cognito green">
+                                            target="_blank" className="btn cognito green mt-5">
                                             {"Go to Coinbase"}
                                         </a>
                                     </div>
@@ -318,7 +336,7 @@ class MyPortfolio extends Component {
                         }
 
                         {
-                            !isLoading && !metaMaskMsg &&
+                            !isLoading && !metaMaskMsg && totalAssetAmount>0 &&
 
 
                             <Row className="align-items-center h-100 position-absolute portfolio-row w-100">
