@@ -71,7 +71,7 @@ class CreateLoan extends Component {
         this.updateValidators = this.updateValidators.bind(this);
     }
     componentDidUpdate(prevProps) {
-        const { tokens, reloadDetails, isTokenLoading } = this.props;
+        const { tokens, isTokenLoading } = this.props;
         if (prevProps.isTokenLoading != isTokenLoading) {
             let firstToken = '';
             let principalTokenSymbol = this.state.principalTokenSymbol;

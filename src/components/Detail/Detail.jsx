@@ -85,7 +85,7 @@ class Detail extends Component {
   getScheduledata() {
     const { currentMetamaskAccount } = this.props;
     const { isMetaMaskAuthRised } = this.state;
-    const { loanDetails, userTimezone, repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay, isLoanUser } = this.state;
+    const { loanDetails, userTimezone, isLoanUser } = this.state;
     const {
       principalAmount,
       creditorAddress,
@@ -299,7 +299,6 @@ class Detail extends Component {
             collateralAmount,
             collateralNumDecimals,
             totalExpectedRepayment,
-            repaidAmount,
             debtorAddress,
             creditorAddress
           } = loanRequestData;
@@ -345,8 +344,7 @@ class Detail extends Component {
             isLoanUser: isMetaMaskAuthRised && (debtorAddress == currentMetamaskAccount || creditorAddress == currentMetamaskAccount),
             buttonLoading: false,
             repaymentButtonLoading: false,
-            modalOpen: false,
-            buttonLoading: false
+            modalOpen: false
           }, () => {
             this.buttonOperations();
           })
@@ -484,7 +482,6 @@ class Detail extends Component {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
     const { loanDetails } = this.state;
-    const { principalNumDecimals } = loanDetails;
     this.setState({
       buttonLoading: true
     });
@@ -587,7 +584,6 @@ class Detail extends Component {
   }
 
   onCloseModal = () => {
-    const { repaymentButtonLoading } = this.state;
     this.setState({ buttonLoading: false, modalOpen: false });
   };
 

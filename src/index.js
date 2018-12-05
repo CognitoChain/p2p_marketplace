@@ -28,7 +28,7 @@ if (gatid === undefined) {
     ReactGA.pageview(history.location.pathname);
     
     // track pageviews when history changes
-    const unlisten = history.listen((location, action) => {
+    history.listen((location, action) => {
         console.log("path: ", action, location.pathname, location.state);
         ReactGA.pageview(location.pathname);
     });

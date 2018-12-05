@@ -50,10 +50,6 @@ class MyPortfolio extends Component {
     }
     async componentDidUpdate(prevProps) {
         const { 
-            tokens: prevTokens, 
-            myEthBalance: prevEthBalance ,
-            myFundedRequests:prevMyFundedRequests,
-            myBorrowedRequests:prevMyBorrowedRequests,
             myEthBalanceLoading:prevMyEthBalanceLoading,
             isTokenLoading:prevIsTokenLoading,
             myFundedLoading:prevMyFundedLoading,
@@ -65,11 +61,8 @@ class MyPortfolio extends Component {
             priceFeedData,
             myEthBalance,
             myEthBalanceLoading,
-            tokens,
             isTokenLoading,
             myFundedLoading,
-            myFundedRequests,
-            myBorrowedRequests,
             myBorrowedLoading
         } = this.props;
         if (!_.isUndefined(priceFeedData) && isMetaMaskAuthRised) {
@@ -232,7 +225,7 @@ class MyPortfolio extends Component {
         });
     }
     updateAssetsProcessed() {
-        const { totalTokenProcessed, totalEthProcessed, totalFundProcessed, totalTokenBalance, totalEthBalance, totalFundBalance,myFundedRequests } = this.state;
+        const { totalTokenProcessed, totalEthProcessed, totalFundProcessed, totalTokenBalance, totalEthBalance, totalFundBalance } = this.state;
         console.log("updateAssetsProcessed")
         console.log("totalTokenProcessed + " + totalTokenProcessed + " --- " + totalTokenBalance)
         console.log("totalEthProcessed + " + totalEthProcessed+ " --- " + totalEthBalance)
@@ -265,7 +258,7 @@ class MyPortfolio extends Component {
         }
     }
     calculateValues() {
-        const { totalAssetAmount, totalLiablitiesAmount, doughnutDataPrepared } = this.state;
+        const { totalAssetAmount, totalLiablitiesAmount } = this.state;
         const { myBorrowedLoading, isTokenLoading,myFundedLoading,myEthBalanceLoading } = this.props;
         if (isTokenLoading || myBorrowedLoading || myFundedLoading || myEthBalanceLoading) {
             this.setState({
@@ -302,7 +295,6 @@ class MyPortfolio extends Component {
     
     render() {
         const { totalAssetAmount, totalLiablitiesAmount, assetLiabilitiesPercentage, doughnutData, metaMaskMsg, assetsProcessed, liabilitiesProcessed, doughnutDataPrepared } = this.state;
-        const { myBorrowedLoading, isTokenLoading } = this.props;
         let isLoading = (assetsProcessed === true && liabilitiesProcessed === true && doughnutDataPrepared === true) ? false : true;
         return (
             <Col lg={6} md={6} sm={6} xl={6}>

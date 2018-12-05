@@ -66,7 +66,6 @@ class MyActivities extends Component {
       await this.asyncForEach(myBorrowedRequests, async ts => {
           let totalRepaidAmount = parseFloat(ts.repaidAmount); 
           let totalRepaymentAmount = parseFloat(ts.repaymentAmount);
-          let outstandingAmount = totalRepaymentAmount - totalRepaidAmount;
           repaymentSchedule = ts.repaymentSchedule;
           let expectedRepaidAmountDharma = 0;
           let interestRatePercent = parseFloat(ts.interestRatePercent);
