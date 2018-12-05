@@ -33,7 +33,7 @@ class MyPortfolio extends Component {
             myBorrowedRequests: [],
             myTokens: [],
             isAssetsTokenLoading:false,
-            allowStateSet:true
+            isMounted:true
         };
     }
     componentDidMount(){
@@ -118,12 +118,12 @@ class MyPortfolio extends Component {
     }   
 
     shouldComponentUpdate(nextProps, nextState) {
-        return (nextState.allowStateSet === false) ? false : true;
+        return nextState.isMounted === false;
     }
 
     componentWillUnmount() {
         this.setState({
-          allowStateSet: false
+          isMounted: false
         });
     }
 

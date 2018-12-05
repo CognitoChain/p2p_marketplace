@@ -39,6 +39,7 @@ class Dashboard extends Component {
             myBorrowRequestProcessed:false,
             myFundedRequestProcessed:false,
             isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
+            isMounted:true  
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -51,11 +52,12 @@ class Dashboard extends Component {
         this.getMyLoanRequests();
         this.getETHbalance()
     }
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.isMounted === false;
+    }
     componentWillUnmount() {
         this.setState({
-            myBorrowedRequestsIsMounted: false,
-            myLoanRequestsIsMounted: false,
-            myFundedRequestsIsMounted: false
+            isMounted: false
         });
     }
     componentDidUpdate(prevProps){

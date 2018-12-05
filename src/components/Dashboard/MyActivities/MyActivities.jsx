@@ -22,12 +22,12 @@ class MyActivities extends Component {
       loanRequestsActivities: [],
       isLoading: true,
       metaMaskMsg: false,
-      allowStateSet:true      
+      isMounted:true      
     };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (nextState.allowStateSet === false) ? false : true;
+    return nextState.isMounted === false;
   }
 
   async componentDidUpdate(prevProps) {
@@ -49,7 +49,7 @@ class MyActivities extends Component {
 
   componentWillUnmount() {
     this.setState({
-      allowStateSet: false
+      isMounted: false
     });
   }
 

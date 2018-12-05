@@ -47,7 +47,8 @@ class Detail extends Component {
       modalMessage: '',
       modalMessageDisplay: '',
       isLoanUser: false,
-      isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
+      isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
+      isMounted:true 
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -71,6 +72,15 @@ class Detail extends Component {
         await this.getDetailData();
       }));
     }
+  }
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.isMounted === false;
+  }
+  
+  componentWillUnmount() {
+    this.setState({
+        isMounted: false
+    });
   }
   getScheduledata() {
     const { currentMetamaskAccount } = this.props;

@@ -20,7 +20,8 @@ class LoanRequests extends Component {
             highlightRow: null,
             isLoading: true,
             modal: false,
-            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
+            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
+            isMounted:true  
         };
         this.parseLoanRequests = this.parseLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -40,6 +41,16 @@ class LoanRequests extends Component {
             this.getLoanRequests();
           });
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.isMounted === false;
+    }
+
+    componentWillUnmount() {
+        this.setState({
+          isMounted: false
+        });
     }
 
     getLoanRequests() {

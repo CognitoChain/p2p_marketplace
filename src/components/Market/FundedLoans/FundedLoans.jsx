@@ -107,7 +107,8 @@ class FundedLoans extends Component {
             fundedLoansLists: [],
             highlightRow: null,
             isLoading: true,
-            myFundedLoansIsMounted:true
+            myFundedLoansIsMounted:true,
+            isMounted:true 
         };
         this.fundedLoansRequests = this.fundedLoansRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -123,7 +124,6 @@ class FundedLoans extends Component {
      */
     async componentDidMount() {
         const { highlightRow} = this.props;
-        const { myFundedLoansIsMounted } = this.state;
         this.setState({
             highlightRow,
         });
@@ -134,10 +134,7 @@ class FundedLoans extends Component {
         api.setToken(authToken).get("loanRequests", { sort, order })
             .then(this.fundedLoansRequests)
             .then(fundedLoansLists => {
-                if(myFundedLoansIsMounted)    
-                {
-                    this.setState({ fundedLoansLists, isLoading: false });           
-                }
+                this.setState({ fundedLoansLists, isLoading: false });           
             }).catch((error) => {
                 if(error.status && error.status === 403){
                     this.props.redirect(`/login/`);
@@ -145,6 +142,16 @@ class FundedLoans extends Component {
             });
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.isMounted === false;
+    }
+
+    componentWillUnmount(){
+        this.setState({
+          isMounted: false                
+        });
+    }
+    
     fundedLoansRequests(FundedData) {
         var filteredFundedData = _.filter(FundedData, { 'status': "FILLED" });
         return Promise.all(filteredFundedData.map(this.parseLoanRequest));
@@ -201,11 +208,7 @@ class FundedLoans extends Component {
         });
     }
 
-    componentWillUnmount(){
-        this.setState({
-          myFundedLoansIsMounted: false                
-        });
-    }
+    
 
     render() {
         const { highlightRow, isLoading } = this.state;
