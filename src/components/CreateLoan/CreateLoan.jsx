@@ -55,8 +55,9 @@ class CreateLoan extends Component {
             customAlertMsgClassname: '',
             customAlertMsgTitle: '',
             isBottomButtonLoading: true,
-            unlockTokenButtonLoading:false,
-            buttonLoading:false
+            unlockTokenButtonLoading: false,
+            buttonLoading: false,
+            userTokens: []
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -69,26 +70,46 @@ class CreateLoan extends Component {
         this.displayValidationErrors = this.displayValidationErrors.bind(this);
         this.updateValidators = this.updateValidators.bind(this);
     }
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.tokens.length > 0 && this.props.tokens.length == 0) {
+    componentDidUpdate(prevProps) {
+        const { tokens, reloadDetails, isTokenLoading } = this.props;
+        if (prevProps.isTokenLoading != isTokenLoading) {
             let firstToken = '';
             let principalTokenSymbol = this.state.principalTokenSymbol;
-            _.every(nextProps.tokens, function (token) {
-                if (token.balance > 0 && firstToken == '' && token.symbol != principalTokenSymbol) {
-                    firstToken = token.symbol;
-                    return false;
-                }
-                return true;
-            })
+            if (tokens.length > 0) {
+                _.every(tokens, function (token) {
+                    if (token.balance > 0 && firstToken == '' && token.symbol != principalTokenSymbol) {
+                        firstToken = token.symbol;
+                        return false;
+                    }
+                    return true;
+                })
+            }
             this.setState({
                 collateralTokenSymbol: firstToken || this.state.collateralTokenSymbol
+            }, () => {
+                this.setUserTokens();
             })
         }
     }
-
+    setUserTokens() {
+        const { tokens } = this.props;
+        let userTokens = []
+        if (tokens.length > 0) {
+            userTokens = _.filter(tokens, (token) => {
+                if (token.balance > 0) {
+                    return true
+                }
+                return false;
+            })
+            this.setState({
+                userTokens
+            })
+        }
+    }
     async componentDidMount() {
         this.setHasSufficientAllowance();
-        const authToken=  auth.getToken()
+        this.setUserTokens();
+        const authToken = auth.getToken()
         const api = new Api();
 
         const relayer = await api.setToken(authToken).get("relayerAddress").catch((error) => {
@@ -123,8 +144,8 @@ class CreateLoan extends Component {
 
         const api = new Api();
         let { LTVRatioValue } = this.state;
-        const authToken =  auth.getToken();
-        this.setState({buttonLoading: true});
+        const authToken = auth.getToken();
+        this.setState({ buttonLoading: true });
         if (this.isFormValid() && LTVRatioValue <= 60) {
             try {
                 const { dharma } = this.props;
@@ -134,18 +155,18 @@ class CreateLoan extends Component {
                     ...loanRequest.toJSON(),
                     id: loanRequest.getAgreementId(),
                 });
-                this.setState({buttonLoading: false});
+                this.setState({ buttonLoading: false });
                 this.props.onCompletion(loanRequest.getAgreementId());
             } catch (e) {
                 let error = new Error(e);
                 error = error.props.message.split(".")
-                
+
                 this.setState({
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: error[0],
-                    buttonLoading:false
+                    buttonLoading: false
                 });
             }
         }
@@ -155,18 +176,18 @@ class CreateLoan extends Component {
                 customAlertMsgStyle: 'danger',
                 customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                 customAlertMsgTitle: (LTVRatioValue > 60) ? "LTV ratio can not be greater then 60." : "Please complete required fields",
-                buttonLoading:false
+                buttonLoading: false
             });
         }
     }
 
     async setHasSufficientAllowance(tokenSymbol, status) {
         const { dharma } = this.props;
-        const { collateralTokenSymbol, collateralAmount} = this.state;
+        const { collateralTokenSymbol, collateralAmount } = this.state;
         const symbol = tokenSymbol ? tokenSymbol : collateralTokenSymbol;
         const isCompleted = status && status == "success" ? true : false;
         const { Token } = Dharma.Types;
-        this.setState({customAlertMsgDisplay:false});
+        this.setState({ customAlertMsgDisplay: false });
         const currentAccount = await dharma.blockchain.getCurrentAccount();
         let stateObj = {};
         /*const tokens = new Tokens(dharma, currentAccount);*/
@@ -178,8 +199,7 @@ class CreateLoan extends Component {
             let hasSufficientAllowance =
                 tokenData.hasUnlimitedAllowance || tokenData.allowance >= collateralAmount || isCompleted;
             stateObj["hasSufficientAllowance"] = hasSufficientAllowance;
-            if(tokenData.hasUnlimitedAllowance)
-            {
+            if (tokenData.hasUnlimitedAllowance) {
                 stateObj["customAlertMsgDisplay"] = true;
                 stateObj["customAlertMsgStyle"] = 'success';
                 stateObj["customAlertMsgClassname"] = 'fa fa-check fa-2x pull-left mr-2';
@@ -195,7 +215,7 @@ class CreateLoan extends Component {
         const { Token } = Dharma.Types;
         const { collateralTokenSymbol } = this.state;
         const currentAccount = await dharma.blockchain.getCurrentAccount();
-        this.setState({unlockTokenButtonLoading: true,customAlertMsgDisplay:false});
+        this.setState({ unlockTokenButtonLoading: true, customAlertMsgDisplay: false });
         if (typeof currentAccount != 'undefined') {
             try {
                 const txHash = await Token.makeAllowanceUnlimitedIfNecessary(
@@ -213,18 +233,17 @@ class CreateLoan extends Component {
                 });
 
                 let response = await getTransactionReceipt(txHash);
-                if(!_.isUndefined(response))
-                {
+                if (!_.isUndefined(response)) {
                     this.props.refreshTokens(false);
                     this.setState({
                         txHash,
-                        unlockTokenButtonLoading:false,
-                        hasSufficientAllowance:true,
+                        unlockTokenButtonLoading: false,
+                        hasSufficientAllowance: true,
                         customAlertMsgDisplay: true,
                         customAlertMsgStyle: 'success',
                         customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
                         customAlertMsgTitle: 'Token Authorised.'
-                    });    
+                    });
                 }
             }
             catch (e) {
@@ -234,7 +253,7 @@ class CreateLoan extends Component {
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
                     customAlertMsgTitle: error.props.message,
-                    unlockTokenButtonLoading:false
+                    unlockTokenButtonLoading: false
                 });
             }
         }
@@ -357,7 +376,7 @@ class CreateLoan extends Component {
     }
 
     updateValidators(fieldName, value) {
-        const { collateralCurrentBalance, hasSufficientAllowance, principalTokenSymbol, collateralTokenSymbol } = this.state;
+        const { collateralCurrentBalance, hasSufficientAllowance, principalTokenSymbol, collateralTokenSymbol, userTokens } = this.state;
         if (!this.validators[fieldName]) {
             this.validators[fieldName] = {}
         }
@@ -380,11 +399,20 @@ class CreateLoan extends Component {
             });
         }
         if (fieldName == "collateral" && hasSufficientAllowance && value > collateralCurrentBalance && collateralCurrentBalance > 0) {
-            this.validators[fieldName].errors.push("You do not have sufficient collateral balance in wallet.'");
+            this.validators[fieldName].errors.push("You do not have sufficient collateral balance in wallet.");
             this.validators[fieldName].valid = false;
         }
+
         if (fieldName == "collateralTokenSymbol" && principalTokenSymbol == collateralTokenSymbol) {
             this.validators[fieldName].errors.push("Please choose another token.");
+            this.validators[fieldName].valid = false;
+        }
+
+
+
+        if (fieldName == "collateralTokenSymbol" && userTokens.length == 0) {
+            console.log(userTokens.length)
+            this.validators[fieldName].errors.push("Please add tokens to your wallet to use as collateral");
             this.validators[fieldName].valid = false;
         }
         if (fieldName == "userLoanAgree" && !value) {
@@ -401,6 +429,7 @@ class CreateLoan extends Component {
         let status = true;
         const validationFields = ["principal", "collateral", "collateralTokenSymbol", "termLength", "interestRate", "userLoanAgree", "LTVRatioValue"];
         validationFields.forEach((field) => {
+            console.log("------")
             this.updateValidators(field, this.state[field])
             if (!this.validators[field].valid) {
                 status = false;
@@ -412,6 +441,9 @@ class CreateLoan extends Component {
     displayValidationErrors(fieldName) {
         const validator = this.validators[fieldName];
         const result = '';
+        if (fieldName == "collateralTokenSymbol") {
+            console.log(validator)
+        }
         if (validator && !validator.valid) {
             const errors = validator.errors.map((info, index) => {
                 return <span className="error" key={index}>* {info}<br /></span>
@@ -435,7 +467,7 @@ class CreateLoan extends Component {
         let principalTokenSymbol = this.state.principalTokenSymbol;
         let collateralTokenSymbol = this.state.collateralTokenSymbol;
         const api = new Api();
-        const authToken =  auth.getToken();
+        const authToken = auth.getToken();
         api.setToken(authToken)
             .get(`priceFeed`)
             .then(async priceFeedData => {
@@ -517,7 +549,7 @@ class CreateLoan extends Component {
 
                     <Row className="mt-4 mb-4">
                         <Col>
-                            <h5 className="mb-2"> <div className="round-icon round-icon-lg orange"><img className="mb-1" src={borrowImg} height="20" alt="New Loan"/></div> New Loan</h5>
+                            <h5 className="mb-2"> <div className="round-icon round-icon-lg orange"><img className="mb-1" src={borrowImg} height="20" alt="New Loan" /></div> New Loan</h5>
                         </Col>
                     </Row>
                 </div>
@@ -555,7 +587,7 @@ class CreateLoan extends Component {
                                                             <InputRange
                                                                 className="mt-20"
                                                                 maxValue={60}
-                                                                formatLabel={value => `${niceNumberDisplay(value,2)} %`}
+                                                                formatLabel={value => `${niceNumberDisplay(value, 2)} %`}
                                                                 minValue={5}
                                                                 value={LTVRatio}
                                                                 onChange={value => this.handleLTVChange(value)} />
@@ -624,17 +656,17 @@ class CreateLoan extends Component {
                                                             <SummaryItem
                                                                 labelName="Loan Amount"
                                                                 labelValue={principal > 0 ? niceNumberDisplay(principal) + ' ' + principalTokenSymbol : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(principal,principalTokenSymbol)}
+                                                                tooltipValue={tooltipNumberDisplay(principal, principalTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Collateral Amount"
                                                                 labelValue={collateral > 0 ? niceNumberDisplay(collateral) + ' ' + collateralTokenSymbol : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(collateral,collateralTokenSymbol)}
+                                                                tooltipValue={tooltipNumberDisplay(collateral, collateralTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="LTV"
-                                                                labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio,2) + "%" : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(LTVRatio,"%")}
+                                                                labelValue={LTVRatio > 0 ? niceNumberDisplay(LTVRatio, 2) + "%" : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(LTVRatio, "%")}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Loan Term"
@@ -642,8 +674,8 @@ class CreateLoan extends Component {
                                                             />
                                                             <SummaryItem
                                                                 labelName="Interest Rate(Per Loan Term)"
-                                                                labelValue={interestRate > 0 ? niceNumberDisplay(interestRate,2) + "%" : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(interestRate,"%")}
+                                                                labelValue={interestRate > 0 ? niceNumberDisplay(interestRate, 2) + "%" : '-'}
+                                                                tooltipValue={tooltipNumberDisplay(interestRate, "%")}
                                                             />
                                                             {/*<SummaryItem 
                                                             labelName = "Expiration"
@@ -652,12 +684,12 @@ class CreateLoan extends Component {
                                                             <SummaryItem
                                                                 labelName="Interest Amount"
                                                                 labelValue={interestAmount > 0 ? niceNumberDisplay(interestAmount) + ' ' + principalTokenSymbol : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(interestAmount,principalTokenSymbol)}
+                                                                tooltipValue={tooltipNumberDisplay(interestAmount, principalTokenSymbol)}
                                                             />
                                                             <SummaryItem
                                                                 labelName="Total Repayment Amount"
                                                                 labelValue={totalReapaymentAmount > 0 ? niceNumberDisplay(totalReapaymentAmount) + ' ' + principalTokenSymbol : '-'}
-                                                                tooltipValue={tooltipNumberDisplay(totalReapaymentAmount,principalTokenSymbol)}
+                                                                tooltipValue={tooltipNumberDisplay(totalReapaymentAmount, principalTokenSymbol)}
                                                             />
                                                             {/*<SummaryItem 
                                                             labelName = "Relayer Fee"
@@ -717,18 +749,18 @@ class CreateLoan extends Component {
                         }
                     </div>
                 }
-                
+
                 {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
                     <div>
                         <Row className="mb-30">
                             <Col md={3}></Col>
                             <Col md={6}>
-                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error"/>
+                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error" />
                             </Col>
                             <Col md={3}></Col>
                         </Row>
                     </div>
-                }    
+                }
 
             </div>
         );
