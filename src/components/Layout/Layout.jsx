@@ -238,7 +238,7 @@ class Layout extends Component {
   }
   renderAuthenticationRoute() {
     return (
-      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateReloadDetails={this.updateReloadDetails}  updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} checkLogin={this.checkLogin} />
         <PublicRoute {...this.state} path="/email-verify/" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-verify/:token" exact={true} component={Login} urlpath={currentLocation} />
@@ -253,7 +253,7 @@ class Layout extends Component {
     const authToken = auth.getToken();
     const authUserInfo = auth.getUserInfo();
     return (
-      <Base metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} {...this.state}>
+      <Base metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} updateReloadDetails={this.updateReloadDetails}  {...this.state}>
         <Switch>
           <Route path='/market'
             render={() =>
@@ -261,10 +261,10 @@ class Layout extends Component {
             }
           />
           <PrivateRoute {...this.state} path='/dashboard' component={DashboardContainer} updateReloadDetails={this.updateReloadDetails} />
-          <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} />
+          <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} updateReloadDetails={this.updateReloadDetails}/>
           <PrivateRoute {...this.state} path="/loanrequests" component={LoanRequestsContainer} />
           <PrivateRoute path="/createold" {...this.state} component={CreateLoanRequestContainer} />
-          <PrivateRoute {...this.state} path="/create" component={Create} />
+          <PrivateRoute {...this.state} path="/create" component={Create} updateReloadDetails={this.updateReloadDetails}/>
           <PrivateRoute {...this.state} path="/tokens" component={TokensContainer} />
           <PrivateRoute {...this.state} path="/request/:id" component={LoanRequestContainer} />
           <PrivateRoute {...this.state} path="/detail/:id" component={DetailContainer} updateReloadDetails={this.updateReloadDetails} />
@@ -280,7 +280,7 @@ class Layout extends Component {
   }
   renderHomeRoute() {
     return (
-      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateReloadDetails={this.updateReloadDetails}  updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <Route exact={true} path='/'
           render={() =>
             <Login {...this.props} {...this.state} urlpath={currentLocation} checkLogin={this.checkLogin} />
