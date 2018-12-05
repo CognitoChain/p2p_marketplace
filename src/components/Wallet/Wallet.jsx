@@ -24,13 +24,13 @@ class Wallet extends Component {
     super(props);
     this.state = {
       tokenlist: this.props.tokens,
-      isWalletMounted: true
+      isMounted: true,
     };
     this.tooltipTop = this.tooltipTop.bind(this);
   }
-  /*componentWillMount() {
-    this.getETH();
-  }*/
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.isMounted;
+  }
   componentDidUpdate(prevProps) {
     if (prevProps.isTokenLoading != this.props.isTokenLoading) {
       this.setState({ tokenlist: this.props.tokens })
@@ -38,21 +38,9 @@ class Wallet extends Component {
   }
   componentWillUnmount() {
     this.setState({
-      isWalletMounted: false
+      isMounted: false
     });
   }
-  /*async getETH() {
-    const { dharma } = this.props;
-    const currentAccount = await dharma.blockchain.getCurrentAccount();
-    if (typeof currentAccount != "undefined") {
-      dharma.blockchain.getAccounts().then(accounts => {
-        const owner = accounts[0];
-        this.setState({
-          currentMetamaskAccount: owner
-        });
-      });
-    }
-  }*/
   handleLoading(token, isLoading) {
     const { tokenlist } = this.state;
     let symbol = token.symbol;
