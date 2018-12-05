@@ -31,9 +31,9 @@ class Wallet extends Component {
   /*componentWillMount() {
     this.getETH();
   }*/
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.tokens != this.props.tokens) {
-      this.setState({ tokenlist: nextProps.tokens })
+  componentDidUpdate(prevProps) {
+    if (prevProps.isTokenLoading != this.props.isTokenLoading) {
+      this.setState({ tokenlist: this.props.tokens })
     }
   }
   componentWillUnmount() {
