@@ -27,7 +27,7 @@ class MyActivities extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextState.isMounted === false;
+    return nextState.isMounted;
   }
 
   async componentDidUpdate(prevProps) {

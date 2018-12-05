@@ -13,6 +13,7 @@ import MyLoanRequests from "./MyLoanRequests/MyLoanRequests";
 import Api from "../../services/api";
 import { convertBigNumber } from "../../utils/Util";
 import auth from '../../utils/auth';
+import priceFeedData from '../../priceFeed.json';
 
 import './Dashboard.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
@@ -53,7 +54,7 @@ class Dashboard extends Component {
         this.getETHbalance()
     }
     shouldComponentUpdate(nextProps, nextState) {
-        return nextState.isMounted === false;
+        return nextState.isMounted;
     }
     componentWillUnmount() {
         this.setState({
@@ -279,14 +280,14 @@ class Dashboard extends Component {
     setPriceFeedData() {
         const { isMetaMaskAuthRised } = this.state;
         const authToken =  auth.getToken();
-
         if (isMetaMaskAuthRised) {
-            const api = new Api();
+            /*const api = new Api();
             api.setToken(authToken)
                 .get(`priceFeed`)
                 .then(async priceFeedData => {
                     this.setState({ priceFeedData: priceFeedData });
-                });
+                });*/
+            this.setState({ priceFeedData: priceFeedData });
         }
     }
 

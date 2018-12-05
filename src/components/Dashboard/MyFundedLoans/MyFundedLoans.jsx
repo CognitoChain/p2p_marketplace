@@ -9,6 +9,20 @@ import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoa
 import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyFundedLoans.css";
 class MyFundedLoans extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isMounted:true
+        }
+    }
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.isMounted;
+    }
+    componentWillUnmount() {
+        this.setState({
+          isMounted: false
+        });
+    }
     render() {
         const { myFundedRequests, myFundedLoading, currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
         if (myFundedLoading) {

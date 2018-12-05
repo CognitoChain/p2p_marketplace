@@ -9,6 +9,21 @@ import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorro
 import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyBorrowedLoans.css";
 class MyBorrowedLoans extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isMounted:true
+        }
+    }
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextState.isMounted;
+    }
+
+    componentWillUnmount() {
+        this.setState({
+          isMounted: false
+        });
+    }
     renderShowsTotal(start, to, total) {
         return (
             <p style={{ color: 'blue' }}>

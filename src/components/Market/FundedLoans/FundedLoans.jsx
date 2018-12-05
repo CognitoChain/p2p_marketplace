@@ -143,7 +143,7 @@ class FundedLoans extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return nextState.isMounted === false;
+        return nextState.isMounted;
     }
 
     componentWillUnmount(){
