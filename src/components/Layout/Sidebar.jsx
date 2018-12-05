@@ -40,7 +40,7 @@ class Sidebar extends Component {
             <hr className="grey-hr" />
             <div className="details-container">
               <div>Contact Us</div>
-              <div className="support-email"><a href="mailto:support@cognitochain.io">support@cognitochain.io</a></div>
+              <div className="support-email"><a href="mailto:support@Loanbase.io">support@Loanbase.io</a></div>
             </div>
 
             <div>
