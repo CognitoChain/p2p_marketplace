@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
-import loanBaseImg from "../../../assets/images/loanbase_poweredby.png";
+import loanBaseImg from "../../../assets/images/cognitochain_poweredby.png";
 import etherImg from "../../../assets/images/eth_poweredby.png";
 import dharmaImg from "../../../assets/images/dharma_poweredby.png";
 import loanImg from "../../../assets/images/loans.jpg";
@@ -240,13 +240,13 @@ class Login extends React.Component {
                                 <h2>Powered By</h2>
                             </div>
                             <div className="col-md-3">
-                                <img src={loanBaseImg} alt="" class="img-fluid" />
+                                <a href="https://cognitochain.io/" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
                             </div>
                             <div className="col-md-3">
-                                <img src={etherImg} alt="" class="img-fluid"/>
+                                <a href="https://www.ethereum.org/" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
                             </div>
                             <div className="col-md-3">
-                                <img src={dharmaImg} alt="" class="img-fluid"/>
+                                <a href="https://dharma.io/" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
                             </div>
                         </div>
                     </div>
