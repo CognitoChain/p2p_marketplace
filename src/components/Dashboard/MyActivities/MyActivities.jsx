@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Loading from "../../Loading/Loading";
 import MyActivitiesEmpty from "./MyActivitiesEmpty/MyActivitiesEmpty";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay,tooltipNumberDisplay,numberUsFormat } from "../../../utils/Util";
 
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
@@ -114,7 +114,7 @@ class MyActivities extends Component {
                 
                 let paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((st < currentTimestamp) ? 'missed' : 'due'));
                 let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
-
+                amount = numberUsFormat(amount);
                 if (st > current_timestamp && i == 1 && amount > 0) {
                   if (isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount) {
                     if (parseFloat(ts.repaidAmount) < parseFloat(ts.repaymentAmount) && ts.isRepaid == false) {
@@ -175,7 +175,7 @@ class MyActivities extends Component {
                 var duration = moment.duration(now.diff(end));
                 var daysBefore = parseInt(duration.asDays());
                 var hoursBefore = parseInt(duration.asHours());
-
+                missedRepaymentAmount = numberUsFormat(missedRepaymentAmount);
                 loanRequestsActivities.push({
                   id: "l_" + _.random(999999999),
                   date: moment(missedDate, "DD/MM/YYYY HH:mm:ss", true).format(),
@@ -243,8 +243,10 @@ class MyActivities extends Component {
                 if (schedule_ts > current_timestamp * 1000 && i == 1) {
                   let date = new Date(schedule_ts);
                   let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
+                  expectedRepaidAmount = numberUsFormat(expectedRepaidAmount);
                   expectedRepaidAmountDharma += expectedRepaidAmount;
                   let amount = parseFloat(expectedRepaidAmountDharma) - parseFloat(ts.repaidAmount);
+                  amount = numberUsFormat(amount);
                   if(amount > 0)
                   {
                     investmentsActivities.push({

@@ -11,7 +11,7 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay} from "../../utils/Util";
+import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay, numberUsFormat} from "../../utils/Util";
 import auth from '../../utils/auth';
 import "./LoanRequest.css";
 import ReactGA from 'react-ga';
@@ -88,6 +88,7 @@ class LoanRequest extends Component {
                     if (!_.isUndefined(priceFeedData[principalTokenSymbol])) {
                         let principalTokenCurrentPrice = priceFeedData[principalTokenSymbol].USD;
                         principalCurrentAmount = parseFloat(get_terms.principalAmount) * principalTokenCurrentPrice;
+                        principalCurrentAmount = numberUsFormat(principalCurrentAmount);
                     }
                     if (!_.isUndefined(priceFeedData[collateralTokenSymbol])) {
                         let collateralTokenCurrentPrice =
@@ -95,6 +96,7 @@ class LoanRequest extends Component {
                         collateralCurrentAmount =
                             parseFloat(get_terms.collateralAmount) *
                             collateralTokenCurrentPrice;
+                        collateralCurrentAmount = numberUsFormat(collateralCurrentAmount);
                     }
                     if (principalCurrentAmount > 0 && collateralCurrentAmount > 0) {
                         LTVRatioValue = (principalCurrentAmount / collateralCurrentAmount) * 100;
@@ -104,7 +106,7 @@ class LoanRequest extends Component {
                     let interestRate = get_terms.interestRate;
                     let interestAmount = (principal * interestRate) / 100;
                     let totalReapaymentAmount = parseFloat(principal) + parseFloat(interestAmount);
-
+                    totalReapaymentAmount = numberUsFormat(totalReapaymentAmount);
                     this.setState({
                         principal: get_terms.principalAmount,
                         principalTokenSymbol: get_terms.principalTokenSymbol,

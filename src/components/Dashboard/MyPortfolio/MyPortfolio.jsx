@@ -4,7 +4,7 @@ import _ from "lodash";
 import { Doughnut } from 'react-chartjs-2';
 import Loading from "../../Loading/Loading";
 import CustomAlertMsg from "../../CustomAlertMsg/CustomAlertMsg";
-import { niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay, tooltipNumberDisplay, numberUsFormat } from "../../../utils/Util";
 import "./MyPortfolio.css";
 class MyPortfolio extends Component {
     constructor(props) {
@@ -129,6 +129,7 @@ class MyPortfolio extends Component {
         let ethPrice = (!_.isUndefined(priceFeedData["ETH"])) ? priceFeedData["ETH"].USD : 0;
         if (myEthBalance > 0 && ethPrice) {
             totalEthBalance = myEthBalance * ethPrice;
+            totalEthBalance = numberUsFormat(totalEthBalance);
         }
         this.setState({
             totalEthBalance,
@@ -139,32 +140,24 @@ class MyPortfolio extends Component {
 
     }
     async calculateTotalTokenBalance() {
-        console.log("calculateTotalTokenBalance")
         const { tokens, priceFeedData,isTokenLoading } = this.props;
         let totalTokenBalance = 0;
-        console.log("isTokenLoading " + isTokenLoading)
         if(isTokenLoading){
             return;
         }
-        console.log(tokens)
         if (tokens.length > 0) {
-            console.log("yes")
             await this.asyncForEach(tokens, async ts => {
                 if (ts.balance > 0) {
                     let tokenBalance = ts.balance;
                     let tokenSymbol = (ts.symbol == "WETH" && _.isUndefined(priceFeedData[ts.symbol])) ? "ETH" : ts.symbol;
-                    console.log("--")
-                    console.log(tokenSymbol)
                     if (!_.isUndefined(priceFeedData[tokenSymbol])) {
                         let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
                         let tokenCurrentAmount = parseFloat(tokenBalance) * parseFloat(tokenCurrentPrice);
-                        console.log(tokenCurrentAmount)
-
+                        tokenCurrentAmount = numberUsFormat(tokenCurrentAmount);
                         totalTokenBalance += tokenCurrentAmount;
                     }
                 }
             });
-            console.log(totalTokenBalance)
         }
         this.setState({
             totalTokenBalance,
@@ -186,6 +179,7 @@ class MyPortfolio extends Component {
                     if (!_.isUndefined(priceFeedData[tokenSymbol])) {
                         let tokenCurrentPrice = priceFeedData[tokenSymbol].USD;
                         let tokenCurrentAmount = parseFloat(mf.totalExpectedRepaymentAmount) * parseFloat(tokenCurrentPrice);
+                        tokenCurrentAmount = numberUsFormat(tokenCurrentAmount);
                         totalFundBalanceCount += tokenCurrentAmount;
                     }
                 }
@@ -212,6 +206,7 @@ class MyPortfolio extends Component {
                     if (!_.isUndefined(priceFeedData[principalSymbol])) {
                         let principalTokenCurrentPrice = priceFeedData[principalSymbol].USD;
                         let principalCurrentAmount = parseFloat(principal) * parseFloat(principalTokenCurrentPrice);
+                        principalCurrentAmount = numberUsFormat(principalCurrentAmount);
                         totalLiablitiesAmount += principalCurrentAmount;
                     }
                 }
@@ -226,14 +221,8 @@ class MyPortfolio extends Component {
     }
     updateAssetsProcessed() {
         const { totalTokenProcessed, totalEthProcessed, totalFundProcessed, totalTokenBalance, totalEthBalance, totalFundBalance } = this.state;
-        console.log("updateAssetsProcessed")
-        console.log("totalTokenProcessed + " + totalTokenProcessed + " --- " + totalTokenBalance)
-        console.log("totalEthProcessed + " + totalEthProcessed+ " --- " + totalEthBalance)
-        console.log("totalFundProcessed + " + totalFundProcessed+ " --- " + totalFundBalance)
         if (totalTokenProcessed === true && totalEthProcessed === true && totalFundProcessed === true) {
             let totalAssetAmount = parseFloat(totalTokenBalance) + parseFloat(totalEthBalance) + parseFloat(totalFundBalance);
-            console.log(totalAssetAmount)
-
             this.setState({
                 totalAssetAmount,
                 assetsProcessed: true
@@ -244,9 +233,6 @@ class MyPortfolio extends Component {
     }
     callCalculateValues() {
         const { assetsProcessed, liabilitiesProcessed } = this.state;
-        console.log("callCalculateValues")
-        console.log("assetsProcessed + " + assetsProcessed + " --- ")
-        console.log("liabilitiesProcessed + " + liabilitiesProcessed+ " --- ")
         if (assetsProcessed === true && liabilitiesProcessed === true) {
             this.calculateValues();
         }

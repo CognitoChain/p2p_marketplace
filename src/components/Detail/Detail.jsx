@@ -12,7 +12,7 @@ import Transactions from "./Transactions/Transactions";
 import RepaymentSchedule from "./RepaymentSchedule/RepaymentSchedule";
 import Api from "../../services/api";
 import LoadingFull from "../LoadingFull/LoadingFull";
-import { niceNumberDisplay, convertBigNumber, getTransactionReceipt } from "../../utils/Util";
+import { niceNumberDisplay, convertBigNumber, getTransactionReceipt, numberUsFormat } from "../../utils/Util";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import auth from '../../utils/auth';
 import "./Detail.css";
@@ -107,6 +107,7 @@ class Detail extends Component {
     let installmentPrincipal = principalAmount / termLengthAmount;
     installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
     let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
+    installmentInterestAmount = numberUsFormat(installmentInterestAmount); 
     installmentInterestAmount = (installmentInterestAmount > 0) ? installmentInterestAmount : 0;
     if (!_.isEmpty(loanDetails)) {
       let repaymentLoanstemp = [];
@@ -124,6 +125,7 @@ class Detail extends Component {
           let currentTimestamp = moment().unix();
           ts = ts / 1000;
           let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
+          expectedRepaidAmount = numberUsFormat(expectedRepaidAmount);
           expectedRepaidAmountDharma += expectedRepaidAmount;
           let deductNo = expectedRepaidAmountDharma - totalRepaidAmount;
           deductNo = (deductNo > outstandingAmount) ? outstandingAmount : deductNo;
@@ -382,7 +384,7 @@ class Detail extends Component {
     const { loanDetails } = this.state;
     const { principalNumDecimals } = loanDetails;
     let outstandingAmount = await debt.getOutstandingAmount();
-    outstandingAmount = new Intl.NumberFormat('en-US', { useGrouping : false } ).format(outstandingAmount);
+    outstandingAmount = numberUsFormat(outstandingAmount);
     outstandingAmount = (outstandingAmount > 0 && !_.isObject(outstandingAmount)) ? outstandingAmount : convertBigNumber(outstandingAmount,principalNumDecimals);
     return outstandingAmount;
   }
