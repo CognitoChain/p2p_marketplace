@@ -97,10 +97,10 @@ class CookiePolicy extends Component {
                         </p>
 
                         <p>
-                            You can find out more information about how to change your browser cookie settings at <a href={`www.allaboutcookies.org`} target="_blank">{"www.allaboutcookies.org"}</a>
+                            You can find out more information about how to change your browser cookie settings at <a href={`https://allaboutcookies.org`} target="_blank" rel="noopener noreferrer">{"www.allaboutcookies.org"}</a>
                         </p>
                         <p>
-                            Some third parties may use Advertising Cookies to help gather information about your browsing activity so that they can deliver website advertising to you that is relevant to your interests. The advertising industries in EU have developed schemes to help you opt-out of receiving cookies used for these purposes. You can find out more about the EU scheme from <a href={`www.youronlinechoices.eu`} target="_blank">{"www.youronlinechoices.eu"}</a>
+                            Some third parties may use Advertising Cookies to help gather information about your browsing activity so that they can deliver website advertising to you that is relevant to your interests. The advertising industries in EU have developed schemes to help you opt-out of receiving cookies used for these purposes. You can find out more about the EU scheme from <a href={`https://youronlinechoices.eu`} target="_blank" rel="noopener noreferrer" >{"www.youronlinechoices.eu"}</a>
                         </p>
 
                         <p>
