@@ -18,7 +18,7 @@ import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import "./Wallet.css";
-import { niceNumberDisplay,getTransactionReceipt,tooltipNumberDisplay } from "../../utils/Util";
+import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
     super(props);
@@ -129,65 +129,70 @@ class Wallet extends Component {
                 <Col xl={3} md={6} lg={6} className="mb-30" key={token.symbol}>
                   <Card className="card card-statistics h-100">
                     <CardBody className="pb-0">
-                      <div className="clearfix mb-10">
-                        <div className="float-left icon-box rounded-circle">
-                          <span className="text-white">
-                            <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" alt={token.symbol} />
-                          </span>
+                      <div className="token-details-row mb-10 row">
+                        <div class="col-md-2">
+                          <div className="icon-box rounded-circle">
+                            <span className="text-white">
+                              <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" alt={token.symbol} />
+                            </span>
+                          </div>
                         </div>
-
-                        <div>
-                          <div className="float-left text-left crypto-currency-text">
-                            <div className="wallet-token-symbol">
-                              {token.symbol}
+                        <div class="col-md-10">
+                          <div class="row">
+                            <div className="col-md-8 text-left">
+                              <div className="wallet-token-symbol">
+                                {token.symbol}
+                              </div>
+                              <div>{token.name}</div>
                             </div>
-                            <div>{token.name}</div>
-                          </div>
-                          <div className="float-right text-right">
-                            <p className="card-text text-dark">
-                              <span className="wallet-token-balance custom-tooltip" tooltip-title={tooltipNumberDisplay(token.balance,token.symbol)}>
-                                {niceNumberDisplay(token.balance)}
-                              </span>{" "}
-                              {token.symbol}
-                            </p>
+                            <div className="col-md-4 text-right">
+                              <p className="card-text text-dark">
+                                <span className="wallet-token-balance custom-tooltip" tooltip-title={tooltipNumberDisplay(token.balance, token.symbol)}>
+                                  {niceNumberDisplay(token.balance)}
+                                </span>{" "}
+                                {token.symbol}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="mt-3 pull-left text-left d-inline-block">
-                        {
-                          token.hasUnlimitedAllowance
-                            ? <label className="badge badge-success">Unlocked</label>
-                            : <label className="badge badge-warning">Locked</label>
-
-                        }
-                      </div>
-                      <div className="mt-3 pull-right text-right d-inline-block" id={"token" + tokenSymbol}>
-                        {
-                          token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
-                        }
-                        <Switch height={20} width={40} uncheckedIcon={false} disabled={token.isLoading} checkedIcon={false} checked={token.hasUnlimitedAllowance} onChange={() =>
-                          this.updateProxyAllowanceAsync(
-                            token
-                          )
-                        } className="react-switch" />
-                        <Tooltip placement="top" isOpen={token.tootlTipStatus} target={"token" + tokenSymbol} toggle={() =>
-                          this.tooltipTop(
-                            token
-                          )
-                        }>
+                      <div class="row mt-3 ">
+                        <div className="col-md-8 text-left">
                           {
                             token.hasUnlimitedAllowance
-                              ? "Lock"
-                              : "Unlock"
+                              ? <label className="badge badge-success">Unlocked</label>
+                              : <label className="badge badge-warning">Locked</label>
+
                           }
-                        </Tooltip>
+                        </div>
+                        <div className="col-md-4 text-right" id={"token" + tokenSymbol} >
+                          {
+                            token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
+                          }
+                          <Switch height={20} width={40} uncheckedIcon={false} disabled={token.isLoading} checkedIcon={false} checked={token.hasUnlimitedAllowance} onChange={() =>
+                            this.updateProxyAllowanceAsync(
+                              token
+                            )
+                          } className="react-switch" />
+                          <Tooltip placement="top" isOpen={token.tootlTipStatus} target={"token" + tokenSymbol} toggle={() =>
+                            this.tooltipTop(
+                              token
+                            )
+                          }>
+                            {
+                              token.hasUnlimitedAllowance
+                                ? "Lock"
+                                : "Unlock"
+                            }
+                          </Tooltip>
+                        </div>
                       </div>
                     </CardBody>
                   </Card>
                 </Col>
               );
             }
-            else{
+            else {
               return '';
             }
           })}
@@ -205,7 +210,7 @@ class Wallet extends Component {
 
   }
   render() {
-    const { wrongMetamaskNetwork, currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
+    const { wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised } = this.props;
     return (
       <div className="wallet-page">
 
