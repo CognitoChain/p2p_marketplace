@@ -411,7 +411,6 @@ class CreateLoan extends Component {
 
 
         if (fieldName == "collateralTokenSymbol" && userTokens.length == 0) {
-            console.log(userTokens.length)
             this.validators[fieldName].errors.push("Please add tokens to your wallet to use as collateral");
             this.validators[fieldName].valid = false;
         }
@@ -429,7 +428,6 @@ class CreateLoan extends Component {
         let status = true;
         const validationFields = ["principal", "collateral", "collateralTokenSymbol", "termLength", "interestRate", "userLoanAgree", "LTVRatioValue"];
         validationFields.forEach((field) => {
-            console.log("------")
             this.updateValidators(field, this.state[field])
             if (!this.validators[field].valid) {
                 status = false;
@@ -441,9 +439,6 @@ class CreateLoan extends Component {
     displayValidationErrors(fieldName) {
         const validator = this.validators[fieldName];
         const result = '';
-        if (fieldName == "collateralTokenSymbol") {
-            console.log(validator)
-        }
         if (validator && !validator.valid) {
             const errors = validator.errors.map((info, index) => {
                 return <span className="error" key={index}>* {info}<br /></span>

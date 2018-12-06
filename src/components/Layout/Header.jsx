@@ -39,17 +39,14 @@ class Header extends Component {
     componentWillUnmount() {
         clearInterval(this.interval);
     }
-    componentWillReceiveProps(nextProps){
-        if(nextProps.isMetaMaskAuthRised && nextProps.isMetaMaskAuthRised != this.props.isMetaMaskAuthRised){
-            
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.isMetaMaskAuthRised && nextProps.isMetaMaskAuthRised != this.props.isMetaMaskAuthRised) {
+
         }
     }
     componentDidUpdate(prevProps) {
-        // console.log("componentDidUpdate Header")
-        // console.log(prevProps.reloadDetails)
-        // console.log(this.props.reloadDetails)
-        if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
-            this.props.refreshTokens();    
+        if (prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true) {
+            this.props.refreshTokens();
             this.props.updateReloadDetails();
         }
     }
@@ -63,15 +60,15 @@ class Header extends Component {
         currentMetamaskAccount = (!_.isUndefined(currentMetamaskAccount) && currentMetamaskAccount != '' && currentMetamaskAccount != null) ? currentMetamaskAccount : '';
         currentAccount = (!_.isUndefined(currentAccount) && currentAccount != '' && currentAccount != null) ? currentAccount : '';
         if ((currentMetamaskAccount == '' && currentAccount != '') || (currentMetamaskAccount != String(currentAccount) & currentMetamaskAccount != '')) {
-            this.props.updateMetamaskAccount(currentAccount, true);            
+            this.props.updateMetamaskAccount(currentAccount, true);
         }
     }
     render() {
         const authUserInfo = auth.getUserInfo();
-        const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation, isWeb3Enabled } = this.props;
+        const { wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation, isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
         let currentMetamaskAccountDisplay = ethAddressDisplay(currentMetamaskAccount);
-        return (    
+        return (
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
                 <div className="text-left navbar-brand-wrapper">
@@ -152,8 +149,6 @@ class Header extends Component {
                         </li>
                     </ul>
             </nav>
-            //   End Header
-
         );
     }
 }

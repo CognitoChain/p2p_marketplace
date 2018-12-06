@@ -8,7 +8,6 @@ class Overview extends Component {
       nextRepaymentAmount,
       nextRepaymentDate,
       repaymentBtnDisplay,
-      currentMetamaskAccount,
       isMetaMaskAuthRised,
       collateralBtnDisplay,
       collateralSeizeBtnDisplay,
@@ -23,7 +22,6 @@ class Overview extends Component {
     let {
       principal,
       principalSymbol,
-      debtorAddress,
       isCollateralSeized,
       isCollateralReturned,
       outstandingAmount,

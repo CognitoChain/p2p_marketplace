@@ -30,8 +30,6 @@ class LoginForm extends React.Component {
   }
   componentDidMount() {
     const { locationState } = this.state;
-    console.log("locationState")
-    console.log(locationState)
     if (!_.isUndefined(locationState) && !_.isEmpty(locationState) && !_.isUndefined(locationState.message)) {
       this.props.historyPush.push({
         pathname: '/login',

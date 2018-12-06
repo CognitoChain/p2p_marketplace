@@ -101,9 +101,7 @@ class Dashboard extends Component {
         if(!myEthBalanceLoading){
             this.setState({ myEthBalanceLoading: true,myEthBalance:0 });
         }
-        console.log(currentMetamaskAccount)
         await window.web3.eth.getBalance(currentMetamaskAccount, (err, balance) => {
-            console.log(balance)
             let ethBalance = window.web3.fromWei(balance, "ether");
             myEthBalance = (ethBalance > 0) ? parseFloat(ethBalance) : 0;
             this.setState({
