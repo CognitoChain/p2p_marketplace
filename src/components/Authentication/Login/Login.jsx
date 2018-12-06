@@ -240,13 +240,13 @@ class Login extends React.Component {
                                 <h2>Powered By</h2>
                             </div>
                             <div className="col-md-3">
-                                <a href="https://cognitochain.io/" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
+                                <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
                             </div>
                             <div className="col-md-3">
-                                <a href="https://www.ethereum.org/" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
+                                <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
                             </div>
                             <div className="col-md-3">
-                                <a href="https://dharma.io/" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
+                                <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
                             </div>
                         </div>
                     </div>
