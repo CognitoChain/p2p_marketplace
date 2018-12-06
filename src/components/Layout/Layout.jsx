@@ -175,7 +175,7 @@ class Layout extends Component {
     console.log("Layout jsx isMetaMaskAuthRised");
     console.log(isMetaMaskAuthRisedNew);
     let reloadDetails = false;
-    if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew ) {
+    if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew && currentMetamaskAccount!='') {
       reloadDetails = true
     }
     else if (isMetaMaskAuthRised && oldCurrentMetamaskAccount != currentMetamaskAccount ) {
