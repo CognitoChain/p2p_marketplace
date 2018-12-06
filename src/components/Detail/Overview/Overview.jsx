@@ -18,7 +18,7 @@ class Overview extends Component {
       unblockCollateral,
       seizeCollateral,
       buttonLoading,
-      isLoanUser,
+      isLoanUser      
     } = this.props;
     let {
       principal,
@@ -28,7 +28,8 @@ class Overview extends Component {
       isCollateralReturned,
       outstandingAmount,
       isRepaid,
-      totalRepaymentAmount
+      totalRepaymentAmount,
+      totalRepaidAmount
     } = loanDetails;
     let outstandingAmountDisplay = niceNumberDisplay(outstandingAmount);
     return (
@@ -48,7 +49,7 @@ class Overview extends Component {
             </Col>
 
             <Col lg={6} md={6} sm={6} xl={6} className="text-right">
-              {outstandingAmountDisplay > 0 && repaymentBtnDisplay &&
+              {outstandingAmountDisplay > 0 && isLoanUser &&
                 <div className="">
                   <span>Outstanding Amount</span>
                   <br />
@@ -71,9 +72,9 @@ class Overview extends Component {
             </Col>
           </Row>
           <Row className="mt-20">
-            <Col lg={5} md={5} sm={6} xl={5}>
+            <Col lg={6} md={6} sm={6} xl={6}>
               {outstandingAmountDisplay > 0 && isMetaMaskAuthRised &&
-                currentMetamaskAccount == debtorAddress && (
+                isLoanUser && (
 
                   <div className="pull-left">
                     <span>Next Repayment</span>
@@ -90,38 +91,22 @@ class Overview extends Component {
 
                 )}
             </Col>
-            <Col lg={7} md={7} sm={6} xl={7} className="text-right">
-              {repaymentBtnDisplay === true && (
-                <button
-                  className={"btn cognito repayment-button icon mb-15 btn-make-repayment btn-sm " + overViewButtonBackgroundClass}
-                  onClick={makeRepayment}
-                  disabled={buttonLoading}
-                >
-                  Make Repayment {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
-                </button>
-              )}
 
-              {collateralBtnDisplay === true && (
-                  <button
-                    className="btn cognito repayment-button icon mb-15 btn-make-repayment"
-                    onClick={unblockCollateral}
-                    disabled={buttonLoading}
-                  >
-                    Claim Collateral {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
-                  </button>
+            <Col lg={6} md={6} sm={6} xl={6} className="text-right">
+              {outstandingAmountDisplay > 0 && isMetaMaskAuthRised &&
+                isLoanUser && (
+
+                  <div className="pull-left">
+                    <span>Total Repaid Amount</span>
+                    <br />
+                    <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaidAmount,principalSymbol)}>
+                      {niceNumberDisplay(totalRepaidAmount)}
+                    </span>{" "}
+                    {principalSymbol}
+                  </div>
                 )}
-
-              {collateralSeizeBtnDisplay === true && (
-                <button
-                  className={"btn cognito repayment-button icon mb-15 btn-make-repayment btn-sm " + overViewButtonBackgroundClass}
-                  onClick={seizeCollateral}
-                  disabled={buttonLoading}
-                >
-                  Seize Collateral {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
-                </button>
-              )}
-
             </Col>
+            
             <Col>
               {
                 isCollateralSeized && isLoanUser && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
@@ -131,6 +116,42 @@ class Overview extends Component {
               }
             </Col>
           </Row>
+
+
+          <Row className="mt-20">
+            <Col className="text-center">
+              {repaymentBtnDisplay === true && (
+                <button
+                  className={"btn cognito repayment-button icon btn-make-repayment btn-sm " + overViewButtonBackgroundClass}
+                  onClick={makeRepayment}
+                  disabled={buttonLoading}
+                >
+                  Make Repayment {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
+                </button>
+              )}
+
+              {collateralBtnDisplay === true && (
+                  <button
+                    className="btn cognito repayment-button icon btn-make-repayment"
+                    onClick={unblockCollateral}
+                    disabled={buttonLoading}
+                  >
+                    Claim Collateral {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
+                  </button>
+                )}
+
+              {collateralSeizeBtnDisplay === true && (
+                <button
+                  className={"btn cognito repayment-button icon btn-make-repayment btn-sm " + overViewButtonBackgroundClass}
+                  onClick={seizeCollateral}
+                  disabled={buttonLoading}
+                >
+                  Seize Collateral {buttonLoading && <i className="fa-spin fa fa-spinner text-white m-1"></i>}
+                </button>
+              )}
+            </Col>
+          </Row>
+
         </CardBody>
       </Card>
     );
