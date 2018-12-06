@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
-import loanBaseImg from "../../../assets/images/cognitochain_poweredby.png";
-import etherImg from "../../../assets/images/eth_poweredby.png";
-import dharmaImg from "../../../assets/images/dharma_poweredby.png";
+import loanBaseImg from "../../../assets/images/cognitochain-transparent.png";
+import etherImg from "../../../assets/images/eth-transparent.png";
+import dharmaImg from "../../../assets/images/dharma-transparent.png";
 import loanImg from "../../../assets/images/loans.jpg";
 import loanBaselogoImg from "../../../assets/images/loanbase.svg";
 import transparencyImg from "../../../assets/images/transparency.svg";
@@ -67,23 +67,35 @@ class Login extends React.Component {
                         <div className="image" style={{ backgroundImage: "url('" + loanImg + "')" }}></div>
                         <div className="login-bg-overlay"></div>
 
-                        <div className="row m-0 pt-50 pb-50 h-100-lg justify-content-lg-between align-items-lg-center">
+                        <div className="row m-0 pt-30 pb-30 h-100-lg justify-content-lg-between align-items-lg-center">
                             <div className="col-md-8">
                                 <div className="header-image-content text-left">
                                     <div className="row">
-                                        <div className="col-md-1"></div>
-                                        <div className="col-md-10">
+                                        <div className="col-md-1 hide-xs"></div>
+                                        <div className="col-md-10 col-xs-12">
                                             <h1>Tokenized P2P Debt Market Place</h1>
                                             <h4>Leverage your digital assets without losing your position.</h4>
                                             <p className="mt-30 header-image-p">
                                                 Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
                                             </p>
-                                            <p className="mt-30 header-image-p">
+                                            <p className="mt-30 header-image-p text-left">
                                                 <Link to="/market" className="btn btn-theme cognito">Explore Market</Link>
-
                                             </p>
+
+                                            <h4 className="mt-30 mb-1 loan-base-title text-center">Powered by</h4>
+                                            <div className="row">
+                                                <div className="col-md-4">
+                                                    <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="col-md-1"></div>
+                                        <div className="col-md-1 hide-xs"></div>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +106,7 @@ class Login extends React.Component {
                                         <div className="row">
 
                                             <div className="col-md-11">
-                                                <div className="login-form p-4 mr-30">
+                                                <div className="login-form p-4">
                                                     {formTemplate}
                                                 </div>
                                                 <div className="col-md-1"></div>
@@ -104,6 +116,10 @@ class Login extends React.Component {
                                 )
                             }
                         </div>
+
+                        
+
+
                     </div>
                 </section>
 
@@ -233,31 +249,12 @@ class Login extends React.Component {
                     </div>
                 </section>
 
-                <section className="powered-by-container">
-                    <div className="container pt-50 pb-50">
-                        <div className="row text-center h-100 justify-content-center align-items-center">
-                            <div className="col-md-3">
-                                <h2>Powered By</h2>
-                            </div>
-                            <div className="col-md-3">
-                                <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
-                            </div>
-                            <div className="col-md-3">
-                                <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
-                            </div>
-                            <div className="col-md-3">
-                                <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 <section className="loanbase-logo-container">
                     <div className="container pt-20 pb-20 text-center">
                         <img src={loanBaselogoImg} alt="Loan Base" height={150} />
                     </div>
                 </section>
-            </div >
+            </div>
         );
     }
 }

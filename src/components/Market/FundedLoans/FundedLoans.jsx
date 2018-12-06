@@ -247,6 +247,7 @@ class FundedLoans extends Component {
             <div className="FundedLoansList">
                 <BootstrapTable
                     hover={false}
+                    responsive={true}
                     keyField="id"
                     classes={"market-funded-request"}
                     columns={columns}

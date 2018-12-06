@@ -46,28 +46,28 @@ class Market extends Component {
                     <div className="market-bg-content">
                         <h5>Digital assets backed loans got much easier. Here is how</h5>
                         <div className="row mt-30 how-it-works">
-                            <div className="col-md-3 p-2">
+                            <div className="col-md-3 col-sm-3 col-xs-12 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 1</h5>
                                     <p className="title-text">Login to Loanbase</p>
                                     <h6>Create Loan Request</h6>
                                 </div>
                             </div>
-                            <div className="col-md-3 p-2">
+                            <div className="col-md-3 col-sm-3 col-xs-12 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 2</h5>
                                     <p className="title-text">Authorize Smart Contract</p>
                                     <h6>Unlock Collateral</h6>
                                 </div>
                             </div>
-                            <div className="col-md-3 p-2">
+                            <div className="col-md-3 col-sm-3 col-xs-12 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 3</h5>
                                     <p className="title-text">Publish in Loanbase Marketplace</p>
                                     <h6>Get Funded</h6>
                                 </div>
                             </div>
-                            <div className="col-md-3 p-2">
+                            <div className="col-md-3 col-sm-3 col-xs-12 p-2">
                                 <div className="step-container p-2">
                                     <h5 className="text-muted">Step 4</h5>
                                     <p className="title-text">Repay Loan</p>

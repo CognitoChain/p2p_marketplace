@@ -427,7 +427,7 @@ class MyActivities extends Component {
               <div className="LoanRequests">
                 <BootstrapTable
                   hover={false}
-                 
+                  responsive={true}
                   keyField="id"
                   classes={"open-request"}
                   columns={columns}

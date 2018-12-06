@@ -179,6 +179,7 @@ class MyFundedLoans extends Component {
 
                 <BootstrapTable
                     hover={false}
+                    responsive={true}
                     keyField="id"
                     classes={"funded-request"}
                     columns={columns}

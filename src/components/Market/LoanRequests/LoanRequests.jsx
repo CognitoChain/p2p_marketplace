@@ -289,6 +289,7 @@ class LoanRequests extends Component {
             <div className="LoanRequests">
                 <BootstrapTable
                     hover={false}
+                    responsive={true}
                     ref='LoanRequestsTable' 
                     keyField="id"
                     classes={"market-open-request"}

@@ -69,6 +69,7 @@ class Transactions extends Component {
                   {isLoading === false && (
                     <BootstrapTable
                       hover={false}
+                      responsive={true}
                       keyField="id"
                       classes={"transaction-history"}
                       columns={transactionColumns}

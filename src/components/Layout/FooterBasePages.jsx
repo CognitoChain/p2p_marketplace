@@ -6,7 +6,7 @@ class FooterBasePages extends Component{
         return(
             //<!--================================= footer -->
          
-        <footer className="bg-white mt-20 p-4 footer-container footer-full-width">
+        <footer className="bg-white p-4 footer-container footer-full-width position-relative">
                         <Row>
                             <Col md={6}>
                                 <div className="text-center text-md-left">

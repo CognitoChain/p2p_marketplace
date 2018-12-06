@@ -177,6 +177,7 @@ class MyBorrowedLoans extends Component {
             <div className="LoanRequests">
                 <BootstrapTable
                     hover={false}
+                    responsive={true}
                     keyField="id"
                     classes={"borrowed-request"}
                     columns={columns}

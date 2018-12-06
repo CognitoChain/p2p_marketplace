@@ -78,43 +78,44 @@ class Header extends Component {
                     <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
                     <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
                 </div>
-                <div className="ml-auto header-right-block">
-                    {
-                        wrongMetamaskNetwork === true && (
-                            <CustomAlertMsg
-                                bsStyle='danger'
-                                extraClass="d-inline-block header-notice mb-0"
-                                title={wrongMetamskNetworkMsg}
-                            />
-                        )
-                    }
-                    {
-                        isWeb3Enabled === false && (currentLocation == '' || currentLocation == 'login') && (
-                            <CustomAlertMsg
-                                bsStyle='danger'
-                                extraClass="d-inline-block header-notice mb-0"
-                                title="Your browser isn't Web3-enabled."
-                            />
-                        )
-                    }
-                    {
-                        !_.isNull(authToken) && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
-                            // <CustomAlertMsg
-                            //     bsStyle='danger'
-                            //     extraClass="d-inline-block header-notice mb-0"
-                            //     title="Please log in to Metamask and allow Loanbase to access your Metamask Account."
-                            // />
-                            <button className="btn orange cognito d-inline-block small" onClick={() => { this.connectMetaMask() }}>Connect your MetaMask</button>
+              
+                <ul className="nav navbar-nav ml-auto">
 
-                        )
-                    }
-                    {
-                        !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
-                            <label className="headerEthAddress">{currentMetamaskAccountDisplay}</label>
-                        )
-                    }
-                    <ul className="nav navbar-nav d-inline-block">
-                        <li className="nav-item dropdown mr-30">
+                        <li className="nav-item">
+                            {
+                                wrongMetamaskNetwork === true && (
+                                    <CustomAlertMsg
+                                        bsStyle='danger'
+                                        extraClass="d-inline-block header-notice mb-0"
+                                        title={wrongMetamskNetworkMsg}
+                                    />
+                                )
+                            }
+                            {
+                                isWeb3Enabled === false && (currentLocation == '' || currentLocation == 'login') && (
+                                    <CustomAlertMsg
+                                        bsStyle='danger'
+                                        extraClass="d-inline-block header-notice mb-0"
+                                        title="Your browser isn't Web3-enabled."
+                                    />
+                                )
+                            }
+                            {
+                                !_.isNull(authToken) && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
+                                    <button className="btn orange cognito d-inline-block small" onClick={() => { this.connectMetaMask() }}>Connect your MetaMask</button>
+
+                                )
+                            }
+                            {
+                                !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
+                                    <label className="headerEthAddress">{currentMetamaskAccountDisplay}</label>
+                                )
+                            }
+                        </li>
+                    </ul>
+
+                    <ul className={"nav navbar-nav mr-0 " + ((!_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised)?"":"nav-message")}>
+                        <li className="nav-item dropdown mr-20">
                             {
                                 !_.isNull(authToken) && (
                                     <div>
@@ -135,7 +136,7 @@ class Header extends Component {
                                                 {
                                                     authUserInfo.socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
                                                 }
-                                                <a className="dropdown-item" onClick={() => { this.props.logout()}} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
+                                                <a className="dropdown-item" onClick={() => { this.props.logout() }} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
                                         </div>
                                     </div>
@@ -150,7 +151,6 @@ class Header extends Component {
                             }
                         </li>
                     </ul>
-                </div>
             </nav>
             //   End Header
 

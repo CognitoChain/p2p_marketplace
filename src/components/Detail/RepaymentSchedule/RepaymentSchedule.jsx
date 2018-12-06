@@ -115,6 +115,7 @@ class RepaymentSchedule extends Component {
               {isLoading === false && (
                 <BootstrapTable
                   hover={false}
+                  responsive={true}
                   keyField="id"
                   classes={"repayment-schedule"}
                   columns={columns}

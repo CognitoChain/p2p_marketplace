@@ -38,7 +38,7 @@ class Basepages extends React.Component {
                 <div className="container-fluid">
                     <div className="row">
                         <div className="col-md-12 p-0">
-                            <div className="main-content-container">
+                            <div className="main-content-container pb-0">
                                 {this.props.children}
                             </div>
                             <FooterBasePages />
