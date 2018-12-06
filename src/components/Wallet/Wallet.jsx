@@ -139,17 +139,17 @@ class Wallet extends Component {
                         </div>
                         <div class="col-md-10">
                           <div class="row">
-                            <div className="col-md-8 text-left">
+                            <div className="col-md-7 text-left">
                               <div className="wallet-token-symbol">
                                 {token.symbol}
                               </div>
                               <div>{token.name}</div>
                             </div>
-                            <div className="col-md-4 text-right">
+                            <div className="col-md-5 text-right">
                               <p className="card-text text-dark">
                                 <span className="wallet-token-balance custom-tooltip" tooltip-title={tooltipNumberDisplay(token.balance, token.symbol)}>
                                   {niceNumberDisplay(token.balance)}
-                                </span>{" "}
+                                </span><br/>
                                 {token.symbol}
                               </p>
                             </div>
