@@ -125,7 +125,6 @@ class Detail extends Component {
           let currentTimestamp = moment().unix();
           ts = ts / 1000;
           let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
-          expectedRepaidAmount = numberUsFormat(expectedRepaidAmount);
           expectedRepaidAmountDharma += expectedRepaidAmount;
           let deductNo = expectedRepaidAmountDharma - totalRepaidAmount;
           deductNo = (deductNo > outstandingAmount) ? outstandingAmount : deductNo;
