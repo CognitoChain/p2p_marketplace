@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Card, CardBody, CardTitle, ListGroup } from "reactstrap";
 import * as moment from "moment-timezone";
 import _ from "lodash";
-import { niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
+import { niceNumberDisplay, tooltipNumberDisplay, ethAddressDisplay } from "../../../utils/Util";
 import SummaryItem from "../SummaryItem/SummaryItem";
 
 class Summary extends Component {
@@ -33,8 +33,8 @@ class Summary extends Component {
     let collateralCurrentAmount = 0;
     let LTVRatioValue = '';
     let principalCurrentAmount = 0;
-    let debtorAddressDisplay = debtorAddress.substr(0,4)+'....'+debtorAddress.substr(-4);
-    let creditorAddressDisplay = creditorAddress.substr(0,4)+'....'+creditorAddress.substr(-4);
+    let debtorAddressDisplay = ethAddressDisplay(debtorAddress);
+    let creditorAddressDisplay = ethAddressDisplay(creditorAddress);
     if (!_.isEmpty(priceFeeds)) {
       let pricePrincipalSymbol = (principalSymbol == "WETH" && _.isUndefined(priceFeeds[principalSymbol])) ? "ETH" : principalSymbol;
       let priceCollateralSymbol = (collateralSymbol == "WETH" && _.isUndefined(priceFeeds[collateralSymbol])) ? "ETH" : collateralSymbol;

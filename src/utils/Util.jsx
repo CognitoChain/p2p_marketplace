@@ -106,3 +106,12 @@ export const getTransactionReceipt = async (hash) => {
     console.log('We have the error', e);
   }
 }
+
+export const ethAddressDisplay = (ethAddress) => {
+  let ETHAddressDisplay = '';
+  if(!_.isUndefined(ethAddress))
+  {
+    ETHAddressDisplay = ethAddress.substr(0,6)+'...'+ethAddress.substr(-4);
+  }
+  return ETHAddressDisplay;
+}

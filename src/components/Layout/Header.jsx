@@ -6,6 +6,7 @@ import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Avatar from 'react-avatar';
 import auth from '../../utils/auth';
 
+import { ethAddressDisplay } from "../../utils/Util";
 class Header extends Component {
 
     constructor(props) {
@@ -69,7 +70,7 @@ class Header extends Component {
         const authUserInfo = auth.getUserInfo();
         const {wrongMetamskNetworkMsg, wrongMetamaskNetwork, currentMetamaskAccount, isMetaMaskAuthRised, currentLocation, isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
-        
+        let currentMetamaskAccountDisplay = ethAddressDisplay(currentMetamaskAccount);
         return (    
             <nav className="admin-header navbar navbar-default col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
 
@@ -109,7 +110,7 @@ class Header extends Component {
                     }
                     {
                         !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
-                            <label className="headerEthAddress">{currentMetamaskAccount}</label>
+                            <label className="headerEthAddress">{currentMetamaskAccountDisplay}</label>
                         )
                     }
                     <ul className="nav navbar-nav d-inline-block">
