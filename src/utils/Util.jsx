@@ -104,7 +104,6 @@ export const getTransactionReceipt = async (hash) => {
     return receipt;
   }
   catch (e) {
-    console.log('We have the error', e);
   }
 }
 

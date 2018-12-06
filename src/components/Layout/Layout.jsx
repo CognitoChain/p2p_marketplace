@@ -1,7 +1,6 @@
 // External libraries
 import React, { Component } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
-// Components
 import Basepages from './Basepages';
 import Base from './Base';
 import Login from '../Authentication/Login/Login';
@@ -13,11 +12,7 @@ import Privacy from '../Privacy/Privacy';
 import TermsConditions from '../TermsConditions/TermsConditions';
 import { withRouter } from 'react-router-dom';
 import DashboardContainer from '../../containers/Dashboard';
-import LoanRequestsContainer from "../../containers/LoanRequests";
-import CreateLoanRequestContainer from "../../containers/CreateLoanRequest";
-import TokensContainer from "../../containers/Tokens";
 import LoanRequestContainer from "../../containers/LoanRequest";
-import InvestmentsContainer from "../../containers/Investments";
 import DetailContainer from "../../containers/Detail";
 import FundContainer from '../../containers/Fund';
 import ChangePassword from '../ChangePassword/ChangePassword';
@@ -32,14 +27,11 @@ let currentLocation = '';
 let loginCheckInterval;
 const PrivateRoute = ({ component: Component, ...rest }) => {
   let messageLoginPage = '', messageClass = '';
-  // console.log("PrivateRoute")
-  // console.log(messageLoginPage)
   const authToken = auth.getToken();
   if (authToken == null) {
     messageLoginPage = "LOGIN_REQUIRED";
     messageClass = "warning";
   }
-  //console.log(messageLoginPage)
   return (
     <div>
       <Route
@@ -107,7 +99,6 @@ class Layout extends Component {
   checkLogin() {
     const authToken = auth.getToken();
     if (!_.isNull(authToken)) {
-      console.log("Interval Started")
       loginCheckInterval = setInterval(() => {
         const updatedToken = auth.getToken();
         if (_.isNull(updatedToken)) {
@@ -121,7 +112,6 @@ class Layout extends Component {
     this.checkLogin()
   }
   componentWillUnmount() {
-    console.log("Interval Cleared unmount")
     clearInterval(loginCheckInterval)
     loginCheckInterval = false;
   }
@@ -148,7 +138,6 @@ class Layout extends Component {
   }
   async updateMetamaskAccountData(newMetamaskAccount) {
     let { isUserMetaMaskPermission,currentMetamaskAccount } = this.state;
-    console.log("updateMetamaskAccountData")
     if (newMetamaskAccount) {
       isUserMetaMaskPermission = true;
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
@@ -172,8 +161,6 @@ class Layout extends Component {
   updateMetaMaskAuthorized() {
     const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked,oldCurrentMetamaskAccount,isMetaMaskAuthRised,currentMetamaskAccount } = this.state;
     const isMetaMaskAuthRisedNew = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked == false);
-    console.log("Layout jsx isMetaMaskAuthRised");
-    console.log(isMetaMaskAuthRisedNew);
     let reloadDetails = false;
     if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew && currentMetamaskAccount!='') {
       reloadDetails = true
@@ -196,7 +183,6 @@ class Layout extends Component {
     })
     if (window.ethereum) {
       try {
-        console.log("aaa")
         await window.ethereum.enable();
         this.setState({ isUserMetaMaskPermission: true, isUserMetaMaskPermissionAsked: false }, () => {
           this.updateMetaMaskAuthorized();
@@ -205,7 +191,6 @@ class Layout extends Component {
         this.setState({ isUserMetaMaskPermission: false, isUserMetaMaskPermissionAsked: false }, () => {
           this.updateMetaMaskAuthorized();
         })
-        console.log("User denied account access...");
       }
     }
     else if (window.web3) {
@@ -262,13 +247,9 @@ class Layout extends Component {
           />
           <PrivateRoute {...this.state} path='/dashboard' component={DashboardContainer} updateReloadDetails={this.updateReloadDetails} />
           <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} updateReloadDetails={this.updateReloadDetails}/>
-          <PrivateRoute {...this.state} path="/loanrequests" component={LoanRequestsContainer} />
-          <PrivateRoute path="/createold" {...this.state} component={CreateLoanRequestContainer} />
           <PrivateRoute {...this.state} path="/create" component={Create} updateReloadDetails={this.updateReloadDetails}/>
-          <PrivateRoute {...this.state} path="/tokens" component={TokensContainer} />
           <PrivateRoute {...this.state} path="/request/:id" component={LoanRequestContainer} />
           <PrivateRoute {...this.state} path="/detail/:id" component={DetailContainer} updateReloadDetails={this.updateReloadDetails} />
-          <PrivateRoute {...this.state} path="/investments" component={InvestmentsContainer} />
           <PrivateRoute {...this.state} path="/success" component={Success} />
           <PrivateRoute {...this.state} path="/fund/:id" component={FundContainer} />
           {
@@ -325,11 +306,9 @@ class Layout extends Component {
         {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}
         {(currentLocation == '' || homeRoutes.indexOf(currentLocation) > -1) && this.renderHomeRoute()}
         {path.indexOf(currentLocation) === -1 && currentLocation != '' && homeRoutes.indexOf(currentLocation) == -1 && this.renderAuthenitcatedRoute()}
-
       </div>
     )
 
   }
 }
-
 export default withRouter(Layout);

@@ -39,10 +39,7 @@ class LoginContainer extends Component {
         }
 
         if (type === "google") {
-            console.log("have google profile: ", res.w3.U3);
-            console.log("tokenId: ", res.tokenId)  ;          
             this.googleSignIn(res.tokenId).then(response => {
-                console.log("logged-in as '", response.name, "' email: ", response.email);
                 this.setState({
                     name: response.name,
                     email: response.email,
@@ -59,14 +56,10 @@ class LoginContainer extends Component {
     }
 
     const responseFacebook = response => {
-      console.log("facebook console");
-      console.log(response);
       this.signup(response, "facebook");
     };
 
     const responseGoogle = response => {
-      console.log("google console");
-      console.log(response);
       this.signup(response, "google");
     };
 

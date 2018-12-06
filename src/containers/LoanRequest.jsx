@@ -13,7 +13,6 @@ class LoanRequestContainer extends Component {
     async onFillComplete(id,currentAccount) {
         const api = new Api();
         let data = {'address': currentAccount};
-        console.log("updating loan request - data: ", data)
         const authToken = auth.getToken();
         await api.setToken(authToken).put("loanRequests", id, data);
         this.props.history.push(`/fund/${id}`);        

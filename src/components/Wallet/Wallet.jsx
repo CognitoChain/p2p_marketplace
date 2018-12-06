@@ -89,7 +89,6 @@ class Wallet extends Component {
           });
         }
       } catch (e) {
-        console.log(e)
       }
     }
     this.handleLoading(token, false)

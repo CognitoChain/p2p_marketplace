@@ -78,7 +78,6 @@ class DharmaProvider extends Component {
             tokens,
             isTokenLoading
         }, () => {
-            console.log("getUserTokens")
             this.getUserTokens();
         })
     }

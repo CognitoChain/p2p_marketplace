@@ -8,19 +8,12 @@ class CreateLoanContainer extends Component {
         this.redirect = this.redirect.bind(this);
         this.onCompletion = this.onCompletion.bind(this);
     }
-
-    /**
-     * When the loan request is created, we redirect the user back to the table that includes
-     * all of the loan requests, and highlight the newly created request.
-     */
     onCompletion(id) {
-        /*this.props.history.push(`/requests/${id}`);*/
         this.props.history.push('success');
     }
     redirect(location) {
         this.props.history.push(location);
     }
-
     render() {
         return (
             <DharmaConsumer>
