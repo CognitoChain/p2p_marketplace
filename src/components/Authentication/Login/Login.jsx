@@ -78,20 +78,20 @@ class Login extends React.Component {
                                             <p className="mt-30 header-image-p">
                                                 Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
                                             </p>
-                                            <p className="mt-30 header-image-p text-left">
+                                            <p className="mt-30 header-image-p text-left text-center-xs">
                                                 <Link to="/market" className="btn btn-theme cognito">Explore Market</Link>
                                             </p>
 
                                             <h4 className="mt-30 mb-1 loan-base-title text-center">Powered by</h4>
                                             <div className="row">
                                                 <div className="col-md-4">
-                                                    <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" class="img-fluid" /></a>
+                                                    <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" className="img-fluid" /></a>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" class="img-fluid"/></a>
+                                                    <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" className="img-fluid"/></a>
                                                 </div>
                                                 <div className="col-md-4">
-                                                    <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" class="img-fluid"/></a>
+                                                    <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" className="img-fluid"/></a>
                                                 </div>
                                             </div>
                                         </div>

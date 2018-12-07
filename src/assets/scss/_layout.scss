@@ -1259,3 +1259,35 @@ textarea.form-control {
     position: absolute;
     z-index: 99;
 }
+.basepage-footer-container{
+  background: $logo-blue;
+  color:$white;
+}
+.basepage-footer-container h5,.basepage-footer-container a{
+  color:$white;  
+}
+.basepage-footer-container .social-icons i{
+  color:white !important;
+}
+.useful-links{
+  list-style-type:none !important;
+}
+.useful-links li{
+  padding:5px 0 !important;
+}
+.basepage-footer-container h5{
+  position:relative !important; 
+}
+.basepage-footer-container h5:after{
+    display: block;
+    content: "";
+    position: absolute;
+    height: 3px;
+    background: #f19b1e;
+    width: 15%;
+    bottom: -10px;
+    margin: 0;
+    left: 0;
+    right: 0;
+    border-radius: 5em;
+}
