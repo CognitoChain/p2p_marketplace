@@ -47,11 +47,15 @@ class Dashboard extends Component {
         this.updateMyBorrowRequestProcessed = this.updateMyBorrowRequestProcessed.bind(this);
     }
     componentDidMount() {
-        this.setPriceFeedData();
-        this.getBorrowedLoanRequests();
-        this.getFundedLoanRequests();
-        this.getMyLoanRequests();
-        this.getETHbalance()
+        const { isMetaMaskAuthRised } = this.props;
+        if(isMetaMaskAuthRised)
+        {
+            this.setPriceFeedData();
+            this.getBorrowedLoanRequests();
+            this.getFundedLoanRequests();
+            this.getMyLoanRequests();
+            this.getETHbalance()
+        }
     }
     shouldComponentUpdate(nextProps, nextState) {
         return nextState.isMounted;

@@ -20,7 +20,7 @@ class Overview extends Component {
       isLoanUser      
     } = this.props;
     let {
-      principal,
+      principalAmount,
       principalSymbol,
       isCollateralSeized,
       isCollateralReturned,
@@ -39,10 +39,10 @@ class Overview extends Component {
               <div className="pull-left">
                 <span>Loan Amount</span>
                 <br />
-                <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(principal,principalSymbol)}>
-                  {principal > 0 ? niceNumberDisplay(principal) : " - "}
+                <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(principalAmount,principalSymbol)}>
+                  {principalAmount > 0 ? niceNumberDisplay(principalAmount) : " - "}
                 </span>{" "}
-                {principal > 0 && principalSymbol}
+                {principalAmount > 0 && principalSymbol}
               </div>
             </Col>
 

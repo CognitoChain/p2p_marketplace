@@ -61,9 +61,14 @@ class Detail extends Component {
   }
   async componentWillMount() {
     this.getPriceFeeds();
-    await this.getDetailData();
+    const { isMetaMaskAuthRised } = this.props;
+    if(isMetaMaskAuthRised)
+    {
+      await this.getDetailData();  
+    }
   }
    componentDidUpdate(prevProps) {
+
     if(prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true){
       //this.props.updateReloadDetails();
       this.setState({
@@ -82,26 +87,26 @@ class Detail extends Component {
         isMounted: false
     });
   }
-  getScheduledata() {
-    const { currentMetamaskAccount } = this.props;
-    const { isMetaMaskAuthRised } = this.state;
+  async getScheduledata() {
+    const { dharma } = this.props;
     const { loanDetails, userTimezone, isLoanUser } = this.state;
     const {
+      id,
       principalAmount,
-      creditorAddress,
-      debtorAddress,
       totalRepaymentAmount,
       repaymentSchedule,
       termLengthAmount,
       interestRatePercent,
       totalRepaidAmount,
+      totalRepaidAmountNumber,
       principalSymbol,
       isCollateralSeized,
       isCollateralReturned,
       isCollateralSeizable,
       collateralReturnable,
       isRepaid,
-      outstandingAmount
+      outstandingAmount,
+      principalNumDecimals
     } = loanDetails;
 
     let installmentPrincipal = principalAmount / termLengthAmount;
@@ -114,29 +119,28 @@ class Detail extends Component {
       let repaymentLoanstemp = [];
       let lastExpectedRepaidAmount = 0;
       let expectedRepaidAmountDharma = 0;
-      let nextRepaymentAmount, repaymentAmount = 0;
+      let nextRepaymentAmount = 0;
       let nextRepaymentDate = '';
       let overViewBackgroundClass = '';
       let overViewButtonBackgroundClass = '';
       let i = 1;
       let j = 1;
+      let nextRepaymentTimestamp = '';
       if ((!_.isUndefined(repaymentSchedule) && repaymentSchedule.length > 0) && isLoanUser) {
         repaymentSchedule.forEach(ts => {
           let date = new Date(ts);
-          let currentTimestamp = moment().unix();
-          ts = ts / 1000;
+          let currentTimestamp = moment().unix() * 1000;
           expectedRepaidAmountDharma += repaymentInstallment;
-          let deductNo = expectedRepaidAmountDharma - totalRepaidAmount;
-          deductNo = (deductNo > outstandingAmount) ? outstandingAmount : deductNo;
-          expectedRepaidAmountDharma = (expectedRepaidAmountDharma > totalRepaymentAmount) ? totalRepaymentAmount : expectedRepaidAmountDharma;
-          if (ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmountDharma) {
-            repaymentAmount = nextRepaymentAmount = deductNo;
-            nextRepaymentDate = moment(date, "DD/MM/YYYY", true).format("DD/MM/YYYY");
+          if(ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmountDharma)
+          {
+            nextRepaymentTimestamp = ts;
             j++;
           }
-          else if (ts < currentTimestamp && totalRepaidAmount < totalRepaymentAmount) {
-            repaymentAmount = nextRepaymentAmount = deductNo;
+          else if(ts < currentTimestamp)
+          {
+            nextRepaymentTimestamp = ts;
           }
+
           let paidStatus = '-';
           paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((ts < currentTimestamp) ? 'missed' : 'due'));
 
@@ -181,7 +185,7 @@ class Detail extends Component {
             lastExpectedRepaidAmount = expectedRepaidAmountDharma;
           }
           repaymentLoanstemp.push({
-            id: i,
+            id: i++,
             ts: ts,
             createdDate: moment.tz(date, 'DD/MM/YYYY HH:mm:ss', userTimezone).format(),
             principalAmount: installmentPrincipal,
@@ -190,16 +194,29 @@ class Detail extends Component {
             totalRepaymentAmount: repaymentInstallment,
             status: paidStatus
           });
-          i++;
         });
+
+        if(nextRepaymentTimestamp != '')
+        {
+          let nextRepaymentScheduleTimestamp = nextRepaymentTimestamp / 1000;
+          let expectedAmountToPayBigNumber = await dharma.servicing.getExpectedValueRepaid(
+            id,
+            nextRepaymentScheduleTimestamp
+          );
+          let expectedAmountToNumber = expectedAmountToPayBigNumber.toNumber();
+          nextRepaymentAmount = expectedAmountToNumber - totalRepaidAmountNumber;
+          nextRepaymentAmount = convertBigNumber(nextRepaymentAmount,principalNumDecimals);
+          nextRepaymentDate = moment(new Date(nextRepaymentTimestamp), "DD/MM/YYYY", true).format("DD/MM/YYYY");
+        }
+
         this.setState({
           nextRepaymentAmount,
           overViewBackgroundClass,
           overViewButtonBackgroundClass,
-          repaymentAmount,
           nextRepaymentDate,
           lastExpectedRepaidAmount,
-          repaymentLoans: repaymentLoanstemp
+          repaymentLoans: repaymentLoanstemp,
+          isLoading:false
         })
       }
     }
@@ -241,17 +258,16 @@ class Detail extends Component {
       isCollateralSeized,
       isCollateralReturned
     } = loanDetails;
-
     let repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay, loanScheduleDisplay = false;
     if (isMetaMaskAuthRised && typeof debtorAddress != "undefined" && debtorAddress == currentMetamaskAccount) {
-      if (outstandingAmount > 0 && !isCollateralSeized) {
+      if (!isRepaid && !isCollateralSeized) {
         repaymentBtnDisplay = true;
       }
-      if (collateralReturnable === true && isCollateralReturned == false) {
+      if ((collateralReturnable || isRepaid) && !isCollateralReturned) {
         collateralBtnDisplay = true;
       }
     }
-    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable === true && isRepaid === false) {
+    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable === true /*&& isRepaid === false*/) {
       collateralSeizeBtnDisplay = true;
     }
     if (isMetaMaskAuthRised && ((typeof debtorAddress != "undefined" && debtorAddress == currentMetamaskAccount) || (typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount))) {
@@ -304,12 +320,12 @@ class Detail extends Component {
           } = loanRequestData;
           loanRequestData.principalAmount = convertBigNumber(principalAmount, principalNumDecimals);
           loanRequestData.collateralAmount = convertBigNumber(collateralAmount, collateralNumDecimals);
-          loanRequestData.principal = loanRequestData.principalAmount;
           loanRequestData.totalRepaymentAmount = convertBigNumber(totalExpectedRepayment, principalNumDecimals);
 
           const valueRepaidAr = await dharma.servicing.getValueRepaid(
             id
           );
+          loanRequestData.totalRepaidAmountNumber = valueRepaidAr.toNumber();
           loanRequestData.totalRepaidAmount = convertBigNumber(valueRepaidAr.toNumber(), principalNumDecimals);
 
           const debt = await Debt.fetch(dharma, id);
@@ -328,18 +344,14 @@ class Detail extends Component {
             id
           );
           loanRequestData.isCollateralSeized = isCollateralSeized;
-
           let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
             id
           );
           loanRequestData.isCollateralReturned = isCollateralReturned;
-
           const investment = await Investment.fetch(dharma, id);
           loanRequestData.isRepaid = await investment.isRepaid();
-          
           this.setState({
             userTimezone,
-            isLoading: false,
             loanDetails: loanRequestData,
             isLoanUser: isMetaMaskAuthRised && (debtorAddress == currentMetamaskAccount || creditorAddress == currentMetamaskAccount),
             buttonLoading: false,
@@ -382,6 +394,8 @@ class Detail extends Component {
     const { loanDetails } = this.state;
     const { principalNumDecimals } = loanDetails;
     let outstandingAmount = await debt.getOutstandingAmount();
+    //console.log("outstandingAmount");
+    //console.log(outstandingAmount);
     outstandingAmount = numberUsFormat(outstandingAmount);
     outstandingAmount = (outstandingAmount > 0 && !_.isObject(outstandingAmount)) ? outstandingAmount : convertBigNumber(outstandingAmount,principalNumDecimals);
     return outstandingAmount;
@@ -390,21 +404,24 @@ class Detail extends Component {
     const { Debt } = Dharma.Types;
     const { dharma, id, currentMetamaskAccount } = this.props;
     const { isMetaMaskAuthRised } = this.state;
-
-    let { loanDetails, repaymentAmount } = this.state;
+    let { loanDetails, nextRepaymentAmount } = this.state;
     let { debtorAddress, principalSymbol } = loanDetails;
-    let repaymentAmountDisplay = niceNumberDisplay(repaymentAmount)
+    let repaymentAmountDisplay = niceNumberDisplay(nextRepaymentAmount)
     this.setState({ repaymentButtonLoading: true, buttonLoading: true });
     const debtorEthAddress = debtorAddress;
     let alertMessage, alertMessageDisplay = '';
-    repaymentAmount = parseFloat(repaymentAmount);
-    if (isMetaMaskAuthRised && debtorEthAddress == currentMetamaskAccount && repaymentAmount > 0
+    nextRepaymentAmount = parseFloat(nextRepaymentAmount);
+    if (isMetaMaskAuthRised && debtorEthAddress == currentMetamaskAccount && nextRepaymentAmount > 0
     ) {
       const debt = await Debt.fetch(dharma, id);
       const outstandingAmount = await this.getOutstandingAmount(debt);
-      if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
+
+      //console.log("outstandingAmount");
+      //console.log(outstandingAmount);
+
+      if (nextRepaymentAmount <= outstandingAmount && outstandingAmount > 0) {
         try {
-          const txHash = await debt.makeRepayment(repaymentAmount);
+          const txHash = await debt.makeRepayment(nextRepaymentAmount);
           let response = await getTransactionReceipt(txHash);
           if (response) {
             await this.timeout(2000);
@@ -426,7 +443,7 @@ class Detail extends Component {
       let toastMessage =
         currentMetamaskAccount != debtorEthAddress
           ? "Invalid access."
-          : repaymentAmount == 0
+          : nextRepaymentAmount == 0
             ? "Payment amount must be greater then zero."
             : "Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.";
       toast.error(toastMessage);
@@ -475,21 +492,24 @@ class Detail extends Component {
   handleInputChange(event) {
     const target = event.target;
     const value = target.value;
-    this.setState({ repaymentAmount: value });
+    this.setState({ nextRepaymentAmount: value });
   }
 
   async unblockCollateral(event, callback) {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
     const { loanDetails } = this.state;
+    const { isRepaid } = loanDetails;
     this.setState({
       buttonLoading: true
     });
     const debt = await Debt.fetch(dharma, id);
     let alertMessage, alertMessageDisplay = '';
     if (!_.isUndefined(debt)) {
-      const outstandingAmount = await this.getOutstandingAmount(debt);
-      if (outstandingAmount == 0) {
+      let collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
+            id
+          );
+      if (collateralReturnable || isRepaid) {
         try {
           const txHash = await debt.returnCollateral();
           let response = await getTransactionReceipt(txHash);
@@ -510,6 +530,8 @@ class Detail extends Component {
             alertMessage = "You have successfully claimed your collateral.";
           }
         } catch (e) {
+          //console.log("e");
+          //console.log(e);
           let errorMsg = (!_.isUndefined(e.message)) ? e.message : 'Something went wrong. Please try again.';
           alertMessageDisplay = 'danger';
           alertMessage = errorMsg;
@@ -537,11 +559,11 @@ class Detail extends Component {
       buttonLoading: true
     });
     const investment = await Investment.fetch(dharma, id);
-    const {
-      isRepaid,
-      isCollateralSeizable
-    } = loanDetails;
-    if (typeof investment != "undefined" && isRepaid === false) {
+    let isCollateralSeizable = await dharma.adapters.collateralizedSimpleInterestLoan.canSeizeCollateral(
+            id
+    );;
+
+    if (typeof investment != "undefined") {
       if (isCollateralSeizable === true) {
         try {
           const txHash = await investment.seizeCollateral();

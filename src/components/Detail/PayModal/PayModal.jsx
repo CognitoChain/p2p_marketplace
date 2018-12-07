@@ -39,9 +39,9 @@ class PayModal extends Component {
             <input
               type="text"
               className="form-control"
-              name="repaymentAmount"
+              name="nextRepaymentAmount"
               id="repayment_amount"
-              value={repaymentAmount}
+              value={nextRepaymentAmount}
               onChange={handleInputChange}
             />
 

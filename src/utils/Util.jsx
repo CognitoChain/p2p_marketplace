@@ -69,7 +69,7 @@ export const convertBigNumber = (obj, power) => {
     let amount = obj / decimal;
     responseNumber = amount;
   }
-  responseNumber = new Intl.NumberFormat('en-US', { useGrouping : false } ).format(responseNumber);
+  responseNumber = new Intl.NumberFormat('en-US', { useGrouping : false,maximumFractionDigits:18 } ).format(responseNumber);
   responseNumber = (responseNumber > 0) ? parseFloat(responseNumber) : 0;
   return responseNumber;
 }
@@ -111,7 +111,7 @@ export const numberUsFormat = (value) => {
   let responseNumber = 0;
   if(!_.isUndefined(value))
   {
-    responseNumber = new Intl.NumberFormat('en-US', { useGrouping : false } ).format(value);
+    responseNumber = new Intl.NumberFormat('en-US', { useGrouping : false,maximumFractionDigits:18 } ).format(value);
   }
   responseNumber = parseFloat(responseNumber);
   return responseNumber;
