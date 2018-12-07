@@ -103,13 +103,33 @@
 	background: white !important;
 }
 .loanbase-step-container{
-	    border: 1px solid #bcbcbc !important;
-		border-radius: 5px !important;
-		/* -webkit-box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important; */
-		/* box-shadow: 0px 0px 0px 2px rgba(188, 188, 188, 0.25) !important; */
-		margin: 1rem 0!important;
-		text-align: left;
-		overflow: hidden;
+	border:1px solid #727b98;
+    border-radius: 5px !important;
+    margin: 1rem 0!important;
+    text-align: left;
+    overflow: hidden;
+    background-image: -webkit-gradient(linear,left bottom,left top,from(hsla(0,0%,65%,.3)),to(hsla(0,0%,100%,.3)));
+    background-image: -webkit-linear-gradient(bottom,hsla(0,0%,65%,.3),hsla(0,0%,100%,.3));
+    background-image: -o-linear-gradient(bottom,hsla(0,0%,65%,.3),hsla(0,0%,100%,.3));
+    background-image: linear-gradient(0deg,hsla(0,0%,65%,.3),hsla(0,0%,100%,.3));
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    color: #fff;
+    -webkit-transition: all .2s cubic-bezier(.4,0,.2,1);
+    -o-transition: all .2s cubic-bezier(.4,0,.2,1);
+    transition: all .2s cubic-bezier(.4,0,.2,1);
+    -webkit-transition-property: all;
+    -o-transition-property: all;
+    transition-property: all;
+    -webkit-transition-duration: .2s;
+    -o-transition-duration: .2s;
+    transition-duration: .2s;
+    -webkit-transition-timing-function: cubic-bezier(.4,0,.2,1);
+    -o-transition-timing-function: cubic-bezier(.4,0,.2,1);
+    transition-timing-function: cubic-bezier(.4,0,.2,1);
+    -webkit-transition-delay: initial;
+    -o-transition-delay: initial;
+    transition-delay: 0s;
 }
 .loanbase-step-container h5,.loanbase-step-container p,.loanbase-step-container h6{
 	margin: 0 !important;
@@ -128,7 +148,7 @@
 	/* min-height: 60px; */
 }
 .how-it-works-container{
-	background: #081635 !important;
+	background-image: linear-gradient(to right top, #081635, #0b1a3d, #0e1d46, #12214e, #172457, #172559, #18265c, #18275e, #14265a, #102556, #0d2351, #0a224d);
 }
 .powered-by-container{
 	background: white !important;
