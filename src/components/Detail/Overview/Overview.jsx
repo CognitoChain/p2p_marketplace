@@ -58,7 +58,7 @@ class Overview extends Component {
                 </div>
               }
               {isRepaid &&
-                <div className="">
+                <div className="text-right">
                   <span>Total Repaid Amount</span>
                   <br />
                   <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaymentAmount,principalSymbol)}>
