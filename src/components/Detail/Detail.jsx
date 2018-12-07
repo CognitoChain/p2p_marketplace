@@ -137,11 +137,10 @@ class Detail extends Component {
           else if (ts < currentTimestamp && totalRepaidAmount < totalRepaymentAmount) {
             repaymentAmount = nextRepaymentAmount = deductNo;
           }
-
-          let paidStatus = '-'
+          let paidStatus = '-';
           paidStatus = (totalRepaidAmount >= expectedRepaidAmountDharma) ? 'paid' : ((totalRepaidAmount < expectedRepaidAmountDharma && totalRepaidAmount > lastExpectedRepaidAmount) ? 'partial_paid' : ((ts < currentTimestamp) ? 'missed' : 'due'));
 
-          if (isMetaMaskAuthRised && (creditorAddress == currentMetamaskAccount || debtorAddress == currentMetamaskAccount)) {
+          if (isLoanUser) {
             if ((isCollateralSeizable == true && isRepaid == false) || isCollateralSeized == true) {
               overViewBackgroundClass = 'overview-bg-error';
               overViewButtonBackgroundClass = 'overview-bg-btn-error';
