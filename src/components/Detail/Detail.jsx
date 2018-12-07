@@ -109,6 +109,7 @@ class Detail extends Component {
     let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
     installmentInterestAmount = numberUsFormat(installmentInterestAmount); 
     installmentInterestAmount = (installmentInterestAmount > 0) ? installmentInterestAmount : 0;
+    let repaymentInstallment = parseFloat(totalRepaymentAmount) / termLengthAmount;
     if (!_.isEmpty(loanDetails)) {
       let repaymentLoanstemp = [];
       let lastExpectedRepaidAmount = 0;
@@ -124,8 +125,7 @@ class Detail extends Component {
           let date = new Date(ts);
           let currentTimestamp = moment().unix();
           ts = ts / 1000;
-          let expectedRepaidAmount = parseFloat(installmentPrincipal) + parseFloat(installmentInterestAmount);
-          expectedRepaidAmountDharma += expectedRepaidAmount;
+          expectedRepaidAmountDharma += repaymentInstallment;
           let deductNo = expectedRepaidAmountDharma - totalRepaidAmount;
           deductNo = (deductNo > outstandingAmount) ? outstandingAmount : deductNo;
           expectedRepaidAmountDharma = (expectedRepaidAmountDharma > totalRepaymentAmount) ? totalRepaymentAmount : expectedRepaidAmountDharma;
@@ -188,7 +188,7 @@ class Detail extends Component {
             principalAmount: installmentPrincipal,
             principalSymbol: principalSymbol,
             interestAmount: installmentInterestAmount,
-            totalRepaymentAmount: expectedRepaidAmount,
+            totalRepaymentAmount: repaymentInstallment,
             status: paidStatus
           });
           i++;
