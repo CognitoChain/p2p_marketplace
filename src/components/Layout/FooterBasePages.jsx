@@ -15,7 +15,7 @@ class FooterBasePages extends Component{
                         <Col md={4}>
                             <h5 className="mb-20 mt-20">Contact Us</h5>
                             <p>
-                                Cognito Technologies Ltd
+                                Cognito Technologies Ltd,
                                 86-90 Paul Street,<br />
                                 London,
                                 England, EC2A 4NE
@@ -23,11 +23,10 @@ class FooterBasePages extends Component{
                             <div className="social-icons mt-20">
                               <ul>
                                 <li className="social-rss"><a href="javascript:void(0);"><i className="fa fa-rss fa-2x" /></a></li>
-                                <li className="social-facebook"><a href="javascript:void(0);"><i className="fa fa-facebook fa-2x" /></a></li>
-                                <li className="social-twitter"><a href="javascript:void(0);"><i className="fa fa-twitter fa-2x" /></a></li>
-                                <li className="social-github"><a href="javascript:void(0);"><i className="fa fa-github fa-2x" /></a></li>
-                                <li className="social-youtube"><a href="javascript:void(0);"><i className="fa fa-youtube fa-2x" /></a></li>
-                                <li className="social-instagram"><a href="javascript:void(0);"><i className="fa fa-instagram fa-2x" /></a></li>
+                                <li className="social-medium"><a href="https://medium.com/@cognitochain" target="_blank" rel="noopener noreferrer" ><i className="fa fa-medium fa-2x" /></a></li>
+                                <li className="social-twitter"><a href="https://twitter.com/Loanbase1" target="_blank" rel="noopener noreferrer" ><i className="fa fa-twitter fa-2x" /></a></li>
+                                <li className="social-github"><a href="https://github.com/CognitoChain" target="_blank" rel="noopener noreferrer" ><i className="fa fa-github fa-2x" /></a></li>
+                                <li className="social-telegram"><a href="https://t.me/Loanbase" target="_blank" rel="noopener noreferrer" ><i className="fa fa-telegram fa-2x" /></a></li>
                               </ul>
                             </div>
 
