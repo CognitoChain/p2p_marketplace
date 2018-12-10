@@ -260,6 +260,12 @@ body{
 .custom-alert-msg h6{
   color :inherit;
 }
+.react-bootstrap-table{
+  overflow-y: auto;
+}
+.react-bootstrap-table table{
+  table-layout: auto;
+}
 .react-bootstrap-table thead>tr>th{
   border-top: none!important;
 }
