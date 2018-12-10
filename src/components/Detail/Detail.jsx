@@ -331,7 +331,7 @@ class Detail extends Component {
           loanRequestData.totalRepaidAmount = convertBigNumber(valueRepaidAr.toNumber(), principalNumDecimals);
 
           const debt = await Debt.fetch(dharma, id);
-          loanRequestData.outstandingAmount = await this.getOutstandingAmount(debt);
+          loanRequestData.outstandingAmount = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
           
           collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
             id
@@ -392,22 +392,22 @@ class Detail extends Component {
   timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  async getOutstandingAmount(debt){
-    const { loanDetails } = this.state;
-    const { principalNumDecimals } = loanDetails;
-    let outstandingAmount = await debt.getOutstandingAmount();
-    //console.log("outstandingAmount");
-    //console.log(outstandingAmount);
-    outstandingAmount = numberUsFormat(outstandingAmount);
-    outstandingAmount = (outstandingAmount > 0 && !_.isObject(outstandingAmount)) ? outstandingAmount : convertBigNumber(outstandingAmount,principalNumDecimals);
+  async getOutstandingAmount(principalNumDecimals,totalExpectedRepayment){
+    const { dharma,id } = this.props;
+    const valueRepaidAr = await dharma.servicing.getValueRepaid(
+      id
+    );
+    let totalRepaidAmountNumber = valueRepaidAr.toNumber();
+    let outstandingAmount = totalExpectedRepayment - totalRepaidAmountNumber;
+    outstandingAmount = convertBigNumber(outstandingAmount,principalNumDecimals);
     return outstandingAmount;
   }
   async processRepayment() {
     const { Debt } = Dharma.Types;
     const { dharma, id, currentMetamaskAccount } = this.props;
     const { isMetaMaskAuthRised } = this.state;
-    let { loanDetails, nextRepaymentAmount } = this.state;
-    let { debtorAddress, principalSymbol } = loanDetails;
+    let { loanDetails, repaymentAmount } = this.state;
+    let { debtorAddress, principalSymbol,principalNumDecimals,totalExpectedRepayment } = loanDetails;
     let repaymentAmountDisplay = niceNumberDisplay(repaymentAmount)
     this.setState({ repaymentButtonLoading: true, buttonLoading: true });
     const debtorEthAddress = debtorAddress;
@@ -416,8 +416,7 @@ class Detail extends Component {
     if (isMetaMaskAuthRised && debtorEthAddress == currentMetamaskAccount && repaymentAmount > 0
     ) {
       const debt = await Debt.fetch(dharma, id);
-      const outstandingAmount = await this.getOutstandingAmount(debt);
-      
+      const outstandingAmount = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
       if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
         try {
           const txHash = await debt.makeRepayment(repaymentAmount);
