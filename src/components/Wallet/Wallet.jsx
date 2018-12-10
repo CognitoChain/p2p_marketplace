@@ -129,15 +129,15 @@ class Wallet extends Component {
                   <Card className="card card-statistics h-100">
                     <CardBody className="pb-0">
                       <div className="token-details-row mb-10 row">
-                        <div class="col-md-2">
+                        <div className="col-md-2">
                           <div className="icon-box rounded-circle">
                             <span className="text-white">
                               <img src={walletLogos[token.symbol.toLowerCase()]} height="30" className="mt-2" alt={token.symbol} />
                             </span>
                           </div>
                         </div>
-                        <div class="col-md-10">
-                          <div class="row">
+                        <div className="col-md-10">
+                          <div className="row">
                             <div className="col-md-7 text-left">
                               <div className="wallet-token-symbol">
                                 {token.symbol}
@@ -155,7 +155,7 @@ class Wallet extends Component {
                           </div>
                         </div>
                       </div>
-                      <div class="row mt-3 ">
+                      <div className="row mt-3 ">
                         <div className="col-md-8 text-left">
                           {
                             token.hasUnlimitedAllowance
