@@ -120,6 +120,7 @@ class Detail extends Component {
       let lastExpectedRepaidAmount = 0;
       let expectedRepaidAmountDharma = 0;
       let nextRepaymentAmount = 0;
+      let repaymentAmount = 0;
       let nextRepaymentDate = '';
       let overViewBackgroundClass = '';
       let overViewButtonBackgroundClass = '';
@@ -205,12 +206,13 @@ class Detail extends Component {
           );
           let expectedAmountToNumber = expectedAmountToPayBigNumber.toNumber();
           nextRepaymentAmount = expectedAmountToNumber - totalRepaidAmountNumber;
-          nextRepaymentAmount = convertBigNumber(nextRepaymentAmount,principalNumDecimals);
+          nextRepaymentAmount = repaymentAmount = convertBigNumber(nextRepaymentAmount,principalNumDecimals);
           nextRepaymentDate = moment(new Date(nextRepaymentTimestamp), "DD/MM/YYYY", true).format("DD/MM/YYYY");
         }
 
         this.setState({
           nextRepaymentAmount,
+          repaymentAmount,
           overViewBackgroundClass,
           overViewButtonBackgroundClass,
           nextRepaymentDate,
@@ -406,22 +408,19 @@ class Detail extends Component {
     const { isMetaMaskAuthRised } = this.state;
     let { loanDetails, nextRepaymentAmount } = this.state;
     let { debtorAddress, principalSymbol } = loanDetails;
-    let repaymentAmountDisplay = niceNumberDisplay(nextRepaymentAmount)
+    let repaymentAmountDisplay = niceNumberDisplay(repaymentAmount)
     this.setState({ repaymentButtonLoading: true, buttonLoading: true });
     const debtorEthAddress = debtorAddress;
     let alertMessage, alertMessageDisplay = '';
-    nextRepaymentAmount = parseFloat(nextRepaymentAmount);
-    if (isMetaMaskAuthRised && debtorEthAddress == currentMetamaskAccount && nextRepaymentAmount > 0
+    repaymentAmount = parseFloat(repaymentAmount);
+    if (isMetaMaskAuthRised && debtorEthAddress == currentMetamaskAccount && repaymentAmount > 0
     ) {
       const debt = await Debt.fetch(dharma, id);
       const outstandingAmount = await this.getOutstandingAmount(debt);
-
-      //console.log("outstandingAmount");
-      //console.log(outstandingAmount);
-
-      if (nextRepaymentAmount <= outstandingAmount && outstandingAmount > 0) {
+      
+      if (repaymentAmount <= outstandingAmount && outstandingAmount > 0) {
         try {
-          const txHash = await debt.makeRepayment(nextRepaymentAmount);
+          const txHash = await debt.makeRepayment(repaymentAmount);
           let response = await getTransactionReceipt(txHash);
           if (response) {
             await this.timeout(2000);
@@ -443,7 +442,7 @@ class Detail extends Component {
       let toastMessage =
         currentMetamaskAccount != debtorEthAddress
           ? "Invalid access."
-          : nextRepaymentAmount == 0
+          : repaymentAmount == 0
             ? "Payment amount must be greater then zero."
             : "Unable to find an active account on the Ethereum network you're on. Please check that MetaMask is properly configured and reload the page.";
       toast.error(toastMessage);
@@ -492,7 +491,7 @@ class Detail extends Component {
   handleInputChange(event) {
     const target = event.target;
     const value = target.value;
-    this.setState({ nextRepaymentAmount: value });
+    this.setState({ repaymentAmount: value });
   }
 
   async unblockCollateral(event, callback) {
