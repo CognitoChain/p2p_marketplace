@@ -18,7 +18,8 @@ class Footer extends Component{
                         <li className="list-inline-item"><a href="/terms" target="_blank">Terms &amp; Conditions | </a> </li>
                         <li className="list-inline-item"><a href="/privacy" target="_blank">Privacy Policy | </a> </li>
                           <li className="list-inline-item"><a href="/disclaimer" target="_blank">Legal Disclaimer | </a> </li>
-                          <li className="list-inline-item"><a href="/cookie-policy" target="_blank">Cookie Policy </a> </li>
+                          <li className="list-inline-item"><a href="/cookie-policy" target="_blank">Cookie Policy | </a> </li>
+                          <li className="list-inline-item"><a href="/faq" target="_blank">FAQ </a> </li>
                       </ul>
                     </Col>
                 </Row>

@@ -52,6 +52,9 @@ class FooterBasePages extends Component{
                                 <li>
                                     <a href="/cookie-policy" target="_blank">Cookie Policy </a> 
                                 </li>
+                                <li>
+                                    <a href="/faq" target="_blank">FAQ </a> 
+                                </li>
                             </ul>
                         </Col>
                     </Row>  

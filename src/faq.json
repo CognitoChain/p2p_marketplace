@@ -1,0 +1,58 @@
+[
+  {
+    "question": "What is LoanBase?",
+    "answer": "Loanbase is a Tokenized P2P Debt Marketplace powered by Ethereum blockchain and Dharma protocol."
+  },
+  {
+    "question": "What are the transaction fees?",
+    "answer": "There are no transactions fees to use the platform while in Beta. However, Users need to pay gas for transactions on the Ethereum blockchain. Your wallet needs to hold a certain amount of ETH in order to pay the gas fee."
+  },
+  {
+    "question": "What is Dharma protocol?",
+    "answer": "Dharma is a universal protocol for credit on Ethereum blockchain.  Dharma provides suite of smart contracts that makes it possible to borrow and lend digital assets on blockchain. Loanbase is an interface to dharma protocol."
+  },
+  {
+    "question": "What is Cognitochain?",
+    "answer": "Cognitochain is a blockchain based micro services platform for originating, servicing and managing credit. If you would like to access our API’s, Send us an email to <a href='mailto:contact@cognitochain.io'>contact@cognitochain.io</a> We will publish our API docs in the future."
+  },
+  {
+    "question": "What tokens are supported for lending and borrowing?",
+    "answer": "Currently we support lending and borrowing of ETH, DAI, BAT, REP, ZRX, OMG, MANA."
+  },
+  {
+    "question": "What type of wallets support?",
+    "answer": "Loanbase allows to connect to ethereum blockchain using Metamask. HD wallets (like Trezor and Ledger) can be used through inbuilt Metamask integration. Support for Coinbase mobile wallet on iOS and Android is coming soon."
+  },
+  {
+    "question": "Why do I need to create an account to use Loanbase?",
+    "answer": "You need to register with an email address to use our platform. We need this to provide services like personalised dashboard to list your loan portfolio across multiple ethereum wallets you may use to interact with the platform. Also We will use the email address to notify you on loan repayments or missed payments."
+  },
+  {
+    "question": "What happens if the loan is defaulted?",
+    "answer": "If the loan is defaulted we will send you a notification to seize the collateral held in the smart contract. You can login to our platform and Identify the loan from your funded loans section and seize the collateral."
+  },
+  {
+    "question": "How to claim collateral after repaying the loan?",
+    "answer": "Once the loan is repaid in full, you can claim the collateral from loan details page or from My Loans."
+  },
+  {
+    "question": "What if collateral value goes down the principal?",
+    "answer": "Loans in the platform are over collateralised by 150%. However, Value of these tokens can fluctuate and you may not necessarily recover the amount you have funded."
+  },
+  {
+    "question": "Why should I unlock tokens?",
+    "answer": "Before you create a loan request or fund an existing loan, you must grant permission to the smart contract to take specific actions on your behalf. For example, when you are creating a loan request, you will grant permission to the Dharma smart contract so that it can hold your tokens in escrow when a lender funds your loan. This means the tokens you pledge for collateral will stay in your wallet until an lender funds your loan request."
+  },
+  {
+    "question": "What happens if I miss a repayment?",
+    "answer": "In Beta, If you miss a repayment, It is treated as default. This means the lender can invoke seize collateral action. We will send notifications to your registered email address on the repayment due dates. Don't miss the repayments."
+  },
+  {
+    "question": "What browsers are supported?",
+    "answer": "Loanbase is a Web3-enabled application, which is just a fancy way of saying that it needs to be plugged into the Ethereum blockchain.In order to use Loanbase on the web, you will need to install the MetaMask browser extension, available for Chrome, Firefox, Opera, and the new Brave browser."
+  },
+  {
+    "question": "How to contact the support?",
+    "answer": "You can reach out to us on Telegram or by email."
+  }
+] 

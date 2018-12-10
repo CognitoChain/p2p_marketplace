@@ -21,6 +21,7 @@ import Api from "../../services/api";
 import GDPR from "../GDPR/GDPR";
 import Disclaimer from "../Disclaimer/Disclaimer";
 import CookiePolicy from "../CookiePolicy/CookiePolicy";
+import Faq from "../Faq/Faq";
 import auth from '../../utils/auth';
 
 let currentLocation = '';
@@ -292,6 +293,11 @@ class Layout extends Component {
                    <CookiePolicy {...this.props} {...this.state} />
                }
         />
+        <Route exact={true} path='/faq'
+               render={() =>
+                   <Faq {...this.props} {...this.state} />
+               }
+        />
       </Basepages>
     )
   }
@@ -300,7 +306,7 @@ class Layout extends Component {
     const urlStringArr = urlString.split("/");
     currentLocation = urlStringArr[0];
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
-    let homeRoutes = ["privacy","gdpr", "terms", "disclaimer", "cookie-policy"];
+    let homeRoutes = ["privacy","gdpr", "terms", "disclaimer", "cookie-policy","faq"];
     return (
       <div>
         {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}
