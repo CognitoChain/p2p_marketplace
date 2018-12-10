@@ -42,6 +42,7 @@ class Login extends React.Component {
         let { urlPath } = this.state;
         let { isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
+        console.log(authToken)
         let formTemplate = <LoginForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
         if (urlPath == "register") {
@@ -79,28 +80,29 @@ class Login extends React.Component {
                                                 Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
                                             </p>
                                             <p className="mt-30 header-image-p text-left text-center-xs">
-                                                <Link to="/market" className="btn btn-theme cognito">Explore Market</Link>
+                                                <Link to="/market" className="btn btn-theme cognito explore-btn">Explore Market</Link>
                                             </p>
-
-                                            <h4 className="mt-30 mb-1 loan-base-title text-center">Powered by</h4>
-                                            <div className="row">
-                                                <div className="col-md-4">
-                                                    <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" className="img-fluid" /></a>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" className="img-fluid"/></a>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" className="img-fluid"/></a>
+                                            <div className="d-xs-none">
+                                                <h4 className="mt-30 mb-1 loan-base-title text-center">Powered by</h4>
+                                                <div className="row">
+                                                    <div className="col-md-4 text-center">
+                                                        <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" className="img-fluid" /></a>
+                                                    </div>
+                                                    <div className="col-md-4 text-center">
+                                                        <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" className="img-fluid" /></a>
+                                                    </div>
+                                                    <div className="col-md-4 text-center">
+                                                        <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" className="img-fluid" /></a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-md-1 hide-xs"></div>
+                                        <div className="col-md-1"></div>
                                     </div>
                                 </div>
                             </div>
                             {
-                                _.isNull(authToken) && isWeb3Enabled && (
+                                !authToken && (
                                     <div className="col-md-4">
 
                                         <div className="row">
@@ -116,13 +118,24 @@ class Login extends React.Component {
                                 )
                             }
                         </div>
-
-                        
-
-
                     </div>
                 </section>
-
+                <section className="how-it-works-container d-md-none d-sm-none d-lg-none">
+                    <div className="pt-50 pb-50 container">
+                        <h3 className="text-center mb-50 loan-base-title white">Powered BY</h3>
+                        <div className="row">
+                            <div className="col-12 text-center">
+                                <a href="https://cognitochain.io/" rel="noopener noreferrer" target="_blank"><img src={loanBaseImg} alt="Conginochain" className="img-fluid" /></a>
+                            </div>
+                            <div className="col-6 text-center">
+                                <a href="https://www.ethereum.org/" rel="noopener noreferrer" target="_blank"><img src={etherImg} alt="Ethereum" className="img-fluid" /></a>
+                            </div>
+                            <div className="col-6 text-center">
+                                <a href="https://dharma.io/" rel="noopener noreferrer" target="_blank"><img src={dharmaImg} alt="Dharma" className="img-fluid" /></a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 <section className="loanbase-container">
                     <div className="pt-50 pb-50 container">
                         <h3 className="text-center mb-50 loan-base-title">Why Loanbase?</h3>
@@ -251,7 +264,7 @@ class Login extends React.Component {
 
                 <section className="loanbase-logo-container">
                     <div className="container pt-20 pb-20 text-center">
-                        <img src={loanBaselogoImg} alt="Loan Base" height={150} />
+                        <img src={loanBaselogoImg} alt="Loan Base" height={250} />
                     </div>
                 </section>
             </div>
