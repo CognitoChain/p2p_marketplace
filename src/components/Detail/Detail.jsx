@@ -426,7 +426,7 @@ class Detail extends Component {
             this.props.refreshTokens();
             await this.getDetailData(true);
             alertMessageDisplay = 'success';
-            alertMessage = "Your repayment of " + repaymentAmountDisplay + " " + principalSymbol + " is under process. You will be notified once payment is confirmed."
+            alertMessage = "Your repayment of " + repaymentAmountDisplay + " " + principalSymbol + " has completed."
           }
         }
         catch (e) {
