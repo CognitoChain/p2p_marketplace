@@ -73,7 +73,7 @@ class Login extends React.Component {
                                     <div className="row">
                                         <div className="col-md-1 hide-xs"></div>
                                         <div className="col-md-10 col-xs-12">
-                                            <h1>Tokenized P2P Debt Market Place</h1>
+                                            <h1>Tokenized P2P Debt Marketplace</h1>
                                             <h4>Leverage your digital assets without losing your position.</h4>
                                             <p className="mt-30 header-image-p">
                                                 Loanbase provides access to dharma - universal protocol for credit on the blockchain. Cryptocurrency investors aka HODL’ers can continue holding their favourite cryptocurrencies and release liquidity.
