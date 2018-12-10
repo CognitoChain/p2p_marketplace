@@ -200,7 +200,7 @@ class MyPortfolio extends Component {
         }
         if (myBorrowedRequests.length > 0) {
             await this.asyncForEach(myBorrowedRequests, async ml => {
-                if (ml.debtorAddress == currentMetamaskAccount) {
+                if (ml.debtorAddress == currentMetamaskAccount && !ml.isRepaid && !ml.isCollateralReturned && !ml.isCollateralSeized) {
                     let principal = parseFloat(ml.principal);
                     let principalSymbol = ml.principalSymbol;
                     if (!_.isUndefined(priceFeedData[principalSymbol])) {
