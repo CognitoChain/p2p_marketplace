@@ -117,7 +117,7 @@ server.delete("/api/*", function(req, res) {
 
 server.use(middlewares);
 
-server.get('/*', function(req, res){
+server.get('*', function(req, res){
     res.sendFile(__dirname + '/build/index.html');
 });
 
