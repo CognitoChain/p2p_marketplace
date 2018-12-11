@@ -76,7 +76,7 @@ class Header extends Component {
                     <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
                 </div>
               
-                <ul className="nav navbar-nav ml-auto d-xs-none d-sm-none">
+                <ul className="nav navbar-nav ml-auto d-xs-none">
 
                         <li className="nav-item">
                             {

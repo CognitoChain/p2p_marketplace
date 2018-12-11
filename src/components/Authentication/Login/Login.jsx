@@ -102,7 +102,7 @@ class Login extends React.Component {
                                 </div>
                             </div>
                             {
-                                !authToken && (
+                                _.isNull(authToken)  && (
                                     <div className="col-md-4">
 
                                         <div className="row">
