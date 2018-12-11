@@ -112,7 +112,7 @@ class Header extends Component {
                     </ul>
 
                     <ul className={"nav navbar-nav mr-0 " + ((!_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised)?"":"nav-message")}>
-                        <li className="nav-item dropdown mr-20">
+                        <li className="nav-item dropdown mr-10">
                             {
                                 !_.isNull(authToken) && (
                                     <div>

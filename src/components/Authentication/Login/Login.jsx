@@ -104,9 +104,7 @@ class Login extends React.Component {
                             {
                                 _.isNull(authToken)  && (
                                     <div className="col-md-4">
-
-                                        <div className="row">
-
+                                        <div className="row mt-50 mb-50">
                                             <div className="col-md-11">
                                                 <div className="login-form p-4">
                                                     {formTemplate}
