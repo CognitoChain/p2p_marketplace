@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Dharma, Web3 } from "@dharmaprotocol/dharma.js";
-
 import DharmaContext from "./DharmaContext";
 import _ from "lodash";
 
@@ -35,10 +34,13 @@ const dharma = new Dharma(getWeb3Provider());
  * Allows any children of this provider to have access to an instance of Dharma.js that is
  * connected to a blockchain.
  */
+let wrongMetamaskNetwork = false;
+const isWeb3Enabled = window.web3;
+const networkId = isWeb3Enabled ? window.web3.version.network : null;
+
 class DharmaProvider extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             // The tokens that the user has in their wallet.
             tokens: [],
@@ -46,6 +48,7 @@ class DharmaProvider extends Component {
             dharma: null,
             // The tokens available for lending on Dharma Protocol.
             supportedTokens: [],
+            wrongMetamaskNetwork: false
         };
 
         this.refreshUserTokens = this.refreshUserTokens.bind(this);
@@ -53,48 +56,92 @@ class DharmaProvider extends Component {
     }
 
     componentDidMount() {
-        if (window.web3){
-            this.getUserTokens();
-            this.getSupportedTokens();
+        if (window.web3) {
+            this.checkNetworkId();
+            if (!wrongMetamaskNetwork) {
+                this.getUserTokens();
+                //this.getSupportedTokens();
+
+            }
         }
     }
-
     getSupportedTokens() {
-        dharma.token.getSupportedTokens().then((supportedTokens) => {
-            this.setState({ supportedTokens });
-        });
+        if (!dharma || wrongMetamaskNetwork) {
+            this.setState({ supportedTokens: [] });
+            return;
+        }
+        try {
+            dharma.token.getSupportedTokens().then((supportedTokens) => {
+                this.setState({ supportedTokens });
+            });
+        } catch (e) {
+            console.log(e)
+        }
+
     }
-    refreshUserTokens(flag){
-        
-        let { isTokenLoading,tokens} = this.state;
+    checkNetworkId() {
+        if (isWeb3Enabled) {
+            if (process.env.REACT_APP_METAMASK_NETWORK == "kovan" && networkId != "42" && networkId != null) {
+                wrongMetamaskNetwork = true;
+            }
+            else if (process.env.REACT_APP_METAMASK_NETWORK == "main" && networkId != "1" && networkId != null) {
+                wrongMetamaskNetwork = true;
+            }
+        }
+    }
+    refreshUserTokens(flag) {
+        if (!dharma || wrongMetamaskNetwork) {
+            this.setState({
+                tokens: [],
+                isTokenLoading: false
+            });
+            return;
+        }
+        let { isTokenLoading, tokens } = this.state;
         // Assume the tokens are out of date.
         if (_.isUndefined(flag)) {
             tokens = [];
         }
-        if(!isTokenLoading){
-            isTokenLoading = true;    
+        if (isTokenLoading) {
+            return true;
         }
         this.setState({
             tokens,
-            isTokenLoading
+            isTokenLoading: true
         }, () => {
-            this.getUserTokens();
+            //this.getUserTokens();
         })
     }
-     getUserTokens() {
-        const { Token } = Dharma.Types;
-        dharma.blockchain.getAccounts().then(async(accounts) => {
-            let tokens = [];
-            const owner = accounts[0];
-            if (!_.isUndefined(owner)) {
-                await Token.all(dharma, owner).then((tokenData) => {
-                    tokens = tokenData;
-                });
-            }
+    async getUserTokens() {
+        if (!dharma || wrongMetamaskNetwork) {
             this.setState({
-                tokens,
+                tokens: [],
                 isTokenLoading: false
             });
+            return;
+        }
+        const { Token } = Dharma.Types;
+        let tokens = [];
+        try {
+            await dharma.blockchain.getAccounts().then(async (accounts) => {
+                const owner = accounts[0];
+                if (!_.isUndefined(owner)) {
+                    try {
+                        await Token.all(dharma, owner).then((tokenData) => {
+                            tokens = tokenData;
+                        });
+                    } catch (e) {
+                        console.log(e)
+                    }
+
+                }
+            });
+        } catch (e) {
+            console.log(e)
+        }
+        this.setState({
+            tokens,
+            isTokenLoading: false
         });
     }
     render() {
@@ -103,7 +150,7 @@ class DharmaProvider extends Component {
             tokens: this.state.tokens,
             isTokenLoading: this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
-            refreshTokens: this.refreshUserTokens            
+            refreshTokens: this.refreshUserTokens
         };
 
         return (
