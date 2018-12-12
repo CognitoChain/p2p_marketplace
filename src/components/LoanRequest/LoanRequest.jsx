@@ -244,6 +244,7 @@ class LoanRequest extends Component {
                 let title = "This loan request cannot be filled";
                 let description = error.message;
                 if (error.message == "Creditor allowance is insufficient") {
+                    error = null
                     title = "Steps Required"
                     description = 'Token transfer authorization required. Click "Unlock Token".'
                 }
