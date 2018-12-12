@@ -108,7 +108,6 @@ class Wallet extends Component {
 
     const { tokenlist } = this.state;
     const { isTokenLoading,isTokenError } = this.props;
-    console.log(this.props)
     let i = 0;
     if (isTokenLoading) {
       return <Loading />
