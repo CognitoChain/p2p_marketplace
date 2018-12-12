@@ -57,7 +57,8 @@ class CreateLoan extends Component {
             isBottomButtonLoading: true,
             unlockTokenButtonLoading: false,
             buttonLoading: false,
-            userTokens: []
+            userTokens: [],
+            unlockError:false
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -226,6 +227,7 @@ class CreateLoan extends Component {
 
                 this.setState({
                     txHash,
+                    unlockError:false,
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'warning',
                     customAlertMsgClassname: 'fa fa-info fa-2x pull-left mr-2',
@@ -237,6 +239,7 @@ class CreateLoan extends Component {
                     this.props.refreshTokens(false);
                     this.setState({
                         txHash,
+                        unlockError:false,
                         unlockTokenButtonLoading: false,
                         hasSufficientAllowance: true,
                         customAlertMsgDisplay: true,
@@ -249,6 +252,7 @@ class CreateLoan extends Component {
             catch (e) {
                 let error = new Error(e);
                 this.setState({
+                    unlockError:true,
                     customAlertMsgDisplay: true,
                     customAlertMsgStyle: 'danger',
                     customAlertMsgClassname: 'fa fa-exclamation-triangle fa-2x pull-left mr-2',
@@ -517,7 +521,8 @@ class CreateLoan extends Component {
             isBottomButtonLoading,
             userLoanAgree,
             unlockTokenButtonLoading,
-            buttonLoading
+            buttonLoading,
+            unlockError
         } = this.state;
         const { wrongMetamaskNetwork, isMetaMaskAuthRised } = this.props;
         const isFormValid = this.isFormValid();
@@ -721,7 +726,7 @@ class CreateLoan extends Component {
                                                         {
                                                             !isBottomButtonLoading &&
                                                             <AuthorizableAction
-                                                                canTakeAction={hasSufficientAllowance && isFormValid}
+                                                                canTakeAction={hasSufficientAllowance && isFormValid && !unlockError}
                                                                 canAuthorize={hasSufficientAllowance}
                                                                 onAction={this.createLoanRequest}
                                                                 onAuthorize={this.authorizeCollateralTransfer}
