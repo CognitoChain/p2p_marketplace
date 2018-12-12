@@ -156,7 +156,7 @@ class Wallet extends Component {
                         </div>
                       </div>
                       <div className="row mt-3 ">
-                        <div className="col-md-8 text-left">
+                        <div className="col-md-7 text-left">
                           {
                             token.hasUnlimitedAllowance
                               ? <label className="badge badge-success">Unlocked</label>
@@ -164,7 +164,7 @@ class Wallet extends Component {
 
                           }
                         </div>
-                        <div className="col-md-4 text-right" id={"token" + tokenSymbol} >
+                        <div className="col-md-5 text-right" id={"token" + tokenSymbol} >
                           {
                             token.isLoading && <i className="btn btn-sm token-loading fa-spin fa fa-spinner"></i>
                           }
