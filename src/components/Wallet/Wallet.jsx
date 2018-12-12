@@ -107,13 +107,14 @@ class Wallet extends Component {
   renderTokenBalances() {
 
     const { tokenlist } = this.state;
-    const { isTokenLoading } = this.props;
+    const { isTokenLoading,isTokenError } = this.props;
+    console.log(this.props)
     let i = 0;
     if (isTokenLoading) {
       return <Loading />
     }
-    else if (tokenlist.length == 0) {
-      return <CustomAlertMsg bsStyle={"warning"} extraClass={"text-center"} title={"Could not find tokens in your wallet."} />
+    else if (!isTokenLoading && tokenlist.length == 0) {
+      return <CustomAlertMsg bsStyle={"danger"} extraClass={"text-center"} title={"Error loading tokens."} />
     }
     else {
       const tokensSorted = _.orderBy(tokenlist, ['symbol'], ['asc']);
@@ -199,7 +200,7 @@ class Wallet extends Component {
           {!isTokenLoading && i == 0 &&
             <Col xl={12} md={12} lg={12} xs={12} sm={12} className="mb-30">
               <Alert color="warning" className="mb-30">
-                Please connect to Kovan Test Network in Metamask & get test tokens from <a href="https://wallet.dharma.io/" target="_blank" className="alert-link" rel="noopener noreferrer">https://wallet.dharma.io/</a>.
+                Could not find tokens in your wallet.
               </Alert>
             </Col>
           }
