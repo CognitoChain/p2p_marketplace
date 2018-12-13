@@ -262,17 +262,17 @@ class Detail extends Component {
     } = loanDetails;
     let repaymentBtnDisplay, collateralBtnDisplay, collateralSeizeBtnDisplay, loanScheduleDisplay = false;
     if (isMetaMaskAuthRised && typeof debtorAddress != "undefined" && debtorAddress == currentMetamaskAccount) {
-      if (!isRepaid && !isCollateralSeized) {
+      if (!isRepaid && !isCollateralReturned && !isCollateralSeized) {
         repaymentBtnDisplay = true;
       }
-      if ((collateralReturnable || isRepaid) && !isCollateralReturned) {
+      if (collateralReturnable && !isCollateralReturned && !isCollateralSeized) {
         collateralBtnDisplay = true;
       }
     }
-    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable === true /*&& isRepaid === false*/) {
+    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable && !isCollateralReturned && !isCollateralSeized /*&& isRepaid === false*/) {
       collateralSeizeBtnDisplay = true;
     }
-    if (isMetaMaskAuthRised && ((typeof debtorAddress != "undefined" && debtorAddress == currentMetamaskAccount) || (typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount))) {
+    if (isLoanUser) {
       loanScheduleDisplay = true;
     }
     this.setState({
