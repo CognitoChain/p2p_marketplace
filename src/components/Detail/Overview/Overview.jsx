@@ -69,47 +69,50 @@ class Overview extends Component {
               }
             </Col>
           </Row>
-          <Row className="mt-30">
-            <Col lg={6} md={6} sm={6} xl={6}>
-              {outstandingAmountDisplay > 0 && isMetaMaskAuthRised && !isCollateralSeized && isLoanUser && (
-                  <div className="pull-left">
-                    <span>Next Repayment</span>
-                    <br />
-                    <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(nextRepaymentAmount,principalSymbol)}>
-                      {nextRepaymentAmount > 0
-                        ? niceNumberDisplay(nextRepaymentAmount)
-                        : " - x"}
-                    </span>{" "}
-                    {outstandingAmountDisplay > 0 ? principalSymbol : ""}
-                    <br />
-                    <span>{nextRepaymentDate}</span>
-                  </div>
 
-                )}
-            </Col>
+          {((outstandingAmountDisplay > 0 && isMetaMaskAuthRised && !isCollateralSeized) || isCollateralSeized || isCollateralReturned) && isLoanUser && ( 
+            <Row className="mt-30">
+              <Col lg={6} md={6} sm={6} xl={6}>
+                {outstandingAmountDisplay > 0 && isMetaMaskAuthRised && !isCollateralSeized && isLoanUser && (
+                    <div className="pull-left">
+                      <span>Next Repayment</span>
+                      <br />
+                      <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(nextRepaymentAmount,principalSymbol)}>
+                        {nextRepaymentAmount > 0
+                          ? niceNumberDisplay(nextRepaymentAmount)
+                          : " - x"}
+                      </span>{" "}
+                      {outstandingAmountDisplay > 0 ? principalSymbol : ""}
+                      <br />
+                      <span>{nextRepaymentDate}</span>
+                    </div>
 
-            <Col lg={6} md={6} sm={6} xl={6} className="text-right">
-              {outstandingAmountDisplay > 0 && isMetaMaskAuthRised && !isCollateralReturned && !isCollateralSeized && isLoanUser && (
-                  <div className="pull-left">
-                    <span>Total Repaid Amount</span>
-                    <br />
-                    <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaidAmount,principalSymbol)}>
-                      {niceNumberDisplay(totalRepaidAmount)}
-                    </span>{" "}
-                    {principalSymbol}
-                  </div>
-                )}
-            </Col>
-            
-            <Col>
-              {
-                isCollateralSeized && isLoanUser && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
-              }
-              {
-                isCollateralReturned && isLoanUser && <h4 className="text-center"><span className="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
-              }
-            </Col>
-          </Row>
+                  )}
+              </Col>
+
+              <Col lg={6} md={6} sm={6} xl={6} className="text-right">
+                {outstandingAmountDisplay > 0 && isMetaMaskAuthRised && !isCollateralReturned && !isCollateralSeized && isLoanUser && (
+                    <div className="pull-left">
+                      <span>Total Repaid Amount</span>
+                      <br />
+                      <span className="loan-detail-numbers custom-tooltip" tooltip-title={tooltipNumberDisplay(totalRepaidAmount,principalSymbol)}>
+                        {niceNumberDisplay(totalRepaidAmount)}
+                      </span>{" "}
+                      {principalSymbol}
+                    </div>
+                  )}
+              </Col>
+              
+              <Col>
+                {
+                  isCollateralSeized && isLoanUser && <h4 className="text-center"><span className="badge badge-danger p-2 font-weight-normal">Collateral was seized</span></h4>
+                }
+                {
+                  isCollateralReturned && isLoanUser && <h4 className="text-center"><span className="badge badge-success p-2 font-weight-normal">Collateral was returned</span></h4>
+                }
+              </Col>
+            </Row>
+          )}
 
           {(repaymentBtnDisplay || collateralBtnDisplay || collateralSeizeBtnDisplay) && (
             <Row className="mt-20">
