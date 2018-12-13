@@ -457,6 +457,10 @@ class CreateLoan extends Component {
         return result;
     }
 
+    roundToThree(num) {    
+        return +(Math.round(num + "e+3")  + "e-3");
+    }
+
     async countLtv(name) {
         const {
             principal,
@@ -484,6 +488,7 @@ class CreateLoan extends Component {
                     if (countCollateral.indexOf(name) > -1 && principal > 0 && LTVRatioValue > 0) {
                         let collateralCount = (pricinipalMarketValue / LTVRatioValue) * 100;
                         let collateralPurchasable = parseFloat(collateralCount) / parseFloat(collateralTokenCurrentPrice);
+                        collateralPurchasable = (collateralPurchasable > 0) ? this.roundToThree(collateralPurchasable) : 0;
                         this.setState({ collateral: collateralPurchasable });
                     }
                     if (name == "collateral" && principal > 0 && collateral > 0) {
