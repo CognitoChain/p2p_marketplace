@@ -274,11 +274,11 @@ class Detail extends Component {
       if (!isRepaid && !isCollateralReturned && !isCollateralSeized) {
         repaymentBtnDisplay = true;
       }
-      if (collateralReturnable && !isCollateralReturned && !isCollateralSeized) {
+      if (collateralReturnable) {
         collateralBtnDisplay = true;
       }
     }
-    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable && !isCollateralReturned && !isCollateralSeized /*&& isRepaid === false*/) {
+    if (isMetaMaskAuthRised && typeof creditorAddress != "undefined" && creditorAddress == currentMetamaskAccount && isCollateralSeizable) {
       collateralSeizeBtnDisplay = true;
     }
     if (isLoanUser) {

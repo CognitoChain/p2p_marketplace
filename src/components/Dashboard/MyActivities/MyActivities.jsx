@@ -82,7 +82,7 @@ class MyActivities extends Component {
           let missedDate = '';
           let missedPaymentClass = '';
 
-          if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.isCollateralReturnable && !ts.isCollateralReturned && !ts.isCollateralSeized)
+          if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.isCollateralReturnable)
           {
             let claimTimestamp = repaymentSchedule.pop();
             let claimDate = new Date(claimTimestamp);
@@ -217,7 +217,7 @@ class MyActivities extends Component {
           let installmentPrincipal = parseFloat(ts.principal) / parseFloat(ts.termLengthAmount);
           installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
           let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
-          if(isMetaMaskAuthRised && ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable && !ts.isCollateralReturned && !ts.isCollateralSeized)
+          if(isMetaMaskAuthRised && ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable)
           {
             let seizeTimestamp = repaymentSchedule.pop();
             let seizeDate = new Date(seizeTimestamp);
