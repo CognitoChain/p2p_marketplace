@@ -32,3 +32,7 @@
 .bg-missed{
     background: #e77882 !important;
 }
+.claim-green:hover{
+  background: #17A086 !important;
+  color: #ffffff !important;
+}

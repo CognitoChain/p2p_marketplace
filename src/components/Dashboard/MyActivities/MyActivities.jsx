@@ -82,25 +82,22 @@ class MyActivities extends Component {
           let missedDate = '';
           let missedPaymentClass = '';
 
-          if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.repaidAmount == ts.repaymentAmount && ts.isRepaid == true)
+          if(isMetaMaskAuthRised && ts.debtorAddress == currentMetamaskAccount && ts.isCollateralReturnable && !ts.isCollateralReturned && !ts.isCollateralSeized)
           {
-            if(ts.isCollateralReturned == false)
-            {
-              let claimTimestamp = repaymentSchedule.pop();
-              let claimDate = new Date(claimTimestamp);
-              loanRequestsActivities.push({
-                id: "l_" + _.random(999999999),
-                date: moment(claimDate, "DD/MM/YYYY HH:mm:ss", true).format(),
-                type: "claim",
-                agreementId: ts.id,
-                buttonText: 'Claim Collateral',
-                buttonClassName: 'green',
-                amount: ts.collateral,
-                sybmol: ts.collateralSymbol                
-              });  
-            }
+            let claimTimestamp = repaymentSchedule.pop();
+            let claimDate = new Date(claimTimestamp);
+            loanRequestsActivities.push({
+              id: "l_" + _.random(999999999),
+              date: moment(claimDate, "DD/MM/YYYY HH:mm:ss", true).format(),
+              type: "claim",
+              agreementId: ts.id,
+              buttonText: 'Claim Collateral',
+              buttonClassName: 'green claim-green',
+              amount: ts.collateral,
+              sybmol: ts.collateralSymbol                
+            });
           }
-          else if(ts.isCollateralSeized == false)
+          else if(!ts.isCollateralSeized && !ts.isCollateralReturned)
           {
             if (!_.isUndefined(repaymentSchedule)) {
               await this.asyncForEach(repaymentSchedule, async st => {
@@ -220,7 +217,7 @@ class MyActivities extends Component {
           let installmentPrincipal = parseFloat(ts.principal) / parseFloat(ts.termLengthAmount);
           installmentPrincipal = (installmentPrincipal > 0) ? installmentPrincipal : 0;
           let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
-          if(isMetaMaskAuthRised && ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable == true && ts.isRepaid === false)
+          if(isMetaMaskAuthRised && ts.creditorAddress == currentMetamaskAccount && ts.isCollateralSeizable && !ts.isCollateralReturned && !ts.isCollateralSeized)
           {
             let seizeTimestamp = repaymentSchedule.pop();
             let seizeDate = new Date(seizeTimestamp);
@@ -238,7 +235,7 @@ class MyActivities extends Component {
           }
           else
           {
-            if (!_.isUndefined(repaymentSchedule)) {
+            if (!ts.isCollateralSeized && !ts.isCollateralReturned && !_.isUndefined(repaymentSchedule)) {
               await this.asyncForEach(repaymentSchedule, async schedule_ts => {
                 if (schedule_ts > current_timestamp * 1000 && i == 1) {
                   let date = new Date(schedule_ts);
@@ -379,7 +376,7 @@ class MyActivities extends Component {
           let label_color = "";
           if (row.type == "minus") {
             label_color = "number-highlight color-orange number-bold custom-tooltip";
-          } else if (row.type == "plus") {
+          } else if (row.type == "plus" || row.type == "claim") {
             label_color = "number-highlight color-green number-bold custom-tooltip";
           }
           return (
