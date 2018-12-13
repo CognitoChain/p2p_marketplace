@@ -114,7 +114,8 @@ class Detail extends Component {
     let installmentInterestAmount = (installmentPrincipal * parseFloat(interestRatePercent)) / 100;
     installmentInterestAmount = numberUsFormat(installmentInterestAmount); 
     installmentInterestAmount = (installmentInterestAmount > 0) ? installmentInterestAmount : 0;
-    let repaymentInstallment = parseFloat(totalRepaymentAmount) / termLengthAmount;
+    /*let repaymentInstallment = parseFloat(totalRepaymentAmount) / termLengthAmount;*/
+
     if (!_.isEmpty(loanDetails)) {
       let repaymentLoanstemp = [];
       let lastExpectedRepaidAmount = 0;
@@ -128,10 +129,18 @@ class Detail extends Component {
       let j = 1;
       let nextRepaymentTimestamp = '';
       if ((!_.isUndefined(repaymentSchedule) && repaymentSchedule.length > 0) && isLoanUser) {
+        let firstRepaymentTimestamp = repaymentSchedule[0] / 1000;
+        let firstExpectedAmountToPayBigNumber = await dharma.servicing.getExpectedValueRepaid(
+          id,
+          firstRepaymentTimestamp
+        );
+        let firstExpectedAmountToNumber = firstExpectedAmountToPayBigNumber.toNumber();
+        let repaymentInstallment = convertBigNumber(firstExpectedAmountToNumber,principalNumDecimals);
         repaymentSchedule.forEach(ts => {
           let date = new Date(ts);
           let currentTimestamp = moment().unix() * 1000;
           expectedRepaidAmountDharma += repaymentInstallment;
+
           if(ts > currentTimestamp && j == 1 && totalRepaidAmount < expectedRepaidAmountDharma)
           {
             nextRepaymentTimestamp = ts;
@@ -249,7 +258,7 @@ class Detail extends Component {
   }
   async buttonOperations() {
     const { currentMetamaskAccount } = this.props;
-    const { loanDetails, isMetaMaskAuthRised} = this.state;
+    const { loanDetails, isMetaMaskAuthRised, isLoanUser} = this.state;
     const {
       isRepaid,
       isCollateralSeizable,
@@ -422,9 +431,33 @@ class Detail extends Component {
           const txHash = await debt.makeRepayment(repaymentAmount);
           let response = await getTransactionReceipt(txHash);
           if (response) {
-            await this.timeout(2000);
-            this.props.refreshTokens();
-            await this.getDetailData(true);
+            let outstandingAmountAfterRepayment = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
+            if(outstandingAmount != outstandingAmountAfterRepayment)
+            {
+              this.props.refreshTokens();
+              await this.getDetailData(true);  
+            }
+            else
+            {
+              let refreshFlag = null;
+              let _this = this;
+              while (refreshFlag === null) {
+                await _this.timeout(2000);
+                let outstandingAmountAfterRepayment = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
+
+                if(outstandingAmount != outstandingAmountAfterRepayment)
+                {
+                  refreshFlag = true;
+                  break;
+                }
+              } 
+
+              if(refreshFlag === true)
+              {
+                this.props.refreshTokens();
+                await this.getDetailData(true);    
+              }
+            }
             alertMessageDisplay = 'success';
             alertMessage = "Your repayment of " + repaymentAmountDisplay + " " + principalSymbol + " has completed."
           }
@@ -507,22 +540,48 @@ class Detail extends Component {
       let collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
             id
           );
-      if (collateralReturnable || isRepaid) {
+      if (collateralReturnable) {
         try {
           const txHash = await debt.returnCollateral();
           let response = await getTransactionReceipt(txHash);
           if (response) {
-            await this.timeout(2000);
-            this.props.refreshTokens();
+            let _this = this;
             let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
               id
             );
-            if (isCollateralReturned == true) {
+            if(isCollateralReturned)
+            {
+              this.props.refreshTokens();  
               loanDetails.isCollateralReturned = true;
               this.setState({
                 loanDetails,
                 collateralBtnDisplay: false
               });
+            }
+            else
+            {
+              let refreshFlag = null;
+              while (refreshFlag === null) {
+                await _this.timeout(2000);
+                let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
+                  id
+                );
+                if(isCollateralReturned)
+                {
+                  refreshFlag = true;
+                  break;
+                }
+              } 
+
+              if(refreshFlag === true)
+              {
+                this.props.refreshTokens();
+                loanDetails.isCollateralReturned = true;
+                this.setState({
+                  loanDetails,
+                  collateralBtnDisplay: false
+                });
+              }
             }
             alertMessageDisplay = 'success';
             alertMessage = "You have successfully claimed your collateral.";
@@ -567,17 +626,42 @@ class Detail extends Component {
           const txHash = await investment.seizeCollateral();
           let response = await getTransactionReceipt(txHash);
           if (response) {
-            await this.timeout(2000);
-            this.props.refreshTokens();
             let isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
               id
             );
             if (isCollateralSeized == true) {
+              this.props.refreshTokens();
               loanDetails.isCollateralSeized = true;
               this.setState({
                 loanDetails,
                 collateralSeizeBtnDisplay: false
               });
+            }
+            else
+            {
+              let refreshFlag = null;
+              let _this = this;
+              while (refreshFlag === null) {
+                await _this.timeout(2000);
+                let isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
+                    id
+                );
+                if(isCollateralSeized)
+                {
+                  refreshFlag = true;
+                  break;
+                }
+              } 
+
+              if(refreshFlag === true)
+              {
+                this.props.refreshTokens();
+                loanDetails.isCollateralSeized = true;
+                this.setState({
+                  loanDetails,
+                  collateralSeizeBtnDisplay: false
+                });
+              }
             }
             alertMessageDisplay = 'success';
             alertMessage = "You have successfully seized collateral."
