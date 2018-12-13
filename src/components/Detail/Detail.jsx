@@ -19,6 +19,10 @@ import "./Detail.css";
 class Detail extends Component {
   constructor(props) {
     super(props);
+    let refreshWaitUptoSeconds = 30;
+    let refreshWaitSeconds = 3;
+    let refreshCycles = Math.ceil(refreshWaitUptoSeconds / refreshWaitSeconds);
+
     this.state = {
       widths: 80,
       loanDetails: {},
@@ -48,7 +52,10 @@ class Detail extends Component {
       modalMessageDisplay: '',
       isLoanUser: false,
       isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
-      isMounted:true 
+      isMounted:true,
+      refreshWaitUptoSeconds:refreshWaitUptoSeconds,
+      refreshWaitSeconds:refreshWaitSeconds,
+      refreshCycles:refreshCycles
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -414,7 +421,7 @@ class Detail extends Component {
   async processRepayment() {
     const { Debt } = Dharma.Types;
     const { dharma, id, currentMetamaskAccount } = this.props;
-    const { isMetaMaskAuthRised } = this.state;
+    const { isMetaMaskAuthRised, refreshWaitSeconds, refreshCycles } = this.state;
     let { loanDetails, repaymentAmount } = this.state;
     let { debtorAddress, principalSymbol,principalNumDecimals,totalExpectedRepayment } = loanDetails;
     let repaymentAmountDisplay = niceNumberDisplay(repaymentAmount)
@@ -441,11 +448,12 @@ class Detail extends Component {
             {
               let refreshFlag = null;
               let _this = this;
+              let i = 0;
               while (refreshFlag === null) {
-                await _this.timeout(2000);
+                await _this.timeout(refreshWaitSeconds*1000);
+                i++;
                 let outstandingAmountAfterRepayment = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
-
-                if(outstandingAmount != outstandingAmountAfterRepayment)
+                if((outstandingAmount != outstandingAmountAfterRepayment) || (i == refreshCycles))
                 {
                   refreshFlag = true;
                   break;
@@ -529,7 +537,7 @@ class Detail extends Component {
   async unblockCollateral(event, callback) {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { loanDetails } = this.state;
+    const { loanDetails, refreshWaitSeconds, refreshCycles } = this.state;
     const { isRepaid } = loanDetails;
     this.setState({
       buttonLoading: true
@@ -561,12 +569,14 @@ class Detail extends Component {
             else
             {
               let refreshFlag = null;
+              let i = 0;
               while (refreshFlag === null) {
-                await _this.timeout(2000);
+                await _this.timeout(refreshWaitSeconds*1000);
+                i++;
                 let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
                   id
                 );
-                if(isCollateralReturned)
+                if(isCollateralReturned || (i == refreshCycles))
                 {
                   refreshFlag = true;
                   break;
@@ -610,7 +620,7 @@ class Detail extends Component {
   async seizeCollateral(event, callback) {
     const { Investment } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { loanDetails } = this.state;
+    const { loanDetails, refreshWaitUptoSeconds, refreshWaitSeconds, refreshCycles } = this.state;
     let alertMessage, alertMessageDisplay = '';
     this.setState({
       buttonLoading: true
@@ -641,12 +651,14 @@ class Detail extends Component {
             {
               let refreshFlag = null;
               let _this = this;
+              let i = 0;
               while (refreshFlag === null) {
-                await _this.timeout(2000);
+                await _this.timeout(refreshWaitSeconds * 1000);
+                i++;
                 let isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
                     id
                 );
-                if(isCollateralSeized)
+                if(isCollateralSeized || (i == refreshCycles))
                 {
                   refreshFlag = true;
                   break;
