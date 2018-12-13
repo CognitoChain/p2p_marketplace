@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-        "@dharmaprotocol/dharma.js": "0.1.74",
+        "@dharmaprotocol/dharma.js": "0.1.70",
         "autoprefixer": "7.1.6",
         "babel-core": "6.26.0",
         "babel-eslint": "7.2.3",
@@ -92,7 +92,7 @@
         "heroku-postbuild": "yarn node scripts/build.js"
     },
     "devDependencies": {
-        "dharma-chain": "^1.0.19"
+        "dharma-chain": "^1.0.16"
     },
     "jest": {
         "collectCoverageFrom": [
