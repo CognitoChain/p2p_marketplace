@@ -148,7 +148,7 @@ class MyFundedLoans extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     let buttonText = '';
                     if (isMetaMaskAuthRised && row.isCollateralSeizable == true && row.creditorAddress == currentMetamaskAccount) {
-                        buttonText = 'Seize Collateral';
+                        buttonText = 'Seize';
                     }
                     return (
                         <div className="text-center">

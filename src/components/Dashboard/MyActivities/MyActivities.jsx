@@ -91,7 +91,7 @@ class MyActivities extends Component {
               date: moment(claimDate, "DD/MM/YYYY HH:mm:ss", true).format(),
               type: "claim",
               agreementId: ts.id,
-              buttonText: 'Claim Collateral',
+              buttonText: 'Claim',
               buttonClassName: 'green claim-green',
               amount: ts.collateral,
               sybmol: ts.collateralSymbol                
@@ -229,7 +229,7 @@ class MyActivities extends Component {
               sybmol: ts.collateralSymbol,
               agreementId: ts.id,
               sortTimestamp: seizeTimestamp,
-              buttonText: 'Seize Collateral',
+              buttonText: 'Seize',
               buttonClassName: 'seize-collateral-btn'              
             });
           }

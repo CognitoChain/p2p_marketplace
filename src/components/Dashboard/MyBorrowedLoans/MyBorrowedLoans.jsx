@@ -147,7 +147,7 @@ class MyBorrowedLoans extends Component {
                             buttonClassName = 'orange';
                         }
                         else if (row.isCollateralReturnable == true) {
-                            buttonText = 'Claim Collateral';
+                            buttonText = 'Claim';
                             buttonClassName = 'green claim-green';
                         }
                     }
