@@ -260,9 +260,7 @@ body{
 .custom-alert-msg h6{
   color :inherit;
 }
-.react-bootstrap-table{
-  overflow-y: auto;
-}
+
 .react-bootstrap-table table{
   table-layout: auto;
 }
@@ -458,6 +456,9 @@ body{
   }
 }
 @media (max-width:600px) {
+  .react-bootstrap-table{
+    overflow-y: auto;
+  }
   .admin-header .navbar-nav{
     margin:0 auto 0.6rem auto!important;
   }

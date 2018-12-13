@@ -1259,6 +1259,14 @@ textarea.form-control {
     position: absolute;
     z-index: 99;
 }
+.custom-tooltip.tooltip-right:hover:after{
+  right: 20% !important;
+  left:inherit !important;
+}
+.custom-tooltip.tooltip-right:hover:before{
+  right: 50% !important;
+  left:inherit !important;
+}
 .basepage-footer-container{
   background: $logo-blue;
   color:$white;

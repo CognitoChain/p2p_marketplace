@@ -373,15 +373,9 @@ class MyActivities extends Component {
         text: "Amount",
         isDummyField: true,
         formatter: function (cell, row, rowIndex, formatExtraData) {
-          let label_color = "";
-          if (row.type == "minus") {
-            label_color = "number-highlight color-orange number-bold custom-tooltip";
-          } else if (row.type == "plus" || row.type == "claim") {
-            label_color = "number-highlight color-green number-bold custom-tooltip";
-          }
           return (
             <div>
-              <span className={label_color} tooltip-title={tooltipNumberDisplay(row.amount,row.sybmol)}>
+              <span className={"number-highlight number-bold custom-tooltip tooltip-right " + (row.type == "minus" ? 'color-orange' : 'color-green')} tooltip-title={tooltipNumberDisplay(row.amount,row.sybmol)}>
                 {niceNumberDisplay(row.amount)}
               </span>
               <br />
