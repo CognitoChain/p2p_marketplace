@@ -58,7 +58,8 @@ class CreateLoan extends Component {
             unlockTokenButtonLoading: false,
             buttonLoading: false,
             userTokens: [],
-            unlockError:false
+            unlockError:false,
+            principalNumDecimals:0
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -144,7 +145,7 @@ class CreateLoan extends Component {
         });
 
         const api = new Api();
-        let { LTVRatioValue } = this.state;
+        let { LTVRatioValue,principalTokenSymbol,principalNumDecimals,collateral,collateralTokenSymbol,termLength,termUnit,interestRate } = this.state;
         const authToken = auth.getToken();
         this.setState({ buttonLoading: true });
         if (this.isFormValid() && LTVRatioValue <= 60) {
@@ -155,6 +156,13 @@ class CreateLoan extends Component {
                 api.setToken(authToken).create("loanRequests", {
                     ...loanRequest.toJSON(),
                     id: loanRequest.getAgreementId(),
+                    principalSymbol:principalTokenSymbol,
+                    principalNumDecimals:principalNumDecimals,
+                    collateralAmount:collateral,
+                    collateralSymbol:collateralTokenSymbol,
+                    termLengthAmount:termLength,
+                    termLengthUnit:termUnit,
+                    interestRatePercent:interestRate
                 });
                 this.setState({ buttonLoading: false });
                 this.props.onCompletion(loanRequest.getAgreementId());
@@ -348,6 +356,13 @@ class CreateLoan extends Component {
         const target = event.target;
         const value = target.value;
         const name = target.name;
+        
+        if (name === "principalTokenSymbol") {
+            const decimals = target.dataset.decimals;
+            this.setState({
+                principalNumDecimals: decimals
+            });
+        }
         if (name === "principal") {
             this.setRelayerFee(value);
         }
