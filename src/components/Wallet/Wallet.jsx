@@ -10,7 +10,7 @@ import {
   Tooltip
 } from "reactstrap";
 import { Link } from 'react-router-dom';
-import { Dharma } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@cognitochain/dharma.js";
 import _ from "lodash";
 import Switch from "react-switch";
 import Loading from "../Loading/Loading";

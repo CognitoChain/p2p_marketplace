@@ -1,4 +1,4 @@
-import { Dharma } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@cognitochain/dharma.js";
 import React, { Component } from "react";
 import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, ListGroup } from 'reactstrap';
 import _ from "lodash";

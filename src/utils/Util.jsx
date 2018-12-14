@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { BigNumber } from "bignumber.js";
-import { Web3 } from "@dharmaprotocol/dharma.js";
+import { Web3 } from "@cognitochain/dharma.js";
 
 export const amortizationUnitToFrequency = (unit) => {
   let frequency = "";

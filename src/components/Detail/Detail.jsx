@@ -1,4 +1,4 @@
-import { Dharma } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@cognitochain/dharma.js";
 import React, { Component } from "react";
 import { Link } from 'react-router-dom';
 import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";

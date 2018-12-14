@@ -15,17 +15,11 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
-"@dharmaprotocol/contracts@0.1.20":
-  version "0.1.20"
-  resolved "https://registry.yarnpkg.com/@dharmaprotocol/contracts/-/contracts-0.1.20.tgz#2b3db32cc8b58c2eb41dd692665bd51bb4d23446"
+"@cognitochain/dharma.js@0.1.73":
+  version "0.1.73"
+  resolved "https://registry.yarnpkg.com/@cognitochain/dharma.js/-/dharma.js-0.1.73.tgz#c3e8222347535a9174a3c620567632b8d30e5bbe"
   dependencies:
-    zeppelin-solidity "1.8.0"
-
-"@dharmaprotocol/dharma.js@0.1.70":
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/@dharmaprotocol/dharma.js/-/dharma.js-0.1.70.tgz#ed3d08b0e5b0f12dbdbe1d9b93038fcd750ad049"
-  dependencies:
-    "@dharmaprotocol/contracts" "0.1.20"
+    "@dharmaprotocol/contracts" "0.1.22"
     "@types/lodash" "^4.14.104"
     abi-decoder "https://github.com/dharmaprotocol/abi-decoder"
     bignumber.js "^5.0.0"
@@ -47,6 +41,12 @@
     web3 "~0.20.7"
     web3-typescript-typings "https://github.com/graemecode/web3-typescript-typings"
     web3-utils "1.0.0-beta.29"
+
+"@dharmaprotocol/contracts@0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@dharmaprotocol/contracts/-/contracts-0.1.22.tgz#1b9f2ddfad748f39d5491c21edb81d9153937c6c"
+  dependencies:
+    zeppelin-solidity "1.8.0"
 
 "@types/lodash@^4.14.104":
   version "4.14.119"

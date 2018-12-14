@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@cognitochain/dharma.js";
 import * as moment from "moment";
 import { Card, CardBody, CardTitle, TabContent, TabPane, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
 import classnames from 'classnames';

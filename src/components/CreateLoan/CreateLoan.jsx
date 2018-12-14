@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, Row, Col, Breadcrumb, BreadcrumbItem, InputGroup, Input, InputGroupAddon, ListGroup, Form } from 'reactstrap';
 import InputRange from 'react-input-range';
-import { Dharma } from "@dharmaprotocol/dharma.js";
+import { Dharma } from "@cognitochain/dharma.js";
 import _ from "lodash";
 import { Link } from 'react-router-dom';
 import AuthorizableAction from "../AuthorizableAction/AuthorizableAction";

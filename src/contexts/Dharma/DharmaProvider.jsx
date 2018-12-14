@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Dharma, Web3 } from "@dharmaprotocol/dharma.js";
+import { Dharma, Web3 } from "@cognitochain/dharma.js";
 import DharmaContext from "./DharmaContext";
 import _ from "lodash";
 
