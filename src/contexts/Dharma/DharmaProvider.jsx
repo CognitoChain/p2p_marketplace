@@ -109,7 +109,7 @@ class DharmaProvider extends Component {
             tokens,
             isTokenLoading: true
         }, () => {
-            //this.getUserTokens();
+            this.getUserTokens();
         })
     }
     async getUserTokens() {
