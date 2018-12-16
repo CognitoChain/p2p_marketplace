@@ -100,7 +100,6 @@ class Detail extends Component {
     const {
       id,
       principalAmount,
-      totalRepaymentAmount,
       repaymentSchedule,
       termLengthAmount,
       interestRatePercent,
@@ -112,7 +111,6 @@ class Detail extends Component {
       isCollateralSeizable,
       collateralReturnable,
       isRepaid,
-      outstandingAmount,
       principalNumDecimals
     } = loanDetails;
 
@@ -271,7 +269,6 @@ class Detail extends Component {
       isCollateralSeizable,
       creditorAddress,
       debtorAddress,
-      outstandingAmount,
       collateralReturnable,
       isCollateralSeized,
       isCollateralReturned
@@ -312,7 +309,7 @@ class Detail extends Component {
   async getDetailData(isRefreshOnly = false) {
     const { id, dharma, currentMetamaskAccount } = this.props;
     const { isMetaMaskAuthRised } = this.state;
-    const { Investment, Debt } = Dharma.Types;
+    const { Investment } = Dharma.Types;
     let userTimezone = moment.tz.guess();
     let collateralReturnable = false;
     let isCollateralSeizable = false;
@@ -346,7 +343,6 @@ class Detail extends Component {
           loanRequestData.totalRepaidAmountNumber = valueRepaidAr.toNumber();
           loanRequestData.totalRepaidAmount = convertBigNumber(valueRepaidAr.toNumber(), principalNumDecimals);
 
-          const debt = await Debt.fetch(dharma, id);
           loanRequestData.outstandingAmount = await this.getOutstandingAmount(principalNumDecimals,totalExpectedRepayment);
           
           collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
@@ -538,7 +534,6 @@ class Detail extends Component {
     const { Debt } = Dharma.Types;
     const { dharma, id } = this.props;
     const { loanDetails, refreshWaitSeconds, refreshCycles } = this.state;
-    const { isRepaid } = loanDetails;
     this.setState({
       buttonLoading: true
     });
@@ -620,7 +615,7 @@ class Detail extends Component {
   async seizeCollateral(event, callback) {
     const { Investment } = Dharma.Types;
     const { dharma, id } = this.props;
-    const { loanDetails, refreshWaitUptoSeconds, refreshWaitSeconds, refreshCycles } = this.state;
+    const { loanDetails, refreshWaitSeconds, refreshCycles } = this.state;
     let alertMessage, alertMessageDisplay = '';
     this.setState({
       buttonLoading: true

@@ -10,7 +10,8 @@ class ModalMessage extends Component {
     }
     render() {
         const { isWeb3Enabled,currentLocation } = this.props;
-        let modalOpen = (!isWeb3Enabled && currentLocation != '' && currentLocation != 'login') ? true : false;
+        //let nonWeb3AllowedPath = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe","market"];
+        let modalOpen = (!isWeb3Enabled && currentLocation != '' && currentLocation.indexOf(currentLocation) == -1) ? true : false;
         return (
             <Modal open={modalOpen} center closeOnEsc={false} closeOnOverlayClick={false} showCloseIcon={false} onClose={this.onCloseModal}>
                 <div className="web3-header">

@@ -107,7 +107,7 @@ class Wallet extends Component {
   renderTokenBalances() {
 
     const { tokenlist } = this.state;
-    const { isTokenLoading,isTokenError } = this.props;
+    const { isTokenLoading } = this.props;
     let i = 0;
     if (isTokenLoading) {
       return <Loading />

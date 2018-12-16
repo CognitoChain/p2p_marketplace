@@ -40,9 +40,7 @@ class Login extends React.Component {
 
     render() {
         let { urlPath } = this.state;
-        let { isWeb3Enabled } = this.props;
         const authToken = auth.getToken();
-        console.log(authToken)
         let formTemplate = <LoginForm {...this.props} updateUrlPathProp={this.updateUrlPathProp} locationState={this.props.location.state} historyPush={this.props.history} />;
 
         if (urlPath == "register") {

@@ -153,7 +153,7 @@ class MyFundedLoans extends Component {
                     return (
                         <div className="text-center">
                             {buttonText != '' &&
-                                <a href='javascript:void(0)' target="_blank" className="btn cognito icon x-small seize-collateral-btn">{buttonText}</a>
+                                <a href='javascript:void(0)' rel="noopener noreferrer" target="_blank" className="btn cognito icon x-small seize-collateral-btn">{buttonText}</a>
                             }
                             {buttonText == '' &&
                                 <span>-</span>
