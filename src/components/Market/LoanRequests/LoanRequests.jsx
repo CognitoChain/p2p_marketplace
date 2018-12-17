@@ -240,11 +240,6 @@ class LoanRequests extends Component {
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    console.log(row)
-                    console.log(row.debtorEthAddress)
-                    console.log(row.currentMetamaskAccount)
-                    console.log(row.isMetaMaskAuthRised)
-
                     if (row.isMetaMaskAuthRised && row.debtorEthAddress != row.currentMetamaskAccount) {
                         return (
                             <div className="text-center">
