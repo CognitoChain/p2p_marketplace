@@ -75,79 +75,84 @@ class Header extends Component {
                     <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
                     <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
                 </div>
-              
-                <ul className="nav navbar-nav ml-auto d-xs-none">
 
-                        <li className="nav-item">
-                            {
-                                wrongMetamaskNetwork === true && (
-                                    <CustomAlertMsg
-                                        bsStyle='danger'
-                                        extraClass="d-inline-block header-notice mb-0"
-                                        title={wrongMetamskNetworkMsg}
-                                    />
-                                )
-                            }
-                            {
-                                isWeb3Enabled === false && (currentLocation == '' || currentLocation == 'login') && (
-                                    <CustomAlertMsg
-                                        bsStyle='danger'
-                                        extraClass="d-inline-block header-notice mb-0"
-                                        title="Your browser isn't Web3-enabled."
-                                    />
-                                )
-                            }
-                            {
-                                !_.isNull(authToken) && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
-                                    <button className="btn orange cognito d-inline-block small" onClick={() => { this.connectMetaMask() }}>Connect your MetaMask</button>
+                <ul className="nav navbar-nav ml-auto mr-10 d-xs-none">
 
-                                )
-                            }
-                            {
-                                !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
-                                    <label className="headerEthAddress">{currentMetamaskAccountDisplay}</label>
-                                )
-                            }
-                        </li>
-                    </ul>
+                    <li className="nav-item">
+                        {
+                            wrongMetamaskNetwork === true && (
+                                <CustomAlertMsg
+                                    bsStyle='danger'
+                                    extraClass="d-inline-block header-notice mb-0"
+                                    title={wrongMetamskNetworkMsg}
+                                />
+                            )
+                        }
+                        {
+                            isWeb3Enabled === false && (
+                                <CustomAlertMsg
+                                    bsStyle='danger'
+                                    extraClass="d-inline-block header-notice mb-0"
+                                    title="Your browser isn't Web3-enabled."
+                                />
+                            )
+                        }
+                        {
+                            !_.isNull(authToken) && wrongMetamaskNetwork == false && !isMetaMaskAuthRised && (
+                                <button className="btn orange cognito d-inline-block small" onClick={() => { this.connectMetaMask() }}>Connect your MetaMask</button>
 
-                    <ul className={"nav navbar-nav mr-0 " + ((!_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised)?"":"nav-message")}>
-                        <li className="nav-item dropdown mr-10">
-                            {
-                                !_.isNull(authToken) && (
-                                    <div>
-                                        <div className="nav-link nav-pill user-avatar btn btn-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                            <Avatar name={authUserInfo.email} size="30px" round={true} />
-                                        </div>
-                                        <div className="dropdown-menu dropdown-menu-right">
-                                            <div>
-                                                <div className="dropdown-header">
-                                                    <div className="media">
-                                                        <div className="media-body">
-                                                            <h5 className="mt-0 mb-0">Welcome</h5>
-                                                            <span>{authUserInfo.email}</span>
+                            )
+                        }
+                        {
+                            !_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised && (
+                                <label className="headerEthAddress">{currentMetamaskAccountDisplay}</label>
+                            )
+                        }
+                    </li>
+                </ul>
+                {
+                    (!_.isNull(authToken) || (_.isNull(authToken) && currentLocation != "login" && currentLocation != "")) && (
+
+
+                        <ul className={"nav navbar-nav mr-10 " + ((!_.isNull(authToken) && wrongMetamaskNetwork == false && isMetaMaskAuthRised) ? "" : "nav-message")}>
+                            <li className="nav-item dropdown mr-10">
+                                {
+                                    !_.isNull(authToken) && (
+                                        <div>
+                                            <div className="nav-link nav-pill user-avatar btn btn-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                                <Avatar name={authUserInfo.email} size="30px" round={true} />
+                                            </div>
+                                            <div className="dropdown-menu dropdown-menu-right">
+                                                <div>
+                                                    <div className="dropdown-header">
+                                                        <div className="media">
+                                                            <div className="media-body">
+                                                                <h5 className="mt-0 mb-0">Welcome</h5>
+                                                                <span>{authUserInfo.email}</span>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div className="dropdown-divider"></div>
+                                                    {
+                                                        authUserInfo.socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
+                                                    }
+                                                    <a className="dropdown-item" onClick={() => { this.props.logout() }} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                                 </div>
-                                                <div className="dropdown-divider"></div>
-                                                {
-                                                    authUserInfo.socialLogin == "no" && <Link className="dropdown-item" to="/change-password"><i className="text-info ti-settings"></i>Change Password</Link>
-                                                }
-                                                <a className="dropdown-item" onClick={() => { this.props.logout() }} href="javascript:void(0);"><i className="text-danger ti-unlock"></i>Logout</a>
                                             </div>
                                         </div>
-                                    </div>
-                                )
-                            }
-                            {
-                                _.isNull(authToken) && currentLocation != "login" && currentLocation != "" && (
-                                    <div className="header-links">
-                                        <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
-                                    </div>
-                                )
-                            }
-                        </li>
-                    </ul>
+                                    )
+                                }
+                                {
+                                    _.isNull(authToken) && currentLocation != "login" && currentLocation != "" && (
+                                        <div className="header-links">
+                                            <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
+                                        </div>
+                                    )
+                                }
+                            </li>
+                        </ul>
+                    )
+                }
             </nav>
         );
     }
