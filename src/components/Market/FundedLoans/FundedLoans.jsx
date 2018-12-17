@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -7,7 +6,7 @@ import _ from 'lodash';
 import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
-import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay,convertBigNumber } from "../../../utils/Util";
 import auth from '../../../utils/auth';
 import "./FundedLoans.css";
 const columns = [
@@ -16,8 +15,8 @@ const columns = [
         dataField: "createdAt",
         text: "Created Date",
         formatter: function (cell, row, rowIndex, formatExtraData) {
-            var date = moment(row.requestedAt).format("DD/MM/YYYY");
-            var time = moment(row.requestedAt).format("HH:mm:ss");
+            var date = moment(row.createdAt).format("DD/MM/YYYY");
+            var time = moment(row.createdAt).format("HH:mm:ss");
             return (
                 <div>
                     <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="loans-time-label">{time}</span></div>
@@ -32,24 +31,24 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-right">
-                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalTokenSymbol)}>{niceNumberDisplay(cell)}</span> <br />{row.principalTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalSymbol)}>{niceNumberDisplay(cell)}</span> <br />{row.principalSymbol}
                 </div>
             )
         }
     },
     {
-        dataField: "termDuration",
+        dataField: "termLengthAmount",
         text: "Term",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-center">
-                    <span className="number-highlight">{cell}</span> {row.termUnit}
+                    <span className="number-highlight">{cell}</span> {row.termLengthUnit}
                 </div>
             )
         }
     },
     {
-        dataField: "interestRate",
+        dataField: "interestRatePercent",
         text: "Interest Rate",
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
@@ -66,7 +65,7 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-right">
-                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralSymbol}
                 </div>
             )
         }
@@ -77,11 +76,11 @@ const columns = [
         isDummyField: true,
         text: "Total Repayment",
         formatter: function (cell, row, rowIndex, formatExtraData) {
-            let interest_amount = (row.principalAmount * row.interestRate) / 100;
+            let interest_amount = (row.principalAmount * row.interestRatePercent) / 100;
             let repayment_amount = row.principalAmount + interest_amount;
             return (
                 <div className="text-right">
-                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalTokenSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
+                    <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalSymbol}
                 </div>
             )
         }
@@ -93,7 +92,7 @@ const columns = [
         formatter: function (cell, row, rowIndex, formatExtraData) {
             return (
                 <div className="text-center">
-                    <span className="number-highlight">{amortizationUnitToFrequency(row.termUnit)}</span>
+                    <span className="number-highlight">{amortizationUnitToFrequency(row.termLengthUnit)}</span>
                 </div>
             )
         }
@@ -110,20 +109,10 @@ class FundedLoans extends Component {
             myFundedLoansIsMounted:true,
             isMounted:true 
         };
-        this.fundedLoansRequests = this.fundedLoansRequests.bind(this);
-        this.parseLoanRequest = this.parseLoanRequest.bind(this);
     }
-
-    /**
-     * When the component mounts, use the API to get all of the load requests from the relayer
-     * database, and parse those into LoanRequest objects using Dharma.js. Then, set the state of
-     * the current component to include those loan requests so that they can be rendered as a table.
-     *
-     * This function assumes that there is a database with Loan Request data, and that we have
-     * access to Dharma.js, which is connected to a blockchain.
-     */
     async componentDidMount() {
-        const { highlightRow} = this.props;
+        const { highlightRow,currentMetamaskAccount } = this.props;
+        const { isLoading,isMetaMaskAuthRised } = this.state;
         this.setState({
             highlightRow,
         });
@@ -133,7 +122,34 @@ class FundedLoans extends Component {
         const authToken = auth.getToken();
         api.setToken(authToken).get("loanRequests", { sort, order })
             .then(this.fundedLoansRequests)
-            .then(fundedLoansLists => {
+            .then(fundedLoansListsData => {
+                var fundedLoansLists = _.filter(fundedLoansListsData, { 'status': "FILLED" });
+
+                fundedLoansLists.map((investment) => {
+                    investment.principalNumDecimals = !_.isNull(investment.principalNumDecimals)?investment.principalNumDecimals:0;
+                    investment.collateralNumDecimals = !_.isNull(investment.collateralNumDecimals)?investment.collateralNumDecimals:0;
+                    investment.principalAmount = !_.isNull(investment.principalAmount)?convertBigNumber(investment.principalAmount,investment.principalNumDecimals):0;
+                    investment.principalSymbol = !_.isNull(investment.principalSymbol)?investment.principalSymbol:" - ";
+                    investment.collateralAmount = !_.isNull(investment.collateralAmount)?investment.collateralAmount:0;
+                    investment.collateralSymbol = !_.isNull(investment.collateralSymbol)?investment.collateralSymbol:" - ";
+                    investment.termLengthAmount = !_.isNull(investment.termLengthAmount)?investment.termLengthAmount:0;
+                    investment.termLengthUnit = !_.isNull(investment.termLengthUnit)?investment.termLengthUnit:" - ";
+                    investment.interestRatePercent = !_.isNull(investment.interestRatePercent)?investment.interestRatePercent:0;
+                    return {
+                        ...investment,
+                        principal: `${investment.principalAmount} ${investment.principalSymbol}`,
+                        collateral: `${investment.collateralAmount} ${investment.collateralSymbol}`,
+                        debtorEthAddress: investment.debtor,
+                        term: `${investment.termLengthAmount} ${investment.termLengthUnit}`,
+                        expiration: moment.unix(investment.expiresAt).fromNow(),
+                        requestedDate: moment(investment.createdAt).calendar(),
+                        authToken: authToken,
+                        isMetaMaskAuthRised:isMetaMaskAuthRised,
+                        currentMetamaskAccount:currentMetamaskAccount,
+                        repaidAmount: `${investment.repaidAmount} ${investment.principalSymbol}`,
+                        totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${investment.principalSymbol}`
+                    };
+                });
                 this.setState({ fundedLoansLists, isLoading: false });           
             }).catch((error) => {
                 if(error.status && error.status === 403){
@@ -151,69 +167,8 @@ class FundedLoans extends Component {
           isMounted: false                
         });
     }
-    
-    fundedLoansRequests(FundedData) {
-        var filteredFundedData = _.filter(FundedData, { 'status': "FILLED" });
-        return Promise.all(filteredFundedData.map(this.parseLoanRequest));
-    }
-
-    /**
-     * Given loan data that comes from the relayer database, `parseLoanRequest` uses Dharma.js to
-     * instantiate a `LoanRequest` type, which has access to more information about the loan. It
-     * then adds an id and requestedAt (both from the relayer database) to that object.
-     *
-     * @param datum
-     * @returns {Promise<any>}
-     */
-    parseLoanRequest(datum) {
-        const { dharma } = this.props;
-
-        const { LoanRequest } = Dharma.Types;
-
-        return new Promise((resolve) => {
-            LoanRequest.load(dharma, datum).then((loanRequest) => {
-                resolve({
-                    ...loanRequest.getTerms(),
-                    id: datum.id,
-                    requestedAt: datum.createdAt,
-                });
-            });
-        });
-    }
-
-    /**
-     * Returns an array of loan requests, which can be rendered in a table.
-     *
-     * For each `LoanRequest` object from Dharma.js, it adds two human-readable timestamps - one
-     * describing when the request was created, and one describing its expiration date.
-     */
-    getData() {
-        const { fundedLoansLists } = this.state;
-
-        if (!fundedLoansLists) {
-            return null;
-        }
-
-        return fundedLoansLists.map((investment) => {
-            return {
-                ...investment,
-                principal: `${investment.principalAmount} ${investment.principalTokenSymbol}`,
-                term: `${investment.termDuration} ${investment.termUnit}`,
-                collateral: `${investment.collateralAmount} ${investment.collateralTokenSymbol}`,
-                repaidAmount: `${investment.repaidAmount} ${investment.principalTokenSymbol}`,
-                totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${
-                    investment.principalTokenSymbol
-                    }`
-            };
-        });
-    }
-
-    
-
     render() {
-        const { highlightRow, isLoading } = this.state;
-
-        const data = this.getData();
+        const { highlightRow, isLoading,fundedLoansLists } = this.state;
 
         if (isLoading) {
             return <Loading />;
@@ -226,7 +181,7 @@ class FundedLoans extends Component {
         };
 
         const rowClasses = (row, rowIndex) => {
-            const rowData = data[rowIndex];
+            const rowData = fundedLoansLists[rowIndex];
 
             if (rowData.id === highlightRow) {
                 return "funded-loans-row1 highlight cursor-pointer";
@@ -240,7 +195,7 @@ class FundedLoans extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns: true
         });
-        if (data.length == 0) {
+        if (fundedLoansLists.length == 0) {
             return <FundedLoansEmpty />
         }
         return (
@@ -251,7 +206,7 @@ class FundedLoans extends Component {
                     keyField="id"
                     classes={"market-funded-request"}
                     columns={columns}
-                    data={data}
+                    data={fundedLoansLists}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={false}

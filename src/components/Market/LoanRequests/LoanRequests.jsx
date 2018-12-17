@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Dharma } from "@dharmaprotocol/dharma.js";
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
@@ -9,7 +8,7 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
 import Api from "../../../services/api";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
+import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay, convertBigNumber } from "../../../utils/Util";
 import auth from '../../../utils/auth';
 import "./LoanRequests.css";
 class LoanRequests extends Component {
@@ -23,10 +22,7 @@ class LoanRequests extends Component {
             isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
             isMounted:true  
         };
-        this.parseLoanRequests = this.parseLoanRequests.bind(this);
-        this.parseLoanRequest = this.parseLoanRequest.bind(this);
         this.toggle = this.toggle.bind(this);
-        /*this.openlink = this.openlink.bind(this);*/
     }
     async componentDidMount() {
         this.getLoanRequests();
@@ -54,8 +50,8 @@ class LoanRequests extends Component {
     }
 
     getLoanRequests() {
-        const { highlightRow } = this.props;
-        const { isLoading } = this.state;
+        const { highlightRow,currentMetamaskAccount } = this.props;
+        const { isLoading,isMetaMaskAuthRised } = this.state;
         this.setState({
             highlightRow,
         });
@@ -70,53 +66,39 @@ class LoanRequests extends Component {
 
         const authToken = auth.getToken();
         api.setToken(authToken).get("loanRequests", { sort, order })
-            .then(this.parseLoanRequests)
-            .then((loanRequests) => this.setState({ loanRequests, isLoading: false }))
+            .then((loanRequestData) => {
+                var loanRequests = _.filter(loanRequestData, { 'status': "OPEN" });
+            
+                loanRequests.map((request) => {
+                    request.principalNumDecimals = !_.isNull(request.principalNumDecimals)?request.principalNumDecimals:0;
+                    request.collateralNumDecimals = !_.isNull(request.collateralNumDecimals)?request.collateralNumDecimals:0;
+                    request.principalAmount = !_.isNull(request.principalAmount)?convertBigNumber(request.principalAmount,request.principalNumDecimals):0;
+                    request.principalSymbol = !_.isNull(request.principalSymbol)?request.principalSymbol:" - ";
+                    request.collateralAmount = !_.isNull(request.collateralAmount)?request.collateralAmount:0;
+                    request.collateralSymbol = !_.isNull(request.collateralSymbol)?request.collateralSymbol:" - ";
+                    request.termLengthAmount = !_.isNull(request.termLengthAmount)?request.termLengthAmount:0;
+                    request.termLengthUnit = !_.isNull(request.termLengthUnit)?request.termLengthUnit:" - ";
+                    request.interestRatePercent = !_.isNull(request.interestRatePercent)?request.interestRatePercent:0;
+                    return {
+                        ...request,
+                        principal: `${request.principalAmount} ${request.principalSymbol}`,
+                        collateral: `${request.collateralAmount} ${request.collateralSymbol}`,
+                        debtorEthAddress: request.debtor,
+                        term: `${request.termLengthAmount} ${request.termLengthUnit}`,
+                        expiration: moment.unix(request.expiresAt).fromNow(),
+                        requestedDate: moment(request.createdAt).calendar(),
+                        authToken: authToken,
+                        isMetaMaskAuthRised:isMetaMaskAuthRised,
+                        currentMetamaskAccount:currentMetamaskAccount
+                    };
+                });
+                this.setState({ loanRequests, isLoading: false })
+            })
             .catch((error) => {
                 if (error.status && error.status === 403) {
                     this.props.redirect(`/login/`);
                 }
             });
-    }
-
-    parseLoanRequests(loanRequestData) {
-        var filteredRequestData = _.filter(loanRequestData, { 'status': "OPEN" });
-        return Promise.all(filteredRequestData.map(this.parseLoanRequest));
-    }
-    parseLoanRequest(datum) {
-        const { dharma } = this.props;
-
-        const { LoanRequest } = Dharma.Types;
-
-        return new Promise((resolve) => {
-            LoanRequest.load(dharma, datum).then((loanRequest) => {
-                resolve({
-                    ...loanRequest.getTerms(),
-                    id: datum.id,
-                    requestedAt: datum.createdAt,
-                    status: datum.status,
-                    debtorEthAddress: datum.debtor
-                });
-            });
-        });
-    }
-    getData() {
-        const { loanRequests,isMetaMaskAuthRised } = this.state;
-        const { currentMetamaskAccount } = this.props;
-        const authToken = auth.getToken();
-        return loanRequests.map((request) => {
-            return {
-                ...request,
-                principal: `${request.principalAmount} ${request.principalTokenSymbol}`,
-                collateral: `${request.collateralAmount} ${request.collateralTokenSymbol}`,
-                term: `${request.termDuration} ${request.termUnit}`,
-                expiration: moment.unix(request.expiresAt).fromNow(),
-                requestedDate: moment(request.requestedAt).calendar(),
-                authToken: authToken,
-                isMetaMaskAuthRised:isMetaMaskAuthRised,
-                currentMetamaskAccount:currentMetamaskAccount
-            };
-        });
     }
     toggle() {
         this.setState({
@@ -145,9 +127,7 @@ class LoanRequests extends Component {
     }
     render() {
         let _self = this;
-        const { highlightRow, isLoading } = this.state;
-        const data = this.getData();
-
+        const { highlightRow, isLoading,loanRequests } = this.state;
         if (isLoading) {
             return <Loading />;
         }
@@ -159,7 +139,7 @@ class LoanRequests extends Component {
         };*/
 
         const rowClasses = (row, rowIndex) => {
-            const rowData = data[rowIndex];
+            const rowData = loanRequests[rowIndex];
 
             if (rowData.id === highlightRow) {
                 return "loan-request-row1 highlight";
@@ -173,8 +153,8 @@ class LoanRequests extends Component {
                 dataField: "createdAt",
                 text: "Created Date",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    var date = moment(row.requestedAt).format("DD/MM/YYYY");
-                    var time = moment(row.requestedAt).format("HH:mm:ss");
+                    var date = moment(row.createdAt).format("DD/MM/YYYY");
+                    var time = moment(row.createdAt).format("HH:mm:ss");
                     return (
                         <div>
                             <div className="text-left"><span className="number-highlight">{date}<br /></span><span className="loans-time-label">{time}</span></div>
@@ -189,24 +169,24 @@ class LoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.principalSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.principalSymbol}
                         </div>
                     )
                 },
             },
             {
-                dataField: "termDuration",
+                dataField: "termLengthAmount",
                 text: "Term",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-center">
-                            <span className="number-highlight">{cell}</span> {row.termUnit}
+                            <span className="number-highlight">{cell}</span> {row.termLengthUnit}
                         </div>
                     )
                 }
             },
             {
-                dataField: "interestRate",
+                dataField: "interestRatePercent",
                 text: "Interest Rate",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
@@ -223,7 +203,7 @@ class LoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-right">
-                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralTokenSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(cell,row.collateralSymbol)}>{niceNumberDisplay(cell)}</span><br />{row.collateralSymbol}
                         </div>
                     )
                 }
@@ -234,11 +214,11 @@ class LoanRequests extends Component {
                 isDummyField: true,
                 text: "Total Repayment",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
-                    let interest_amount = (row.principalAmount * row.interestRate) / 100;
+                    let interest_amount = (row.principalAmount * row.interestRatePercent) / 100;
                     let repayment_amount = row.principalAmount + interest_amount;
                     return (
                         <div className="text-right">
-                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalTokenSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalTokenSymbol}
+                            <span className="number-highlight custom-tooltip" tooltip-title={tooltipNumberDisplay(repayment_amount,row.principalSymbol)}>{niceNumberDisplay(repayment_amount)}</span><br />{row.principalSymbol}
                         </div>
                     )
                 }
@@ -250,7 +230,7 @@ class LoanRequests extends Component {
                 formatter: function (cell, row, rowIndex, formatExtraData) {
                     return (
                         <div className="text-center">
-                            <span className="number-highlight">{amortizationUnitToFrequency(row.termUnit)}</span>
+                            <span className="number-highlight">{amortizationUnitToFrequency(row.termLengthUnit)}</span>
                         </div>
                     )
                 }
@@ -282,7 +262,7 @@ class LoanRequests extends Component {
             /*showTotal:true,*/
             alwaysShowAllBtns: true
         });
-        if (data.length == 0) {
+        if (loanRequests.length == 0) {
             return <LoanRequestsEmpty />
         }
         return (
@@ -293,7 +273,7 @@ class LoanRequests extends Component {
                     keyField="id"
                     classes={"market-open-request"}
                     columns={columns}
-                    data={data}
+                    data={loanRequests}
                     headerClasses={"text-center"}
                     rowClasses={rowClasses}
                     bordered={false}
