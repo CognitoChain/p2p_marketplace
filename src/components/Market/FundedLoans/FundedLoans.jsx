@@ -125,7 +125,7 @@ class FundedLoans extends Component {
             .then(fundedLoansListsData => {
                 var fundedLoansLists = _.filter(fundedLoansListsData, { 'status': "FILLED" });
 
-                fundedLoansLists.map((investment) => {
+                fundedLoansLists = fundedLoansLists.map((investment) => {
                     investment.principalNumDecimals = !_.isNull(investment.principalNumDecimals)?investment.principalNumDecimals:0;
                     investment.collateralNumDecimals = !_.isNull(investment.collateralNumDecimals)?investment.collateralNumDecimals:0;
                     investment.principalAmount = !_.isNull(investment.principalAmount)?convertBigNumber(investment.principalAmount,investment.principalNumDecimals):0;

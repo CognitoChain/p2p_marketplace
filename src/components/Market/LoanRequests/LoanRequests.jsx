@@ -69,7 +69,7 @@ class LoanRequests extends Component {
             .then((loanRequestData) => {
                 var loanRequests = _.filter(loanRequestData, { 'status': "OPEN" });
             
-                loanRequests.map((request) => {
+                loanRequests = loanRequests.map((request) => {
                     request.principalNumDecimals = !_.isNull(request.principalNumDecimals)?request.principalNumDecimals:0;
                     request.collateralNumDecimals = !_.isNull(request.collateralNumDecimals)?request.collateralNumDecimals:0;
                     request.principalAmount = !_.isNull(request.principalAmount)?convertBigNumber(request.principalAmount,request.principalNumDecimals):0;
@@ -240,6 +240,11 @@ class LoanRequests extends Component {
                 isDummyField: true,
                 text: "Action",
                 formatter: function (cell, row, rowIndex, formatExtraData) {
+                    console.log(row)
+                    console.log(row.debtorEthAddress)
+                    console.log(row.currentMetamaskAccount)
+                    console.log(row.isMetaMaskAuthRised)
+
                     if (row.isMetaMaskAuthRised && row.debtorEthAddress != row.currentMetamaskAccount) {
                         return (
                             <div className="text-center">
