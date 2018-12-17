@@ -59,7 +59,8 @@ class CreateLoan extends Component {
             buttonLoading: false,
             userTokens: [],
             unlockError:false,
-            principalNumDecimals:0
+            principalNumDecimals:0,
+            collateralNumDecimals:0
         };
         this.toggleDropDown = this.toggleDropDown.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -92,6 +93,17 @@ class CreateLoan extends Component {
                 this.setUserTokens();
             })
         }
+    }
+    setNumDecimals(){
+        const { tokens } = this.props;
+        const { principalTokenSymbol,collateralTokenSymbol} =  this.state;
+        const principalToken = _.find(tokens, { 'symbol': principalTokenSymbol });
+        const collateralToken = _.find(tokens, { 'symbol': collateralTokenSymbol });
+        this.setState({
+            principalNumDecimals : principalToken.numDecimals,
+            collateralNumDecimals : collateralToken.numDecimals,
+        })
+
     }
     setUserTokens() {
         const { tokens } = this.props;
@@ -145,7 +157,7 @@ class CreateLoan extends Component {
         });
 
         const api = new Api();
-        let { LTVRatioValue,principalTokenSymbol,principalNumDecimals,collateral,collateralTokenSymbol,termLength,termUnit,interestRate } = this.state;
+        let { LTVRatioValue,principalTokenSymbol,principalNumDecimals,collateralNumDecimals,collateral,collateralTokenSymbol,termLength,termUnit,interestRate } = this.state;
         const authToken = auth.getToken();
         this.setState({ buttonLoading: true });
         if (this.isFormValid() && LTVRatioValue <= 60) {
@@ -160,6 +172,7 @@ class CreateLoan extends Component {
                     principalNumDecimals:principalNumDecimals,
                     collateralAmount:collateral,
                     collateralSymbol:collateralTokenSymbol,
+                    collateralNumDecimals:collateralNumDecimals,
                     termLengthAmount:termLength,
                     termLengthUnit:termUnit,
                     interestRatePercent:interestRate
@@ -357,17 +370,12 @@ class CreateLoan extends Component {
         const value = target.value;
         const name = target.name;
         
-        if (name === "principalTokenSymbol") {
-            const decimals = target.dataset.decimals;
-            this.setState({
-                principalNumDecimals: decimals
-            });
-        }
         if (name === "principal") {
             this.setRelayerFee(value);
         }
         this.setState({ [name]: value }, () => {
             if (name == "principal" || name == "collateral" || name === "collateralTokenSymbol" || name == "principalTokenSymbol") {
+                this.setNumDecimals()
                 this.countLtv(name);
             }
             if (name == "principal" || name == "interestRate") {
