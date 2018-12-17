@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardTitle, Row, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import DharmaConsumer from "../../contexts/Dharma/DharmaConsumer";
 import LoanRequests from "./LoanRequests/LoanRequests";
 import FundedLoans from "./FundedLoans/FundedLoans";
 import './Market.css';
@@ -100,17 +99,11 @@ class Market extends Component {
                                             <CardTitle>Open Requests</CardTitle>
                                         </div>
                                     </div>
-                                    <DharmaConsumer>
-                                        {(dharmaProps) => (
-                                            <LoanRequests
-                                                dharma={dharmaProps.dharma}
-                                                redirect={this.redirect}
-                                                highlightRow={highlightRow}
-                                                isTokenLoading={dharmaProps.isTokenLoading}
-                                                {...this.props}
-                                            />
-                                        )}
-                                    </DharmaConsumer>
+                                    <LoanRequests
+                                        redirect={this.redirect}
+                                        highlightRow={highlightRow}
+                                        {...this.props}
+                                    />
                                 </CardBody>
                             </Card>
                         </Col>
@@ -122,15 +115,10 @@ class Market extends Component {
                             <Card className="card-statistics h-100 p-3">
                                 <CardBody>
                                     <CardTitle>Recent Funded Loans</CardTitle>
-                                    <DharmaConsumer>
-                                        {(dharmaProps) => {
-                                            return <FundedLoans
-                                                dharma={dharmaProps.dharma}
-                                                redirect={this.redirect}
-                                                {...this.props}
-                                            />
-                                        }}
-                                    </DharmaConsumer>
+                                    <FundedLoans
+                                        redirect={this.redirect}
+                                        {...this.props}
+                                    />
                                 </CardBody>
                             </Card>
                         </Col>

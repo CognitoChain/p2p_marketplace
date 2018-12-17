@@ -38,7 +38,7 @@ export const niceNumberDisplay = (value, decimalPoint) => {
 }
 export const tooltipNumberDisplay = (value, symbol, action = "append") => {
   let finalNumber = '';
-  if(!_.isUndefined(value)){
+  if(!_.isUndefined(value) && !_.isNull(value)){
     let niceNumber = parseFloat(value);
     let numberAsString = value.toString();
     if(numberAsString.indexOf('.') === -1 || numberAsString.split(".")[1].length < 3) {
@@ -56,6 +56,9 @@ export const tooltipNumberDisplay = (value, symbol, action = "append") => {
     {
       finalNumber = niceNumber;
     }
+  }
+  else{
+    finalNumber = 0
   }
   return finalNumber;
 }
