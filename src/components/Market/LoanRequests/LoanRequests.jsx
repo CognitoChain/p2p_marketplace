@@ -6,99 +6,19 @@ import { confirmAlert } from 'react-confirm-alert';
 import _ from 'lodash';
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import Loading from "../../Loading/Loading";
-import Api from "../../../services/api";
 import LoanRequestsEmpty from "./LoanRequestsEmpty/LoanRequestsEmpty";
-import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay, convertBigNumber } from "../../../utils/Util";
+import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import auth from '../../../utils/auth';
 import "./LoanRequests.css";
 class LoanRequests extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loanRequests: [],
             highlightRow: null,
-            isLoading: true,
             modal: false,
-            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
-            isMounted:true  
+            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
         };
         this.toggle = this.toggle.bind(this);
-    }
-    async componentDidMount() {
-        this.getLoanRequests();
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.reloadDetails === true) {
-          this.props.updateReloadDetails();
-          this.setState({
-            isMetaMaskAuthRised: nextProps.isMetaMaskAuthRised
-          }, () => {
-            this.getLoanRequests();
-          });
-        }
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextState.isMounted;
-    }
-
-    componentWillUnmount() {
-        this.setState({
-          isMounted: false
-        });
-    }
-
-    getLoanRequests() {
-        const { highlightRow,currentMetamaskAccount } = this.props;
-        const { isLoading,isMetaMaskAuthRised } = this.state;
-        this.setState({
-            highlightRow,
-        });
-        const api = new Api();
-        const sort = "createdAt";
-        const order = "desc";
-
-        if(!isLoading)
-        {
-            this.setState({ isLoading: true });
-        }
-
-        const authToken = auth.getToken();
-        api.setToken(authToken).get("loanRequests", { sort, order })
-            .then((loanRequestData) => {
-                var loanRequests = _.filter(loanRequestData, { 'status': "OPEN" });
-            
-                loanRequests = loanRequests.map((request) => {
-                    request.principalNumDecimals = !_.isNull(request.principalNumDecimals)?request.principalNumDecimals:0;
-                    request.collateralNumDecimals = !_.isNull(request.collateralNumDecimals)?request.collateralNumDecimals:0;
-                    request.principalAmount = !_.isNull(request.principalAmount)?convertBigNumber(request.principalAmount,request.principalNumDecimals):0;
-                    request.principalSymbol = !_.isNull(request.principalSymbol)?request.principalSymbol:" - ";
-                    request.collateralAmount = !_.isNull(request.collateralAmount)?request.collateralAmount:0;
-                    request.collateralSymbol = !_.isNull(request.collateralSymbol)?request.collateralSymbol:" - ";
-                    request.termLengthAmount = !_.isNull(request.termLengthAmount)?request.termLengthAmount:0;
-                    request.termLengthUnit = !_.isNull(request.termLengthUnit)?request.termLengthUnit:" - ";
-                    request.interestRatePercent = !_.isNull(request.interestRatePercent)?request.interestRatePercent:0;
-                    return {
-                        ...request,
-                        principal: `${request.principalAmount} ${request.principalSymbol}`,
-                        collateral: `${request.collateralAmount} ${request.collateralSymbol}`,
-                        debtorEthAddress: request.debtor,
-                        term: `${request.termLengthAmount} ${request.termLengthUnit}`,
-                        expiration: moment.unix(request.expiresAt).fromNow(),
-                        requestedDate: moment(request.createdAt).calendar(),
-                        authToken: authToken,
-                        isMetaMaskAuthRised:isMetaMaskAuthRised,
-                        currentMetamaskAccount:currentMetamaskAccount
-                    };
-                });
-                this.setState({ loanRequests, isLoading: false })
-            })
-            .catch((error) => {
-                if (error.status && error.status === 403) {
-                    this.props.redirect(`/login/`);
-                }
-            });
     }
     toggle() {
         this.setState({
@@ -127,16 +47,11 @@ class LoanRequests extends Component {
     }
     render() {
         let _self = this;
-        const { highlightRow, isLoading,loanRequests } = this.state;
-        if (isLoading) {
+        const { highlightRow } = this.state;
+        const { isLoanRequestLoading,loanRequests } = this.props;
+        if (isLoanRequestLoading) {
             return <Loading />;
         }
-
-        /*const rowEvents = {
-            onClick: (e, row, rowIndex) => {
-                this.props.redirect(`/request/${row.id}`);
-            },
-        };*/
 
         const rowClasses = (row, rowIndex) => {
             const rowData = loanRequests[rowIndex];

@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import * as moment from "moment";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from 'react-bootstrap-table2-paginator';
-import _ from 'lodash';
 import Loading from "../../Loading/Loading";
-import Api from "../../../services/api";
 import FundedLoansEmpty from "./FundedLoansEmpty/FundedLoansEmpty";
-import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay,convertBigNumber } from "../../../utils/Util";
-import auth from '../../../utils/auth';
+import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 import "./FundedLoans.css";
 const columns = [
     {
@@ -103,74 +100,16 @@ class FundedLoans extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            fundedLoansLists: [],
             highlightRow: null,
-            isLoading: true,
             myFundedLoansIsMounted:true,
             isMounted:true 
         };
     }
-    async componentDidMount() {
-        const { highlightRow,currentMetamaskAccount } = this.props;
-        const { isLoading,isMetaMaskAuthRised } = this.state;
-        this.setState({
-            highlightRow,
-        });
-        const api = new Api();
-        const sort = "createdAt";
-        const order = "desc";
-        const authToken = auth.getToken();
-        api.setToken(authToken).get("loanRequests", { sort, order })
-            .then(this.fundedLoansRequests)
-            .then(fundedLoansListsData => {
-                var fundedLoansLists = _.filter(fundedLoansListsData, { 'status': "FILLED" });
-
-                fundedLoansLists = fundedLoansLists.map((investment) => {
-                    investment.principalNumDecimals = !_.isNull(investment.principalNumDecimals)?investment.principalNumDecimals:0;
-                    investment.collateralNumDecimals = !_.isNull(investment.collateralNumDecimals)?investment.collateralNumDecimals:0;
-                    investment.principalAmount = !_.isNull(investment.principalAmount)?convertBigNumber(investment.principalAmount,investment.principalNumDecimals):0;
-                    investment.principalSymbol = !_.isNull(investment.principalSymbol)?investment.principalSymbol:" - ";
-                    investment.collateralAmount = !_.isNull(investment.collateralAmount)?investment.collateralAmount:0;
-                    investment.collateralSymbol = !_.isNull(investment.collateralSymbol)?investment.collateralSymbol:" - ";
-                    investment.termLengthAmount = !_.isNull(investment.termLengthAmount)?investment.termLengthAmount:0;
-                    investment.termLengthUnit = !_.isNull(investment.termLengthUnit)?investment.termLengthUnit:" - ";
-                    investment.interestRatePercent = !_.isNull(investment.interestRatePercent)?investment.interestRatePercent:0;
-                    return {
-                        ...investment,
-                        principal: `${investment.principalAmount} ${investment.principalSymbol}`,
-                        collateral: `${investment.collateralAmount} ${investment.collateralSymbol}`,
-                        debtorEthAddress: investment.debtor,
-                        term: `${investment.termLengthAmount} ${investment.termLengthUnit}`,
-                        expiration: moment.unix(investment.expiresAt).fromNow(),
-                        requestedDate: moment(investment.createdAt).calendar(),
-                        authToken: authToken,
-                        isMetaMaskAuthRised:isMetaMaskAuthRised,
-                        currentMetamaskAccount:currentMetamaskAccount,
-                        repaidAmount: `${investment.repaidAmount} ${investment.principalSymbol}`,
-                        totalExpectedRepaymentAmount: `${investment.totalExpectedRepaymentAmount} ${investment.principalSymbol}`
-                    };
-                });
-                this.setState({ fundedLoansLists, isLoading: false });           
-            }).catch((error) => {
-                if(error.status && error.status === 403){
-                    this.props.redirect(`/login/`);
-                }
-            });
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextState.isMounted;
-    }
-
-    componentWillUnmount(){
-        this.setState({
-          isMounted: false                
-        });
-    }
     render() {
-        const { highlightRow, isLoading,fundedLoansLists } = this.state;
+        const { highlightRow } = this.state;
+        const { isFundedRequestLoading,fundedLoansLists } = this.props;
 
-        if (isLoading) {
+        if (isFundedRequestLoading) {
             return <Loading />;
         }
 
