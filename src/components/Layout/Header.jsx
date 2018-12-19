@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 import logoImg from "../../assets/images/logo.svg?v1";
+import logoMiniImg from "../../assets/images/mstile-70x70.png?v1";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import Avatar from 'react-avatar';
 import auth from '../../utils/auth';
@@ -73,11 +74,20 @@ class Header extends Component {
 
                 <div className="text-left navbar-brand-wrapper">
                     <Link className="navbar-brand brand-logo" to="/"><img src={logoImg} alt="" /></Link>
-                    <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoImg} alt="" /></Link>
+                    <Link className="navbar-brand brand-logo-mini" to="/"><img src={logoMiniImg} alt="" /></Link>
                 </div>
 
-                <ul className="nav navbar-nav ml-auto mr-10 d-xs-none">
+                {
+                    currentLocation != "login" && currentLocation != "" && (
+                        <ul className="nav navbar-nav mr-auto d-block d-sm-none">
+                            <li className="nav-item">
+                                <a className="button-toggle-nav inline-block ml-20 pull-left"  onClick={this.togglebutton} href="javascript:void(0);"  ><i className="zmdi zmdi-menu ti-align-right"></i></a>
+                            </li>
+                        </ul>
+                    )
+                }
 
+                <ul className="nav navbar-nav ml-auto mr-10 d-xs-none">
                     <li className="nav-item">
                         {
                             wrongMetamaskNetwork === true && (
@@ -143,7 +153,7 @@ class Header extends Component {
                                     )
                                 }
                                 {
-                                    _.isNull(authToken) && currentLocation != "login" && currentLocation != "" && (
+                                    _.isNull(authToken) && currentLocation != "login" && currentLocation != "register" && currentLocation != "" && (
                                         <div className="header-links">
                                             <Link to="/login" className="btn btn-link cognito">Login / Register</Link>
                                         </div>
