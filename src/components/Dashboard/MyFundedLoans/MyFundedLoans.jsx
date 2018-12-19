@@ -8,6 +8,7 @@ import Loading from "../../Loading/Loading";
 import MyFundedLoansRequestsEmpty from "./MyFundedLoansRequestsEmpty/MyFundedLoansRequestsEmpty";
 import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyFundedLoans.css";
+import PageErrorMessage from "../../General/Pageerror";
 class MyFundedLoans extends Component {
     constructor(props) {
         super(props);
@@ -24,9 +25,14 @@ class MyFundedLoans extends Component {
         });
     }
     render() {
-        const { myFundedRequests, myFundedLoading, currentMetamaskAccount,isMetaMaskAuthRised } = this.props;
-        if (myFundedLoading) {
+        const { myFundedRequests, myFundedLoading, currentMetamaskAccount,isMetaMaskAuthRised, fundedLoanPageErrorDisplay, fundedLoanPageErrorCode } = this.props;
+        if (myFundedLoading && !fundedLoanPageErrorDisplay) {
             return <Loading />;
+        }
+
+        if(fundedLoanPageErrorDisplay)
+        {
+            return <PageErrorMessage pageErrorMessageCode={fundedLoanPageErrorCode} smallsize={true} />;
         }
 
         const rowEvents = {

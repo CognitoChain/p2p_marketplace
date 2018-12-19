@@ -201,7 +201,7 @@ class Market extends Component {
     render() {
         const highlightRow = this.parseQueryParams();
         const { wrongMetamaskNetwork } = this.props;
-        const {loanRequests,isLoanRequestLoading,fundedLoansLists,isFundedRequestLoading} = this.state;
+        const {loanRequests,isLoanRequestLoading,fundedLoansLists,isFundedRequestLoading,pageErrorMessageDisplay,pageErrorMessageCode} = this.state;
         return (
             <div className="content-with-market-bg">
                 <div className="market-bg-image">
@@ -253,7 +253,14 @@ class Market extends Component {
                         </Col>
                     </Row>
                 </div>
-                {!wrongMetamaskNetwork &&
+
+                {
+                    pageErrorMessageDisplay && (
+                        <PageErrorMessage pageErrorMessageCode={pageErrorMessageCode} smallsize={true} />
+                    )
+                }
+
+                {!wrongMetamaskNetwork && !pageErrorMessageDisplay &&
                     <Row className="open-request-table">
 
                         <Col md={12} className="mb-30">
@@ -276,7 +283,7 @@ class Market extends Component {
                         </Col>
                     </Row>
                 }
-                {!wrongMetamaskNetwork &&
+                {!wrongMetamaskNetwork && !pageErrorMessageDisplay &&
                     <Row className="recent-funded-loans-table">
                         <Col md={12} className="mb-30">
                             <Card className="card-statistics h-100 p-3">

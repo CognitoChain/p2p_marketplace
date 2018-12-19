@@ -7,6 +7,7 @@ import Loading from "../../Loading/Loading";
 import MyLoanRequestsEmpty from "./MyLoanRequestsEmpty/MyLoanRequestsEmpty";
 import { amortizationUnitToFrequency,niceNumberDisplay,tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyLoanRequests.css";
+import PageErrorMessage from "../../General/Pageerror";
 class MyLoanRequests extends Component {
     constructor(props) {
         super(props);
@@ -31,10 +32,14 @@ class MyLoanRequests extends Component {
         );
     }
     render() {
-        const { myLoanRequests,myLoansLoading,currentMetamaskAccount,isMetaMaskAuthRised,cancelLoanRequest,cancelLoanButtonLoading } = this.props;
-        
-        if (myLoansLoading) {
+        const { myLoanRequests,myLoansLoading,currentMetamaskAccount,isMetaMaskAuthRised,cancelLoanRequest,cancelLoanButtonLoading,openLoanPageErrorDisplay,openLoanPageErrorCode } = this.props;
+        if (myLoansLoading && !openLoanPageErrorDisplay) {
             return <Loading/>;
+        }
+
+        if(openLoanPageErrorDisplay)
+        {
+            return <PageErrorMessage pageErrorMessageCode={openLoanPageErrorCode} smallsize={true} />;
         }
         
         const rowClasses = (row, rowIndex) => {

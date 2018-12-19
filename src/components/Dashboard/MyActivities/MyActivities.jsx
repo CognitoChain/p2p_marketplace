@@ -13,6 +13,7 @@ import { niceNumberDisplay,tooltipNumberDisplay,numberUsFormat } from "../../../
 import fundLoanImg from "../../../assets/images/fund_loan.png";
 import borrowLoanImg from "../../../assets/images/borrow.png";
 import "./MyActivities.css";
+import PageErrorMessage from "../../General/Pageerror";
 class MyActivities extends Component {
   constructor(props) {
     super(props);
@@ -280,7 +281,7 @@ class MyActivities extends Component {
 
   render() {
     const { loanRequestsActivities, investmentsActivities, metaMaskMsg } = this.state;
-    const { myFundedLoading, myBorrowedLoading } = this.props;
+    const { myFundedLoading, myBorrowedLoading, borrowedLoanPageErrorDisplay, fundedLoanPageErrorDisplay } = this.props;
     let isLoading = myBorrowedLoading || myFundedLoading;
     let activities = [];
     if (!isLoading) {
@@ -405,7 +406,7 @@ class MyActivities extends Component {
                   <Loading />
                 </Col>
               </Row>}
-            {!isLoading && activities.length == 0 && <MyActivitiesEmpty />}
+            {!isLoading && activities.length == 0 && !borrowedLoanPageErrorDisplay && !fundedLoanPageErrorDisplay && <MyActivitiesEmpty />}
             {
               metaMaskMsg &&
               <Row>
@@ -414,7 +415,14 @@ class MyActivities extends Component {
                 </Col>
               </Row>
             }
-            {!isLoading && activities.length > 0 && (
+
+            {
+              (borrowedLoanPageErrorDisplay || fundedLoanPageErrorDisplay) && (
+                  <PageErrorMessage smallsize={true} />
+              )
+            }
+
+            {!isLoading && activities.length > 0 && !borrowedLoanPageErrorDisplay && !fundedLoanPageErrorDisplay && (
               <div className="LoanRequests">
                 <BootstrapTable
                   hover={false}

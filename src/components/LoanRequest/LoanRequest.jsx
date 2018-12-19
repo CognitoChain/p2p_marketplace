@@ -11,6 +11,8 @@ import SummaryItem from "./SummaryItem/SummaryItem";
 import Error from "../Error/Error";
 import fundLoanImg from "../../assets/images/fund_loan.png";
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
+import PageErrorMessage from "../General/Pageerror";
+
 import {niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay, numberUsFormat} from "../../utils/Util";
 import auth from '../../utils/auth';
 import "./LoanRequest.css";
@@ -46,7 +48,9 @@ class LoanRequest extends Component {
             disableSubmitBtn: true,
             isBottomButtonLoading: true,
             unlockTokenButtonLoading:false,
-            buttonLoading:false
+            buttonLoading:false,
+            pageErrorMessageDisplay:false,
+            pageErrorMessageCode:''
         };
 
         // handlers
@@ -123,8 +127,15 @@ class LoanRequest extends Component {
                         collateralCurrentAmount: collateralCurrentAmount,
                         LTVRatioValue: LTVRatioValue
                     });
+            }); 
+            
+        }).catch((error) => {
+            if(error.status){
+                this.setState({
+                    pageErrorMessageDisplay: true,
+                    pageErrorMessageCode:error.status
                 });
-
+            }
         });
     }
 
@@ -342,7 +353,9 @@ class LoanRequest extends Component {
             disableSubmitBtn,
             isBottomButtonLoading,
             unlockTokenButtonLoading,
-            buttonLoading
+            buttonLoading,
+            pageErrorMessageDisplay,
+            pageErrorMessageCode
         } = this.state;
 
         let extraTitle = '';
@@ -371,10 +384,15 @@ class LoanRequest extends Component {
                     </Row>
                 </div>
                 {
-                    (!loanRequest || hasSufficientAllowance === null) && <LoadingFull />
+                    ((!loanRequest || hasSufficientAllowance === null) && !pageErrorMessageDisplay) && <LoadingFull />
                 }
                 {
-                    (loanRequest && hasSufficientAllowance != null) &&
+                    pageErrorMessageDisplay && (
+                        <PageErrorMessage pageErrorMessageCode={pageErrorMessageCode} />
+                    )
+                }
+                {
+                    (loanRequest && hasSufficientAllowance != null && !pageErrorMessageDisplay) &&
                     <div>
                         <Row>
                             <Col lg={6} md={6} sm={6} xl={4} className="mb-30">

@@ -1,0 +1,13 @@
+.page-error-msg .alert-info {
+	background-color:#E4FDF9 !important;
+	border:none !important;
+}
+.page-error-text{
+	font-size: 30px;
+}
+.small-size-page-error-text{
+	font-size: 18px;
+}
+.page-error-msg h3{
+	margin-bottom: 0 !important;
+}

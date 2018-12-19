@@ -16,6 +16,7 @@ import { niceNumberDisplay, convertBigNumber, getTransactionReceipt, numberUsFor
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
 import auth from '../../utils/auth';
 import "./Detail.css";
+import PageErrorMessage from "../General/Pageerror";
 class Detail extends Component {
   constructor(props) {
     super(props);
@@ -55,7 +56,9 @@ class Detail extends Component {
       isMounted:true,
       refreshWaitUptoSeconds:refreshWaitUptoSeconds,
       refreshWaitSeconds:refreshWaitSeconds,
-      refreshCycles:refreshCycles
+      refreshCycles:refreshCycles,
+      pageErrorMessageDisplay:false,
+      pageErrorMessageCode:''
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -374,6 +377,13 @@ class Detail extends Component {
           }, () => {
             this.buttonOperations();
           })
+        }
+      }).catch((error) => {
+        if(error.status){
+            this.setState({
+                pageErrorMessageDisplay: true,
+                pageErrorMessageCode:error.status
+            });
         }
       });
   }
@@ -703,7 +713,9 @@ class Detail extends Component {
       isLoading,
       loanScheduleDisplay,
       alertMessageDisplay,
-      alertMessage
+      alertMessage,
+      pageErrorMessageDisplay,
+      pageErrorMessageCode
     } = this.state;
     return (
       <div>
@@ -726,7 +738,12 @@ class Detail extends Component {
           </Row>
         </div>
         {
-          isLoading && <LoadingFull />
+          isLoading && !pageErrorMessageDisplay && <LoadingFull />
+        }
+        {
+          pageErrorMessageDisplay && (
+              <PageErrorMessage pageErrorMessageCode={pageErrorMessageCode} />
+          )
         }
         {
           !isLoading &&

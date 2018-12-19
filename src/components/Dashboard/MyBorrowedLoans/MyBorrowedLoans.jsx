@@ -8,6 +8,7 @@ import Loading from "../../Loading/Loading";
 import MyBorrowedLoansRequestsEmpty from "./MyBorrowedLoansRequestsEmpty/MyBorrowedLoansRequestsEmpty";
 import { amortizationUnitToFrequency, niceNumberDisplay, tooltipNumberDisplay } from "../../../utils/Util";
 import "./MyBorrowedLoans.css";
+import PageErrorMessage from "../../General/Pageerror";
 class MyBorrowedLoans extends Component {
     constructor(props) {
         super(props);
@@ -32,10 +33,16 @@ class MyBorrowedLoans extends Component {
         );
     }
     render() {
-        const { myBorrowedRequests, myBorrowedLoading, currentMetamaskAccount,isMetaMaskAuthRised} = this.props;
-        if (myBorrowedLoading) {
+        const { myBorrowedRequests, myBorrowedLoading, currentMetamaskAccount, isMetaMaskAuthRised, borrowedLoanPageErrorDisplay, borrowedLoanPageErrorCode} = this.props;
+        if (myBorrowedLoading && !borrowedLoanPageErrorDisplay) {
             return <Loading />;
         }
+
+        if(borrowedLoanPageErrorDisplay)
+        {
+          return <PageErrorMessage pageErrorMessageCode={borrowedLoanPageErrorCode} smallsize={true} />;  
+        }
+
         const rowEvents = {
             onClick: (e, row, rowIndex) => {
                 this.props.redirect(`/detail/${row.id}`);

@@ -17,6 +17,7 @@ import auth from '../../utils/auth';
 
 import './Dashboard.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import PageErrorMessage from "../General/Pageerror";
 
 class Dashboard extends Component {
 
@@ -40,7 +41,13 @@ class Dashboard extends Component {
             myBorrowRequestProcessed:false,
             myFundedRequestProcessed:false,
             isMetaMaskAuthRised: this.props.isMetaMaskAuthRised,
-            isMounted:true  
+            isMounted:true,
+            borrowedLoanPageErrorDisplay:false,
+            borrowedLoanPageErrorCode:'',
+            fundedLoanPageErrorDisplay:false,
+            fundedLoanPageErrorCode:'',
+            openLoanPageErrorDisplay:false,
+            openLoanPageErrorCode:''  
         };
         this.parseMyLoanRequests = this.parseMyLoanRequests.bind(this);
         this.parseLoanRequest = this.parseLoanRequest.bind(this);
@@ -73,6 +80,7 @@ class Dashboard extends Component {
               this.setPriceFeedData();
               this.getBorrowedLoanRequests();
               this.getFundedLoanRequests();
+              this.getMyLoanRequests();
               this.getETHbalance()
             });
           }
@@ -134,9 +142,13 @@ class Dashboard extends Component {
                 this.setState({ myBorrowedRequests, myBorrowedLoading: false });
             })
             .catch((error) => {
-                // if (error.status && error.status === 403) {
-                //     this.props.redirect(`/login/`);
-                // }
+                if (error) {
+                    this.setState({
+                        borrowedLoanPageErrorDisplay: true,
+                        borrowedLoanPageErrorCode:error.status,
+                        myBorrowedLoading:false
+                    });
+                }
             });
     }
 
@@ -156,8 +168,12 @@ class Dashboard extends Component {
                 this.setState({ myFundedRequests, myFundedLoading: false });
             })
             .catch((error) => {
-                if (error.status && error.status === 403) {
-                    this.props.redirect(`/login/`);
+                if (error) {
+                    this.setState({
+                        fundedLoanPageErrorDisplay: true,
+                        fundedLoanPageErrorCode:error.status,
+                        myFundedLoading:false
+                    });
                 }
             });
     }
@@ -174,8 +190,11 @@ class Dashboard extends Component {
                 this.setState({ myLoanRequests, myLoansLoading: false });
             })
             .catch((error) => {
-                if (error.status && error.status === 403) {
-                    this.props.redirect(`/login/`);
+                if (error) {
+                    this.setState({
+                        openLoanPageErrorDisplay: true,
+                        openLoanPageErrorCode:error.status
+                    });
                 }
             });
     }
@@ -323,7 +342,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { isMetaMaskAuthRised } = this.state;
+        const { isMetaMaskAuthRised, borrowedLoanPageErrorDisplay, borrowedLoanPageErrorCode, fundedLoanPageErrorDisplay, fundedLoanPageErrorCode, openLoanPageErrorDisplay, openLoanPageErrorCode } = this.state;
         const { wrongMetamaskNetwork } = this.props;
         return (
             <div>
