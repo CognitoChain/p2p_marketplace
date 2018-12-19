@@ -9,8 +9,8 @@
 }
 .market-bg-content h5{
 	color: #3298DE!important;
-    font-weight: 600;
-    font-size: 24px;
+	font-weight: 600;
+	font-size: 24px;
 }
 .market-bg-content .how-it-works h5,.market-bg-content .how-it-works p,.market-bg-content .how-it-works h6{
 	color: #dee2e6!important;
@@ -18,7 +18,7 @@
 }
 .market-bg-content .how-it-works h6{
 	color:#fff!important;
-    font-weight: 600;
+	font-weight: 600;
 }
 .market-bg-feature{
 	font-size: 1.8em!important;
@@ -36,7 +36,7 @@
 	width:100%;
 	z-index: 0;
 	background-position: center;
-    background-size: cover;
+	background-size: cover;
 }
 .bg-overlay {
 	background: rgba(0, 0, 0, 0.8);
@@ -55,9 +55,9 @@
 	text-align: left !important; 
 }
 .filter-disabled{
-  opacity: .4;
-  cursor: default !important;
-  pointer-events: none;
+	opacity: .4;
+	cursor: default !important;
+	pointer-events: none;
 }
 .step-container{
 	border:1px solid #959698 !important;
@@ -68,4 +68,17 @@
 }
 .title-text{
 	opacity: .70;
+}
+
+@media screen and (min-width: 320px) and (max-width: 480px){
+	.content-with-market-bg{
+		padding-top: 0px !important;
+	}
+	.admin-header.navbar .navbar-brand-wrapper {
+		width: 85px !important;
+	}    
+	.admin-header .navbar-nav{
+		margin-left:15px !important;
+		margin-bottom:0px !important;
+	}
 }

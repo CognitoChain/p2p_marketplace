@@ -204,7 +204,7 @@ class Market extends Component {
         const {loanRequests,isLoanRequestLoading,fundedLoansLists,isFundedRequestLoading,pageErrorMessageDisplay,pageErrorMessageCode} = this.state;
         return (
             <div className="content-with-market-bg">
-                <div className="market-bg-image">
+                <div className="market-bg-image d-none d-sm-block">
                     <div className="image" style={{ backgroundImage: "url('assets/images/loans.jpg')" }}></div>
                     <div className="bg-overlay"></div>
                     <div className="market-bg-content">
@@ -244,11 +244,11 @@ class Market extends Component {
 
                 <div className="page-title">
                     <Row>
-                        <Col sm={6}>
+                        <Col sm={6} xs={6}>
                             <h4 className="mb-0"> Market</h4>
                             <div className='delete-button' onClick={(item) => { if (window.confirm('Are you sure you wish to delete this item?')) this.onCancel(item) }} />
                         </Col>
-                        <Col sm={6} className="pull-right text-right">
+                        <Col sm={6} xs={6} className="pull-right text-right">
                             <Link to="/create"><span className="btn cognito orange small icon mb-15 btn-market-borrow"><img src="assets/images/borrow.png" height="20" alt="Borrow" /> Borrow</span></Link>
                         </Col>
                     </Row>
