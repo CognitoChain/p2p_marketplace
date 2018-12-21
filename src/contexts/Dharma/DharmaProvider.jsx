@@ -37,7 +37,8 @@ const dharma = new Dharma(getWeb3Provider());
 let wrongMetamaskNetwork = false;
 const isWeb3Enabled = window.web3;
 const networkId = isWeb3Enabled ? window.web3.version.network : null;
-
+let tokenFetchRetries = 0;
+let maxFetchReries = 5;
 class DharmaProvider extends Component {
     constructor(props) {
         super(props);
@@ -122,26 +123,44 @@ class DharmaProvider extends Component {
         }
         const { Token } = Dharma.Types;
         let tokens = [];
+        let isTokenFetchFailed = false;
+        let tokenFetchError = '';
         try {
             await dharma.blockchain.getAccounts().then(async (accounts) => {
                 const owner = accounts[0];
                 if (!_.isUndefined(owner)) {
                     try {
+                        tokenFetchRetries = 0;
+                        isTokenFetchFailed = false;
                         await Token.all(dharma, owner).then((tokenData) => {
                             tokens = tokenData;
                         });
                     } catch (e) {
                         console.log(e)
+                        isTokenFetchFailed = true;
+                        tokenFetchError = e;
                     }
 
                 }
             });
         } catch (e) {
             console.log(e)
+
+            isTokenFetchFailed = true;
+            tokenFetchError = e;
         }
         this.setState({
             tokens,
             isTokenLoading: false
+        },()=>{
+            if(isTokenFetchFailed){
+                tokenFetchRetries++;
+                console.log("Retry - " + tokenFetchRetries + " max - "+maxFetchReries)
+                console.log(tokenFetchError);
+                if(tokenFetchRetries <= maxFetchReries){   
+                    this.getUserTokens();
+                }
+            }
         });
     }
     render() {
