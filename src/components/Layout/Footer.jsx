@@ -1,11 +1,11 @@
 import React,{Component} from 'react';
 import { Row, Col} from 'reactstrap';
-
+import CookieConsentBlock from './CookieConsentBlock';
 class Footer extends Component{
     render(){
         return(
             //<!--================================= footer -->
-         
+        <div> 
         <footer className="bg-white mt-20 p-4 footer-container">
                <Row>
                 <Col md={6}>
@@ -24,7 +24,8 @@ class Footer extends Component{
                     </Col>
                 </Row>
         </footer>
-      
+        <CookieConsentBlock/>
+        </div>
         
         );
     }
