@@ -226,18 +226,17 @@ class Detail extends Component {
           nextRepaymentAmount = repaymentAmount = convertBigNumber(nextRepaymentAmount,principalNumDecimals);
           nextRepaymentDate = moment(new Date(nextRepaymentTimestamp), "DD/MM/YYYY", true).format("DD/MM/YYYY");
         }
-
-        this.setState({
-          nextRepaymentAmount,
-          repaymentAmount,
-          overViewBackgroundClass,
-          overViewButtonBackgroundClass,
-          nextRepaymentDate,
-          lastExpectedRepaidAmount,
-          repaymentLoans: repaymentLoanstemp,
-          isLoading:false
-        })
       }
+      this.setState({
+        nextRepaymentAmount,
+        repaymentAmount,
+        overViewBackgroundClass,
+        overViewButtonBackgroundClass,
+        nextRepaymentDate,
+        lastExpectedRepaidAmount,
+        repaymentLoans: repaymentLoanstemp,
+        isLoading:false
+      })
     }
   }
   getTxnHistory() {
