@@ -155,9 +155,9 @@ class DharmaProvider extends Component {
         },()=>{
             if(isTokenFetchFailed){
                 tokenFetchRetries++;
-                console.log("Retry - " + tokenFetchRetries + " max - "+maxFetchReries)
-                console.log(tokenFetchError);
                 if(tokenFetchRetries <= maxFetchReries){   
+                    console.log("Retry - " + tokenFetchRetries + " max - "+maxFetchReries)
+                    console.log(tokenFetchError);
                     this.getUserTokens();
                 }
             }
