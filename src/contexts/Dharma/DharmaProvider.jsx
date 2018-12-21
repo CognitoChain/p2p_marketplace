@@ -130,13 +130,14 @@ class DharmaProvider extends Component {
                 const owner = accounts[0];
                 if (!_.isUndefined(owner)) {
                     try {
-                        tokenFetchRetries = 0;
+                        
                         isTokenFetchFailed = false;
                         await Token.all(dharma, owner).then((tokenData) => {
+                            tokenFetchRetries = 0;
                             tokens = tokenData;
                         });
                     } catch (e) {
-                        console.log(e)
+                        //console.log(e)
                         isTokenFetchFailed = true;
                         tokenFetchError = e;
                     }
@@ -144,8 +145,7 @@ class DharmaProvider extends Component {
                 }
             });
         } catch (e) {
-            console.log(e)
-
+            //console.log(e)
             isTokenFetchFailed = true;
             tokenFetchError = e;
         }
