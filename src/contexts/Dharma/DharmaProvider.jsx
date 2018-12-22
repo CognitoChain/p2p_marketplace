@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Dharma, Web3 } from "@dharmaprotocol/dharma.js";
 import DharmaContext from "./DharmaContext";
 import _ from "lodash";
+import tokensList from '../../tokens.json';
 
 // Get the host from the current environment. If it is not specified, we will assume we
 // are running a testnet or production build and use Metamask.
@@ -37,15 +38,15 @@ const dharma = new Dharma(getWeb3Provider());
 let wrongMetamaskNetwork = false;
 const isWeb3Enabled = window.web3;
 const networkId = isWeb3Enabled ? window.web3.version.network : null;
-let tokenFetchRetries = 0;
-let maxFetchReries = 5;
 class DharmaProvider extends Component {
     constructor(props) {
         super(props);
+        this.interval = '';
         this.state = {
             // The tokens that the user has in their wallet.
             tokens: [],
             isTokenLoading: true,
+            isAllTokensChecked:false,
             dharma: null,
             // The tokens available for lending on Dharma Protocol.
             supportedTokens: [],
@@ -62,9 +63,16 @@ class DharmaProvider extends Component {
             if (!wrongMetamaskNetwork) {
                 this.getUserTokens();
                 //this.getSupportedTokens();
-
+                this.interval = setInterval(() => {
+                    if (this.state.isTokenLoading) {
+                        this.getUserTokens()
+                    }
+                }, 5000);
             }
         }
+    }
+    componentWillUnmount() {
+        clearInterval(this.interval);
     }
     getSupportedTokens() {
         if (!dharma || wrongMetamaskNetwork) {
@@ -103,9 +111,6 @@ class DharmaProvider extends Component {
         if (_.isUndefined(flag)) {
             tokens = [];
         }
-        if (isTokenLoading) {
-            return true;
-        }
         this.setState({
             tokens,
             isTokenLoading: true
@@ -123,44 +128,33 @@ class DharmaProvider extends Component {
         }
         const { Token } = Dharma.Types;
         let tokens = [];
-        let isTokenFetchFailed = false;
-        let tokenFetchError = '';
-        try {
-            await dharma.blockchain.getAccounts().then(async (accounts) => {
-                const owner = accounts[0];
-                if (!_.isUndefined(owner)) {
-                    try {
-                        
-                        isTokenFetchFailed = false;
-                        await Token.all(dharma, owner).then((tokenData) => {
-                            tokenFetchRetries = 0;
-                            tokens = tokenData;
-                        });
-                    } catch (e) {
-                        //console.log(e)
-                        isTokenFetchFailed = true;
-                        tokenFetchError = e;
-                    }
+        await dharma.blockchain.getAccounts().then(async (accounts) => {
+            const owner = accounts[0];
+            if (!_.isUndefined(owner)) {
+                tokens = await Promise.all(
+                    await tokensList.map(async (tokenSymbol) => {
+                        console.log(tokenSymbol)
+                        try {
+                            const token = await Token.getDataForSymbol(dharma, tokenSymbol, owner)
+                            console.log(token)
+                            return token;
+                        }
+                        catch (e) {
+                            console.log("e")
+                            console.log(e)
+                        }
 
-                }
-            });
-        } catch (e) {
-            //console.log(e)
-            isTokenFetchFailed = true;
-            tokenFetchError = e;
-        }
+                    }),
+                );
+                _.compact(tokens);
+                console.log("tokens")
+                console.log(tokens)
+            }
+        });
+
         this.setState({
             tokens,
             isTokenLoading: false
-        },()=>{
-            if(isTokenFetchFailed){
-                tokenFetchRetries++;
-                if(tokenFetchRetries <= maxFetchReries){   
-                    console.log("Retry - " + tokenFetchRetries + " max - "+maxFetchReries)
-                    console.log(tokenFetchError);
-                    this.getUserTokens();
-                }
-            }
         });
     }
     render() {
