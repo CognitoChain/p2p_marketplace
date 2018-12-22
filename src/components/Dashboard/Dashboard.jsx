@@ -17,7 +17,6 @@ import auth from '../../utils/auth';
 
 import './Dashboard.css';
 import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
-import PageErrorMessage from "../General/Pageerror";
 
 class Dashboard extends Component {
 
@@ -342,7 +341,7 @@ class Dashboard extends Component {
         const myBorrowedRequests = this.getBorrowedData();
         const myFundedRequests = this.getMyFundedData();
         const myLoanRequests = this.getMyLoansData();
-        const { isMetaMaskAuthRised, borrowedLoanPageErrorDisplay, borrowedLoanPageErrorCode, fundedLoanPageErrorDisplay, fundedLoanPageErrorCode, openLoanPageErrorDisplay, openLoanPageErrorCode } = this.state;
+        const { isMetaMaskAuthRised } = this.state;
         const { wrongMetamaskNetwork } = this.props;
         return (
             <div>
