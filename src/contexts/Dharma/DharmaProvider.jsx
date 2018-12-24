@@ -106,7 +106,7 @@ class DharmaProvider extends Component {
             });
             return;
         }
-        let { isTokenLoading, tokens } = this.state;
+        let { tokens } = this.state;
         // Assume the tokens are out of date.
         if (_.isUndefined(flag)) {
             tokens = [];
