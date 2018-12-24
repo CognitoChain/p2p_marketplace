@@ -19,7 +19,7 @@ class Base extends Component {
     }
     updateValue(value) {
         this.setState(prevState => ({
-            toggleactive: !prevState.toggleactive
+            toggleactive: value || !prevState.toggleactive
         }))
     }
     
@@ -41,7 +41,7 @@ class Base extends Component {
                 </DharmaConsumer>
                 <div className="container-fluid">
                     <div className="row">
-                        <Sidebar {...this.props} />
+                        <Sidebar {...this.props} updateParent={this.updateValue}/>
                         <div className="content-wrapper">
                             <div className="main-content-container">{this.props.children}</div>
                             <Footer />

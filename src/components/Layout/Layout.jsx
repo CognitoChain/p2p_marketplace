@@ -77,7 +77,11 @@ class Layout extends Component {
       isUserMetaMaskPermissionAsked: false,
       networkId: '',
       wrongMetamaskNetwork: false,
-      wrongMetamskNetworkMsg: ''      
+      wrongMetamskNetworkMsg: '',
+      windowWidth: 0,
+      windowHeight: 0,
+      isMobileSized: false
+
     };
     this.logout = this.logout.bind(this);
     this.updateMetamaskAccount = this.updateMetamaskAccount.bind(this);
@@ -110,11 +114,20 @@ class Layout extends Component {
   }
   componentDidMount() {
     this.checkNetworkId();
-    this.checkLogin()
+    this.checkLogin();
+    this.updateWindowDimensions();
+    window.addEventListener("resize", this.updateWindowDimensions);
   }
   componentWillUnmount() {
     clearInterval(loginCheckInterval)
     loginCheckInterval = false;
+    window.removeEventListener("resize", this.updateWindowDimensions);
+  }
+  updateWindowDimensions = () => {
+    const windowHeight = window.innerHeigh;
+    const windowWidth = window.innerWidth;
+    const isMobileSized = (window.innerWidth < 700) ? true : false;
+    this.setState({ windowWidth, windowHeight, isMobileSized });
   }
   componentDidUpdate() {
     // window.scroll({

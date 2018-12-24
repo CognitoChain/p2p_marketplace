@@ -1,14 +1,26 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import ScrollArea from 'react-scrollbar';
+import { withRouter } from 'react-router-dom';
 import './Header';
 import marketsidebarImg from "../../assets/images/menu-market.png";
 import walletsidebarImg from "../../assets/images/menu-wallet.png";
 import dashboardsidebarImg from "../../assets/images/menu-dashboard.png";
 class Sidebar extends Component {
-  getSelectedClass(linkName){
+  constructor(props) {
+    super(props);
+    this.redirectLocation = this.redirectLocation.bind(this);
+
+  }
+  getSelectedClass(linkName) {
     const { currentLocation } = this.props;
-    return ((linkName == currentLocation) || (linkName=="market" && (currentLocation=="/" || currentLocation=="")))?"active":"";
+    return ((linkName == currentLocation) || (linkName == "market" && (currentLocation == "/" || currentLocation == ""))) ? "active" : "";
+  }
+  redirectLocation(location) {
+    if(this.props.isMobileSized){
+      this.props.updateParent(false)
+    }
+    this.props.history.push(location);
+    return;
   }
   render() {
     return (
@@ -25,13 +37,13 @@ class Sidebar extends Component {
             <ul className="nav navbar-nav side-menu" id="sidebarnav">
               {/* <!-- menu item Dashboard--> */}
               <li className={this.getSelectedClass("market")}>
-                <Link to="/market"><img src={marketsidebarImg} alt="Market" height="25" /><span className="right-nav-text"> Market</span></Link>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("market")}><img src={marketsidebarImg} alt="Market" height="25" /><span className="right-nav-text"> Market</span></a>
               </li>
               <li className={this.getSelectedClass("dashboard")}>
-                <Link to="/dashboard"><img src={dashboardsidebarImg} alt="My Loans" height="25" /><span className="right-nav-text"> My Loans</span></Link>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("dashboard")}><img src={dashboardsidebarImg} alt="My Loans" height="25" /><span className="right-nav-text"> My Loans</span></a>
               </li>
               <li className={this.getSelectedClass("wallet")}>
-                <Link to="/wallet"><img src={walletsidebarImg} alt="My Wallet" height="25" /><span className="right-nav-text"> My Wallet</span></Link>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("wallet")}><img src={walletsidebarImg} alt="My Wallet" height="25" /><span className="right-nav-text"> My Wallet</span></a>
               </li>
             </ul>
           </div>
@@ -63,4 +75,4 @@ class Sidebar extends Component {
     );
   }
 }
-export default Sidebar;
+export default withRouter(Sidebar);
