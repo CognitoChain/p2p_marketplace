@@ -737,7 +737,7 @@ class Detail extends Component {
           </Row>
         </div>
         {
-          isLoading && !pageErrorMessageDisplay && <LoadingFull />
+          isLoading && !pageErrorMessageDisplay && <LoadingFull message="Retrieving realtime loan data from the blockchain, this might take a few seconds..."/>
         }
         {
           pageErrorMessageDisplay && (
