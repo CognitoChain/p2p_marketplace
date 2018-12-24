@@ -33,11 +33,7 @@ class Market extends Component {
 
 
     componentDidMount() {
-        const { isMetaMaskAuthRised } = this.props;
-        if(isMetaMaskAuthRised)
-        {
-            this.getLoanRequests();
-        }
+        this.getLoanRequests();
     }
     
     componentDidUpdate(prevProps){
