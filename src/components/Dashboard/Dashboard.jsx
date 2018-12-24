@@ -382,7 +382,7 @@ class Dashboard extends Component {
                                                 <div className="d-block w-100">
                                                     <CardTitle>My Loans</CardTitle>
                                                 </div>
-                                                <div className="d-block d-md-flex" style={{ position: 'absolute', left: 100, top: 0 }}>
+                                                <div className="d-block d-md-flex my-loans-tab" style={{ position: 'absolute', left: 100, top: 0 }}>
                                                     <Nav tabs>
                                                         <NavItem>
                                                             <NavLink
