@@ -37,13 +37,13 @@ class Sidebar extends Component {
             <ul className="nav navbar-nav side-menu" id="sidebarnav">
               {/* <!-- menu item Dashboard--> */}
               <li className={this.getSelectedClass("market")}>
-                <a href="javascript:void(0)" onClick={() => this.redirectLocation("market")}><img src={marketsidebarImg} alt="Market" height="25" /><span className="right-nav-text"> Market</span></a>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("/market")}><img src={marketsidebarImg} alt="Market" height="25" /><span className="right-nav-text"> Market</span></a>
               </li>
               <li className={this.getSelectedClass("dashboard")}>
-                <a href="javascript:void(0)" onClick={() => this.redirectLocation("dashboard")}><img src={dashboardsidebarImg} alt="My Loans" height="25" /><span className="right-nav-text"> My Loans</span></a>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("/dashboard")}><img src={dashboardsidebarImg} alt="My Loans" height="25" /><span className="right-nav-text"> My Loans</span></a>
               </li>
               <li className={this.getSelectedClass("wallet")}>
-                <a href="javascript:void(0)" onClick={() => this.redirectLocation("wallet")}><img src={walletsidebarImg} alt="My Wallet" height="25" /><span className="right-nav-text"> My Wallet</span></a>
+                <a href="javascript:void(0)" onClick={() => this.redirectLocation("/wallet")}><img src={walletsidebarImg} alt="My Wallet" height="25" /><span className="right-nav-text"> My Wallet</span></a>
               </li>
             </ul>
           </div>
