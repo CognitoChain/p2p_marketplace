@@ -16,8 +16,8 @@ import Switch from "react-switch";
 import Loading from "../Loading/Loading";
 import walletLogos from '../../utils/WalletLogo';
 import CustomAlertMsg from "../CustomAlertMsg/CustomAlertMsg";
-import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
 import "./Wallet.css";
+import MetamaskError from "../General/MetaMaskError";
 import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "../../utils/Util";
 class Wallet extends Component {
   constructor(props) {
@@ -248,19 +248,7 @@ class Wallet extends Component {
             </Col>
           </Row>
         }
-
-        {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
-          <div>
-            <Row className="mb-30">
-              <Col md={3}></Col>
-              <Col md={6}>
-                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Connection Error" />
-              </Col>
-              <Col md={3}></Col>
-            </Row>
-          </div>
-        }
-
+        <MetamaskError wrongMetamaskNetwork={wrongMetamaskNetwork} isMetaMaskAuthRised={isMetaMaskAuthRised} />
       </div>
     );
   }

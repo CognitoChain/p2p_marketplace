@@ -16,7 +16,7 @@ import auth from '../../utils/auth';
 // import priceFeedData from '../../priceFeed.json';
 
 import './Dashboard.css';
-import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import MetamaskError from "../General/MetaMaskError";
 
 class Dashboard extends Component {
 
@@ -446,20 +446,7 @@ class Dashboard extends Component {
                         </Row>
                     </div>
                 }
-
-                {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
-                    <div>
-                        <Row className="mb-30">
-                            <Col md={3}></Col>
-                            <Col md={6}>
-                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error"/>
-                            </Col>
-                            <Col md={3}></Col>
-                        </Row>
-                    </div>
-                }
-
-
+                <MetamaskError wrongMetamaskNetwork={wrongMetamaskNetwork} isMetaMaskAuthRised={isMetaMaskAuthRised} />
             </div>
         );
     }

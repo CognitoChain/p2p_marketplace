@@ -7,7 +7,7 @@ import Api from "../../services/api";
 import LoanRequests from "./LoanRequests/LoanRequests";
 import FundedLoans from "./FundedLoans/FundedLoans";
 import './Market.css';
-import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import MetamaskError from "../General/MetaMaskError";
 import { convertBigNumber } from "../../utils/Util";
 import auth from '../../utils/auth';
 import PageErrorMessage from "../General/Pageerror";
@@ -296,17 +296,8 @@ class Market extends Component {
                         </Col>
                     </Row>
                 }
-                {wrongMetamaskNetwork &&
-                    <div>
-                        <Row className="mb-30">
-                            <Col md={3}></Col>
-                            <Col md={6}>
-                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Connection Error" />
-                            </Col>
-                            <Col md={3}></Col>
-                        </Row>
-                    </div>
-                }
+                <MetamaskError wrongMetamaskNetwork={wrongMetamaskNetwork} isMetaMaskAuthRised={true} />
+
             </div>
 
         );

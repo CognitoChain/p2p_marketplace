@@ -17,7 +17,7 @@ import { niceNumberDisplay, getTransactionReceipt, tooltipNumberDisplay } from "
 import auth from '../../utils/auth';
 import borrowImg from "../../assets/images/borrow.png";
 import './CreateLoan.css';
-import metamaskConnectionErrorImg from "../../assets/images/metamask_connection_error.png";
+import MetamaskError from "../General/MetaMaskError";
 import ReactGA from 'react-ga';
 
 class CreateLoan extends Component {
@@ -777,19 +777,7 @@ class CreateLoan extends Component {
                         }
                     </div>
                 }
-
-                {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
-                    <div>
-                        <Row className="mb-30">
-                            <Col md={3}></Col>
-                            <Col md={6}>
-                                <img src={metamaskConnectionErrorImg} className="img-fluid" alt="Metamask Error" />
-                            </Col>
-                            <Col md={3}></Col>
-                        </Row>
-                    </div>
-                }
-
+                <MetamaskError wrongMetamaskNetwork={wrongMetamaskNetwork} isMetaMaskAuthRised={isMetaMaskAuthRised} />
             </div>
         );
     }
