@@ -21,10 +21,12 @@ import MetamaskError from "../General/MetaMaskError";
 class Detail extends Component {
   constructor(props) {
     super(props);
+    this.interval = '';
+    this.attempts = 1;
+    this.maxAttemps = 5;
     let refreshWaitUptoSeconds = 30;
     let refreshWaitSeconds = 3;
     let refreshCycles = Math.ceil(refreshWaitUptoSeconds / refreshWaitSeconds);
-
     this.state = {
       widths: 80,
       loanDetails: {},
@@ -59,7 +61,7 @@ class Detail extends Component {
       refreshWaitSeconds: refreshWaitSeconds,
       refreshCycles: refreshCycles,
       pageErrorMessageDisplay: false,
-      pageErrorMessageCode: ''
+      pageErrorMessageCode: ''      
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -74,6 +76,17 @@ class Detail extends Component {
     this.getPriceFeeds();
     await this.getDetailData();
   }
+
+  componentDidMount() {
+    this.interval = setInterval(() => {
+        if (this.state.isLoading && this.attempts <= this.maxAttemps) {
+          console.log("this.attempts "+this.attempts);
+          this.attempts++;  
+          this.getDetailData();
+        }
+    }, 20000);
+  }
+
   componentDidUpdate(prevProps) {
 
     if (prevProps.reloadDetails != this.props.reloadDetails && this.props.reloadDetails == true) {
@@ -93,6 +106,7 @@ class Detail extends Component {
     this.setState({
       isMounted: false
     });
+    clearInterval(this.interval);
   }
   async getScheduledata() {
     const { dharma } = this.props;
@@ -319,6 +333,12 @@ class Detail extends Component {
     if (!isRefreshOnly) {
       this.setState({ isLoading: true });
     }
+
+    if(isRefreshOnly)
+    {
+      this.attempts = 0;
+    }
+
     return api
       .setToken(authToken)
       .get(`loan/${id}`)
@@ -337,33 +357,52 @@ class Detail extends Component {
           loanRequestData.collateralAmount = convertBigNumber(collateralAmount, collateralNumDecimals);
           loanRequestData.totalRepaymentAmount = convertBigNumber(totalExpectedRepayment, principalNumDecimals);
 
+          console.log("Get value repaid started "+moment());
           const valueRepaidAr = await dharma.servicing.getValueRepaid(
             id
           );
+          console.log("Get value repaid ended "+moment());
           loanRequestData.totalRepaidAmountNumber = valueRepaidAr.toNumber();
           loanRequestData.totalRepaidAmount = convertBigNumber(valueRepaidAr.toNumber(), principalNumDecimals);
 
+          console.log("Get outstanding amount started "+moment());
           loanRequestData.outstandingAmount = await this.getOutstandingAmount(principalNumDecimals, totalExpectedRepayment);
+          console.log("Get outstanding amount ended "+moment());
 
+          console.log("Get collateral returnable status started "+moment());
           collateralReturnable = await dharma.adapters.collateralizedSimpleInterestLoan.canReturnCollateral(
             id
           );
+          console.log("Get collateral returnable status ended "+moment());
           loanRequestData.collateralReturnable = collateralReturnable;
 
+          console.log("Get collateral seizable status started "+moment());
           isCollateralSeizable = await dharma.adapters.collateralizedSimpleInterestLoan.canSeizeCollateral(
             id
           );;
+          console.log("Get collateral seizable status ends "+moment());
           loanRequestData.isCollateralSeizable = isCollateralSeizable;
+
+          console.log("Get collateral seized status started "+moment());
           isCollateralSeized = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralSeized(
             id
           );
+          console.log("Get collateral seized status ended "+moment());
+
           loanRequestData.isCollateralSeized = isCollateralSeized;
+
+          console.log("Get collateral returned status started "+moment());
           let isCollateralReturned = await dharma.adapters.collateralizedSimpleInterestLoan.isCollateralReturned(
             id
           );
+          console.log("Get collateral returned status ended "+moment());
+
           loanRequestData.isCollateralReturned = isCollateralReturned;
+          console.log("Get loan repaid status "+moment());
           const investment = await Investment.fetch(dharma, id);
           loanRequestData.isRepaid = await investment.isRepaid();
+          console.log("Get loan repaid status ends "+moment());
+
           this.setState({
             userTimezone,
             loanDetails: loanRequestData,
