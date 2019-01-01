@@ -1,7 +1,7 @@
 import { Dharma } from "@dharmaprotocol/dharma.js";
 import React, { Component } from "react";
 import { Link } from 'react-router-dom';
-import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
+import { Row, Col, Breadcrumb, BreadcrumbItem, Alert } from "reactstrap";
 import * as moment from "moment-timezone";
 import _ from "lodash";
 import { toast } from 'react-toastify';
@@ -22,7 +22,7 @@ class Detail extends Component {
   constructor(props) {
     super(props);
     this.interval = '';
-    this.attempts = 1;
+    this.attempts = 0;
     this.maxAttemps = 5;
     let refreshWaitUptoSeconds = 30;
     let refreshWaitSeconds = 3;
@@ -61,7 +61,8 @@ class Detail extends Component {
       refreshWaitSeconds: refreshWaitSeconds,
       refreshCycles: refreshCycles,
       pageErrorMessageDisplay: false,
-      pageErrorMessageCode: ''      
+      pageErrorMessageCode: '',
+      reloadBtnDisplay:false      
     };
     this.handleInputChange = this.handleInputChange.bind(this);
     this.processRepayment = this.processRepayment.bind(this);
@@ -70,7 +71,7 @@ class Detail extends Component {
     this.unblockCollateral = this.unblockCollateral.bind(this);
     this.onCloseModal = this.onCloseModal.bind(this);
     this.unlockToken = this.unlockToken.bind(this);
-
+    this.reloadLoanDetails = this.reloadLoanDetails.bind(this);
   }
   async componentWillMount() {
     this.getPriceFeeds();
@@ -79,10 +80,16 @@ class Detail extends Component {
 
   componentDidMount() {
     this.interval = setInterval(() => {
-        if (this.state.isLoading && this.attempts <= this.maxAttemps) {
-          console.log("this.attempts "+this.attempts);
+        if (this.state.isLoading && this.attempts < this.maxAttemps) {
+          console.log("Attempt => "+this.attempts);
           this.attempts++;  
           this.getDetailData();
+        }
+        else if(this.attempts == this.maxAttemps){
+          this.setState({
+            isLoading:false,
+            reloadBtnDisplay: true
+          });
         }
     }, 20000);
   }
@@ -442,6 +449,17 @@ class Detail extends Component {
       modalButtonLoading: false
     })
   }
+
+  reloadLoanDetails(){
+    this.setState({
+      isLoading:true,
+      reloadBtnDisplay: false
+    }, (async () => {
+        this.attempts = 0;
+        await this.getDetailData();
+    }));
+  }
+
   makeRepayment(event, callback) {
     this.setState({ modalOpen: true, buttonLoading: true, modalButtonLoading: true }, () => {
       this.checkTokenAllowance();
@@ -741,7 +759,8 @@ class Detail extends Component {
       alertMessage,
       pageErrorMessageDisplay,
       pageErrorMessageCode,
-      isMetaMaskAuthRised
+      isMetaMaskAuthRised,
+      reloadBtnDisplay
     } = this.state;
     const { wrongMetamaskNetwork } = this.props;
     return (
@@ -765,7 +784,7 @@ class Detail extends Component {
           </Row>
         </div>
         {
-          isLoading && !pageErrorMessageDisplay && isMetaMaskAuthRised && wrongMetamaskNetwork == false && <LoadingFull message="Retrieving realtime loan data from the blockchain, this might take a few seconds..." />
+          isLoading && !pageErrorMessageDisplay && !reloadBtnDisplay && isMetaMaskAuthRised && wrongMetamaskNetwork == false && <LoadingFull message="Retrieving realtime loan data from the blockchain, this might take a few seconds..." />
         }
         {
           pageErrorMessageDisplay && (
@@ -773,7 +792,24 @@ class Detail extends Component {
           )
         }
         {
-          !isLoading && isMetaMaskAuthRised && wrongMetamaskNetwork == false &&
+          reloadBtnDisplay && (
+            <Col lg={12} md={12} sm={12} xl={12} className="loan-success-msg">
+                <Alert color="danger" className="p-5">
+                    <h3 className="alert-heading  text-center">
+                        <i className="fa fa-cross"></i>  
+                        <span className="loan-created-success-text">Unable to get loan data. Please try again.</span>
+                    </h3>
+                    <div className="text-center mt-10">
+                        <button className="btn seize-collateral-btn cognito small icon mb-15 mr-10 " onClick={this.reloadLoanDetails}>
+                            Reload Loan Details
+                        </button>
+                    </div>
+                </Alert>
+            </Col>
+          )
+        }
+        {
+          !isLoading && !reloadBtnDisplay && isMetaMaskAuthRised && wrongMetamaskNetwork == false &&
           <div>
             {
               alertMessageDisplay != '' && <Row className="mb-30">
