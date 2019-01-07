@@ -15,8 +15,7 @@ class LoanRequests extends Component {
         super(props);
         this.state = {
             highlightRow: null,
-            modal: false,
-            isMetaMaskAuthRised: this.props.isMetaMaskAuthRised
+            modal: false
         };
         this.toggle = this.toggle.bind(this);
     }

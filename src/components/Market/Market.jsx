@@ -18,6 +18,7 @@ class Market extends Component {
             loanRequests: [],
             fundedLoansLists:[],
             isLoanRequestLoading:true,
+            isMetaMaskAuthRised:this.props.isMetaMaskAuthRised,
             isFundedRequestLoading:true,
             isMounted:true,
             pageErrorMessageDisplay:false,
