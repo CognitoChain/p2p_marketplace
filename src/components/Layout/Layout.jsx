@@ -275,12 +275,7 @@ class Layout extends Component {
   }
   renderHomeRoute() {
     return (
-      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateReloadDetails={this.updateReloadDetails}  updateMetaMaskLoading={this.updateMetaMaskLoading}>
-        <Route exact={true} path='/'
-          render={() =>
-            <Login {...this.props} {...this.state} urlpath={currentLocation} checkLogin={this.checkLogin} />
-          }
-        />
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateReloadDetails={this.updateReloadDetails} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <Route exact={true} path='/privacy'
           render={() =>
             <Privacy {...this.props} {...this.state} />
@@ -297,37 +292,80 @@ class Layout extends Component {
           }
         />
         <Route exact={true} path='/disclaimer'
-               render={() =>
-                   <Disclaimer {...this.props} {...this.state} />
-               }
+          render={() =>
+            <Disclaimer {...this.props} {...this.state} />
+          }
         />
         <Route exact={true} path='/cookie-policy'
-               render={() =>
-                   <CookiePolicy {...this.props} {...this.state} />
-               }
+          render={() =>
+            <CookiePolicy {...this.props} {...this.state} />
+          }
         />
         <Route exact={true} path='/faq'
-               render={() =>
-                   <Faq {...this.props} {...this.state} />
-               }
+          render={() =>
+            <Faq {...this.props} {...this.state} />
+          }
         />
       </Basepages>
     )
+  }
+  renderMainPage() {
+    const authToken = auth.getToken();
+    if (_.isNull(authToken)) {
+      return (
+        <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateReloadDetails={this.updateReloadDetails} updateMetaMaskLoading={this.updateMetaMaskLoading}>
+          <Route exact={true} path='/'
+            render={() =>
+              <Login {...this.props} {...this.state} urlpath={currentLocation} checkLogin={this.checkLogin} />
+            } />
+        </Basepages>
+      )
+    }else{
+      return (
+        <Base metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading} updateReloadDetails={this.updateReloadDetails}  {...this.state}>
+          <Route exact={true} path='/'
+            render={() =>
+              <Market {...this.props} {...this.state} updateReloadDetails={this.updateReloadDetails} />
+            } />
+        </Base>
+      )
+    }
   }
   render() {
     const urlString = this.props.location.pathname.substr(1);
     const urlStringArr = urlString.split("/");
     currentLocation = urlStringArr[0];
     let path = ["login", "register", "email-verify", "forgot", "password-reset", "email-unsubscribe"];
-    let homeRoutes = ["privacy","gdpr", "terms", "disclaimer", "cookie-policy","faq"];
-    return (
-      <div>
-        {path.indexOf(currentLocation) > -1 && this.renderAuthenticationRoute()}
-        {(currentLocation == '' || homeRoutes.indexOf(currentLocation) > -1) && this.renderHomeRoute()}
-        {path.indexOf(currentLocation) === -1 && currentLocation != '' && homeRoutes.indexOf(currentLocation) == -1 && this.renderAuthenitcatedRoute()}
-      </div>
-    )
-
+    let homeRoutes = ["privacy", "gdpr", "terms", "disclaimer", "cookie-policy", "faq"];
+    if(currentLocation == ''){
+      return (
+        <div>
+          {this.renderMainPage()}
+        </div>
+      )
+    }
+    else if(currentLocation != '' && homeRoutes.indexOf(currentLocation) > -1 ){
+      return (
+        <div>
+          {this.renderHomeRoute()}
+        </div>
+      )
+    }
+    else if(currentLocation != '' && path.indexOf(currentLocation) > -1 ){
+      return (
+        <div>
+          {this.renderAuthenticationRoute()}
+        </div>
+      )
+    }
+    
+    else{
+      return (
+        <div>
+          {this.renderAuthenitcatedRoute()}
+        </div>
+      )
+    }
   }
 }
 export default withRouter(Layout);
