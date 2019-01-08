@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { DropdownToggle, DropdownMenu, DropdownItem, InputGroup, Input, InputGroupButtonDropdown, InputGroupAddon} from 'reactstrap';
 
 const TIME_UNITS = [
-    {
-        label: "Hours",
-        value: "hours",
-    },
+    // {
+    //     label: "Hours",
+    //     value: "hours",
+    // },
     {
         label: "Days",
         value: "days",
