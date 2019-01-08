@@ -133,22 +133,22 @@ class DharmaProvider extends Component {
             if (!_.isUndefined(owner)) {
                 tokens = await Promise.all(
                     await tokensList.map(async (tokenSymbol) => {
-                        console.log(tokenSymbol)
+                        //console.log(tokenSymbol)
                         try {
                             const token = await Token.getDataForSymbol(dharma, tokenSymbol, owner)
-                            console.log(token)
+                            //console.log(token)
                             return token;
                         }
                         catch (e) {
-                            console.log("e")
+                            //console.log("e")
                             console.log(e)
                         }
 
                     }),
                 );
                 _.compact(tokens);
-                console.log("tokens")
-                console.log(tokens)
+                //console.log("tokens")
+                //console.log(tokens)
             }
         });
 

@@ -8,9 +8,9 @@ class MetamaskError extends Component {
   render() {
 
     const { wrongMetamaskNetwork, isMetaMaskAuthRised } = this.props;
-    console.log("RederMessage")
-    console.log(wrongMetamaskNetwork)
-    console.log(isMetaMaskAuthRised)
+    // console.log("RederMessage")
+    // console.log(wrongMetamaskNetwork)
+    // console.log(isMetaMaskAuthRised)
     return (
       <div>
         {(wrongMetamaskNetwork == true || !isMetaMaskAuthRised) &&
