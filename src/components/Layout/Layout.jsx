@@ -37,7 +37,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     <div>
       <Route
         {...rest}
-        render={(props) => !_.isNull( authToken)
+        render={(props) => !_.isNull(authToken)
           ? <Component {...rest} {...props} />
           : <Redirect to={{ pathname: '/login', state: { from: props.location, message: messageLoginPage, messageClass } }} />}
       />
@@ -68,7 +68,7 @@ class Layout extends Component {
     }
     this.state = {
       currentMetamaskAccount: currentMetamaskAccount,
-      oldCurrentMetamaskAccount:'',
+      oldCurrentMetamaskAccount: '',
       reloadDetails: false,
       isModalMessageOpen: false,
       isWeb3Enabled,
@@ -143,7 +143,7 @@ class Layout extends Component {
   }
   updateReloadDetails() {
     this.setState({
-      reloadDetails:false
+      reloadDetails: false
     });
   }
   async updateMetamaskAccount(newMetamaskAccount, reloadDetails) {
@@ -151,7 +151,7 @@ class Layout extends Component {
     this.updateMetamaskAccountData(newMetamaskAccount)
   }
   async updateMetamaskAccountData(newMetamaskAccount) {
-    let { isUserMetaMaskPermission,currentMetamaskAccount } = this.state;
+    let { isUserMetaMaskPermission, currentMetamaskAccount } = this.state;
     if (newMetamaskAccount) {
       isUserMetaMaskPermission = true;
       localStorage.setItem('currentMetamaskAccount', newMetamaskAccount);
@@ -168,22 +168,22 @@ class Layout extends Component {
       localStorage.removeItem('currentMetamaskAccount');
     }
 
-    this.setState({ oldCurrentMetamaskAccount:currentMetamaskAccount,currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
+    this.setState({ oldCurrentMetamaskAccount: currentMetamaskAccount, currentMetamaskAccount: newMetamaskAccount, updateMetaMaskLoading: false, isUserMetaMaskPermission }, () => {
       this.updateMetaMaskAuthorized();
     });
   }
   updateMetaMaskAuthorized() {
-    const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked,oldCurrentMetamaskAccount,isMetaMaskAuthRised,currentMetamaskAccount } = this.state;
+    const { isUserMetaMaskPermission, isUserMetaMaskPermissionAsked, oldCurrentMetamaskAccount, isMetaMaskAuthRised, currentMetamaskAccount } = this.state;
     const isMetaMaskAuthRisedNew = (isUserMetaMaskPermission == true && isUserMetaMaskPermissionAsked == false);
     let reloadDetails = false;
-    if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew && currentMetamaskAccount!='') {
+    if (isMetaMaskAuthRised != isMetaMaskAuthRisedNew && currentMetamaskAccount != '') {
       reloadDetails = true
     }
-    else if (isMetaMaskAuthRised && oldCurrentMetamaskAccount != currentMetamaskAccount ) {
+    else if (isMetaMaskAuthRised && oldCurrentMetamaskAccount != currentMetamaskAccount) {
       reloadDetails = true
     }
     this.setState({
-      isMetaMaskAuthRised:isMetaMaskAuthRisedNew,
+      isMetaMaskAuthRised: isMetaMaskAuthRisedNew,
       reloadDetails
     })
   }
@@ -237,7 +237,7 @@ class Layout extends Component {
   }
   renderAuthenticationRoute() {
     return (
-      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateReloadDetails={this.updateReloadDetails}  updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
+      <Basepages {...this.state} metamaskPermission={this.metamaskPermission} logout={this.logout} currentLocation={currentLocation} updateReloadDetails={this.updateReloadDetails} updateMetamaskAccount={this.updateMetamaskAccount} updateMetaMaskLoading={this.updateMetaMaskLoading}>
         <PublicRoute {...this.state} path="/login" exact={true} component={Login} urlpath={currentLocation} checkLogin={this.checkLogin} />
         <PublicRoute {...this.state} path="/email-verify/" exact={true} component={Login} urlpath={currentLocation} />
         <PublicRoute {...this.state} path="/email-verify/:token" exact={true} component={Login} urlpath={currentLocation} />
@@ -260,8 +260,8 @@ class Layout extends Component {
             }
           />
           <PrivateRoute {...this.state} path='/dashboard' component={DashboardContainer} updateReloadDetails={this.updateReloadDetails} />
-          <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} updateReloadDetails={this.updateReloadDetails}/>
-          <PrivateRoute {...this.state} path="/create" component={Create} updateReloadDetails={this.updateReloadDetails}/>
+          <PrivateRoute {...this.state} path="/wallet" component={WalletContainer} updateReloadDetails={this.updateReloadDetails} />
+          <PrivateRoute {...this.state} path="/create" component={Create} updateReloadDetails={this.updateReloadDetails} />
           <PrivateRoute {...this.state} path="/request/:id" component={LoanRequestContainer} />
           <PrivateRoute {...this.state} path="/detail/:id" component={DetailContainer} updateReloadDetails={this.updateReloadDetails} />
           <PrivateRoute {...this.state} path="/success" component={Success} />
