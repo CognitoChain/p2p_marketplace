@@ -7,6 +7,10 @@ import auth from '../utils/auth';
 class LoanRequestContainer extends Component {
     constructor(props) {
         super(props);
+        this.interval = '';
+        this.attempts = 0;
+        this.maxAttemps = 5;
+        this.newTokenBalance = 0;
         this.onFillComplete = this.onFillComplete.bind(this);
     }
 
@@ -34,11 +38,22 @@ class LoanRequestContainer extends Component {
                             {...this.props}
                             dharma={ dharmaProps.dharma }
                             refreshTokens={dharmaProps.refreshTokens}
-                            onFillComplete={ async () => {
+                            onFillComplete={ async (principalTokenSymbol,currentTokenBalance) => {
                                 const currentAccount = await dharmaProps.dharma.blockchain.getCurrentAccount();
                                 await this.onFillComplete(id,currentAccount);
-                                await this.timeout(2000);
-                                dharmaProps.refreshTokens();
+                                
+                                this.interval = setInterval(async () => {
+                                    this.newTokenBalance = await dharmaProps.getTokenBalance(principalTokenSymbol);    
+                                    if (currentTokenBalance == this.newTokenBalance && this.attempts < this.maxAttemps) {
+                                      this.attempts++;  
+                                      console.log("Token Balance Update Attempt => "+this.attempts);
+                                    }
+                                    else if(currentTokenBalance != this.newTokenBalance || this.attempts == this.maxAttemps)
+                                    {
+                                        clearInterval(this.interval);
+                                        dharmaProps.refreshTokens();
+                                    }
+                                }, 5000);
                             } }
                         />
                     )

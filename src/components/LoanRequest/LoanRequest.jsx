@@ -50,7 +50,8 @@ class LoanRequest extends Component {
             unlockTokenButtonLoading:false,
             buttonLoading:false,
             pageErrorMessageDisplay:false,
-            pageErrorMessageCode:''
+            pageErrorMessageCode:'',
+            currentTokenBalance:0
         };
 
         // handlers
@@ -65,9 +66,9 @@ class LoanRequest extends Component {
     }
 
     componentWillMount() {
-        const { LoanRequest } = Dharma.Types;
+        const { Token, LoanRequest } = Dharma.Types;
 
-        const { dharma, id } = this.props;
+        const { dharma, id, currentMetamaskAccount } = this.props;
         const authToken = auth.getToken();
         const api = new Api();
         let LTVRatioValue = 0;
@@ -80,7 +81,7 @@ class LoanRequest extends Component {
                 this.reloadState();
             });
             var get_terms = loanRequest.getTerms();
-
+            const currentTokenData = await Token.getDataForSymbol(dharma, get_terms.principalTokenSymbol, currentMetamaskAccount);
             await api.setToken(authToken).get(`priceFeed`)
                 .then(async priceFeedData => {
                     let principalTokenSymbol = get_terms.principalTokenSymbol;
@@ -125,7 +126,8 @@ class LoanRequest extends Component {
                         interestAmount: interestAmount,
                         totalRepaymentAmount: totalReapaymentAmount,
                         collateralCurrentAmount: collateralCurrentAmount,
-                        LTVRatioValue: LTVRatioValue
+                        LTVRatioValue: LTVRatioValue,
+                        currentTokenBalance:currentTokenData.balance
                     });
             }); 
             
@@ -152,7 +154,7 @@ class LoanRequest extends Component {
             action: 'loan-request-fill'
         });
 
-        const { loanRequest, userLoanAgree } = this.state;
+        const { loanRequest, userLoanAgree, principalTokenSymbol, currentTokenBalance } = this.state;
         this.setState({buttonLoading: true});
         if (userLoanAgree === true) {
             try {
@@ -168,7 +170,7 @@ class LoanRequest extends Component {
                                 customAlertMsgClassname: 'fa fa-check fa-2x pull-left mr-2',
                                 customAlertMsgTitle: 'Loan request filled'
                             });
-                            this.props.onFillComplete();
+                            this.props.onFillComplete(principalTokenSymbol,currentTokenBalance);
                         }
                     });
             }

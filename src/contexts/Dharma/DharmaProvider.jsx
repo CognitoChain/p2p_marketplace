@@ -54,6 +54,7 @@ class DharmaProvider extends Component {
         };
 
         this.refreshUserTokens = this.refreshUserTokens.bind(this);
+        this.getTokenBalance = this.getTokenBalance.bind(this);
         this.getUserTokens = this.getUserTokens.bind(this);
     }
 
@@ -157,13 +158,37 @@ class DharmaProvider extends Component {
             isTokenLoading: false
         });
     }
+
+    async getTokenBalance(tokenSymbol = '') {
+        const { Token } = Dharma.Types;
+        return await dharma.blockchain.getAccounts().then(async (accounts) => {
+            const owner = accounts[0];
+            if (!_.isUndefined(owner) && tokenSymbol != '') {
+                try {
+                    const token = await Token.getDataForSymbol(dharma, tokenSymbol, owner);
+                    let tokenBalance = (token.balance > 0) ? token.balance : 0; 
+                    return tokenBalance;
+                }
+                catch (e) {
+                    console.log("e")
+                    console.log(e)
+                }
+            }
+            else
+            {
+                return false;
+            }
+        });
+    }
+
     render() {
         const dharmaProps = {
             dharma: dharma,
             tokens: this.state.tokens,
             isTokenLoading: this.state.isTokenLoading,
             supportedTokens: this.state.supportedTokens,
-            refreshTokens: this.refreshUserTokens
+            refreshTokens: this.refreshUserTokens,
+            getTokenBalance: this.getTokenBalance
         };
 
         return (
