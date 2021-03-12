@@ -53,7 +53,7 @@
         "react-bootstrap-table2-paginator": "^1.0.0",
         "react-chartjs-2": "^2.7.4",
         "react-confirm-alert": "^2.0.6",
-        "react-dev-utils": "^5.0.1",
+        "react-dev-utils": "^11.0.4",
         "react-dom": "^16.4.1",
         "react-facebook-login": "^4.1.0",
         "react-ga": "^2.5.6",
