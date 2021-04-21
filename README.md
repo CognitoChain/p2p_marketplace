@@ -4,12 +4,6 @@
 
 PoC of a Decentralized Peer 2 Peer lending platform
 
-
-# Cognito DHARMA Prototype
-Based on the Dharma Relayer kit:
-```
-https://github.com/dharmaprotocol/relayer-kit
-```
 # Install latest packages
 yarn install
 
@@ -66,9 +60,5 @@ https://kovan.etherscan.io/tx/0x49aeb2b7ec38fa81c9ce5acc005dabffff446566b0cbe4cc
 $ NETWORK=kovan PORT=8000 yarn server
 ```
 
-#  Access webapp in AWS
-```
-http://ec2-35-178-211-233.eu-west-2.compute.amazonaws.com
-```
 
 
